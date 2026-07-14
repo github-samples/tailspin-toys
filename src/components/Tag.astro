@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'span'>, 'color'> {
+    /** Color theme for the tag. */
+    color?: 'blue' | 'purple';
+}
+
+const { color = 'blue', class: className, ...rest } = Astro.props;
+
+const colors: Record<NonNullable<Props['color']>, string> = {
+    blue: 'bg-blue-900/60 text-blue-300',
+    purple: 'bg-purple-900/60 text-purple-300',
+};
+---
+
+<span class:list={['text-xs font-medium px-2.5 py-0.5 rounded', colors[color], className]} {...rest}>
+    <slot />
+</span>

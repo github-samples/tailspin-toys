@@ -1,0 +1,113 @@
+name: "Run tests"
+
+# Run tests on pull requests to main and on pushes to main
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel superseded in-progress runs for the same ref so rapid pushes don't
+# queue behind stale runs (saves runner time and gives faster feedback).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Keep CI runs quiet and reproducible.
+  ASTRO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  # Lint the frontend code with ESLint
+  frontend-lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: "./package-lock.json"
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      # Generate Astro's content/types so eslint sees the same types as the editor.
+      - name: Sync Astro types
+        run: npx astro sync
+
+      # Run ESLint to check code quality
+      - name: Run ESLint
+        run: npm run lint
+
+  # Run the Vitest unit tests (pure transforms + data-access helpers)
+  unit-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: "./package-lock.json"
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+  # Build the static site and run the Playwright end-to-end suite against it
+  frontend-tests:
+    runs-on: ubuntu-latest
+    # Run inside Playwright's official image so the browsers and their OS-level
+    # dependencies are preinstalled. This is the approach recommended by the
+    # Playwright CI docs (https://playwright.dev/docs/ci) and avoids the slow,
+    # network-variable `playwright install --with-deps` apt step on each run.
+    # The tag MUST match the @playwright/test version in package-lock.json
+    # so the bundled browsers resolve; bump it whenever Playwright is upgraded.
+    container: mcr.microsoft.com/playwright:v1.61.1-noble
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: "./package-lock.json"
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      # The Playwright config's webServer builds the static site (prebuild runs
+      # db:migrate + db:seed) and serves it via `astro preview` before the suite.
+      - name: Run Playwright e2e tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v5
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

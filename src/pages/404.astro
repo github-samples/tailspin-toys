@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Card from '../components/Card.astro';
+import Button from '../components/Button.astro';
+import ArrowLeft from '../assets/icons/arrow-left.svg';
+---
+
+<Layout title="Page Not Found - Tailspin Toys">
+  <div class="py-16">
+    <Card as="section" class="max-w-xl mx-auto text-center shadow-lg p-10" data-testid="not-found">
+      <p class="text-6xl font-bold text-blue-400 mb-4">404</p>
+      <h1 class="text-2xl font-semibold text-slate-100 mb-3" data-testid="not-found-heading">Page not found</h1>
+      <p class="text-slate-400 mb-8" data-testid="not-found-text">
+        We couldn&apos;t find the page you were looking for. It may have been removed or the link is incorrect.
+      </p>
+      <Button href="/" data-testid="not-found-home-link">
+        <ArrowLeft class="h-5 w-5 mr-2" aria-hidden="true" />
+        Back to all games
+      </Button>
+    </Card>
+  </div>
+</Layout>

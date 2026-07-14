@@ -1,0 +1,23 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "Tailspin Toys (Astro + Drizzle)",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"features": {
+		"ghcr.io/schlich/devcontainer-features/playwright:0": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"astro-build.astro-vscode",
+				"dbaeumer.vscode-eslint"
+			]
+		}
+	},
+	// Install Node dependencies, Playwright's Chromium browser, and set up the local SQLite database.
+	"postCreateCommand": "npm ci && npx playwright install --with-deps chromium && npm run db:setup",
+	// Astro dev/preview server.
+	"forwardPorts": [4321]
+}

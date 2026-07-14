@@ -1,0 +1,36 @@
+name: "Copilot Setup Steps"
+
+# Allows you to test the setup steps from your repository's "Actions" tab
+on: workflow_dispatch
+
+env:
+  ASTRO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    # Set the permissions to the lowest permissions possible needed for *your steps*. Copilot will be given its own token for its operations.
+    permissions:
+      # If you want to clone the repository as part of your setup steps, for example to install dependencies, you'll need the `contents: read` permission. If you don't clone the repository in your setup steps, Copilot will do this for you automatically after the steps complete.
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # Frontend / app setup - Node.js (the whole app is now Astro + Drizzle/libSQL)
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+          cache-dependency-path: "./package-lock.json"
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Migrate + seed the local SQLite database so builds and tests have data.
+      - name: Set up the database
+        run: npm run db:setup
