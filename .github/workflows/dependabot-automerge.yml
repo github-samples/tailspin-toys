@@ -1,9 +1,15 @@
 name: "Dependabot auto-merge"
 
 # Automatically enable auto-merge for Dependabot pull requests so they merge
-# once all required status checks (see `run-tests.yml`) pass on the PR.
+# once all required status checks (see the "Run tests" workflow) pass on the PR.
 # Auto-merge is enabled only for patch and minor updates; major updates are
 # intentionally left for manual review.
+#
+# This uses the `pull_request` trigger (not `pull_request_target`), matching
+# GitHub's documented auto-merge example. The `permissions:` block below
+# elevates the otherwise read-only Dependabot GITHUB_TOKEN for this workflow,
+# so `pull_request_target` (which runs with the base repo context and carries
+# extra security risk) is not needed.
 on:
   pull_request:
     branches: [main]
@@ -17,7 +23,7 @@ jobs:
   dependabot-automerge:
     runs-on: ubuntu-latest
     # Only run for PRs opened by Dependabot.
-    if: github.actor == 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
 
     steps:
       # Read structured metadata (update type, dependency names) about the

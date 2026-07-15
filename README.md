@@ -93,7 +93,7 @@ npm run typecheck:all    # both of the above
 Dependencies are kept current by Dependabot (`.github/dependabot.yml`), which opens weekly npm and devcontainer update PRs. The `.github/workflows/dependabot-automerge.yml` workflow enables GitHub's native auto-merge on Dependabot PRs for **patch and minor** updates, so they merge on their own once all required status checks pass. Major updates are intentionally left open for manual review.
 
 > [!NOTE]
-> Auto-merge relies on repository settings that live outside this repo's files: "Allow auto-merge" must be enabled, and `main` must have branch protection requiring the `run-tests.yml` checks (`frontend-lint`, `type-check`, `unit-tests`, `frontend-tests`). Branch protection is what guarantees a PR only merges on green CI.
+> Auto-merge relies on repository settings that live outside this repo's files: "Allow auto-merge" must be enabled, and `main` must have branch protection requiring the status checks from the **Run tests** workflow (the `frontend-lint`, `type-check`, `unit-tests`, and `frontend-tests` jobs). Branch protection is what guarantees a PR only merges on green CI.
 
 ## Copilot Agents & Skills
 
