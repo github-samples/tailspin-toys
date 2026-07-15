@@ -88,6 +88,13 @@ npm run typecheck:all    # both of the above
 > [!NOTE]
 > The native compiler is used only for type checking (`--noEmit`); the site is still built by `astro build` (Vite/esbuild). The classic `typescript` package stays on v6 until `typescript-eslint` and `@astrojs/check` support the native API (~TS 7.1); a Dependabot `ignore` in `.github/dependabot.yml` holds the classic `typescript@7` bump until then.
 
+## Dependency updates
+
+Dependencies are kept current by Dependabot (`.github/dependabot.yml`), which opens weekly npm and devcontainer update PRs. The `.github/workflows/dependabot-automerge.yml` workflow enables GitHub's native auto-merge on Dependabot PRs for **patch and minor** updates, so they merge on their own once all required status checks pass. Major updates are intentionally left open for manual review.
+
+> [!NOTE]
+> Auto-merge relies on repository settings that live outside this repo's files: "Allow auto-merge" must be enabled, and `main` must have branch protection requiring the `run-tests.yml` checks (`frontend-lint`, `type-check`, `unit-tests`, `frontend-tests`). Branch protection is what guarantees a PR only merges on green CI.
+
 ## Copilot Agents & Skills
 
 This project ships Copilot customizations to assist with quality assurance:
