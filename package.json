@@ -38,7 +38,7 @@
     "autoprefixer": "^10.5.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.6.0",
-    "eslint-plugin-astro": "^2.1.1",
+    "eslint-plugin-astro": "^3.0.0",
     "globals": "^17.7.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.1",
