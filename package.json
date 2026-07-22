@@ -35,7 +35,6 @@
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
-    "autoprefixer": "^10.5.3",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.7.0",
     "eslint-plugin-astro": "^3.0.0",
