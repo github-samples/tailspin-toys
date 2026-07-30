@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
 import { eq } from 'drizzle-orm';
 import { createDatabase, type Database } from '../src/lib/db';
 import { categories, games, publishers } from './schema';
@@ -73,7 +73,9 @@ export async function seedDatabase(db: Database, csvPath: string = join(here, 'g
 }
 
 // Allow running directly: `tsx db/seed.ts`
-if (import.meta.url === `file://${process.argv[1]}`) {
+// pathToFileURL normalises Windows backslashes and slash count, making the
+// comparison safe on all platforms when invoked via `tsx db/seed.ts`.
+if (import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
     const db = createDatabase();
     seedDatabase(db)
         .then(() => {
