@@ -2,6 +2,7 @@
 # Updates section configures how dependabot should handle dependency updates:
 # - Monitors NPM dependencies in the root directory
 # - Checks for updates weekly
+# - Applies a 7-day cooldown so newly published versions must age before being proposed
 # - Groups updates based on their type (dev grouped by minor/patch or prod grouped by patch)
 #
 # Learn more at https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#configuration-options-for-the-dependabotyml-file
@@ -11,6 +12,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Wait 7 days after a version is published before proposing it, so freshly
+    # released packages have time to be vetted (mirrors our package cooldown policy).
+    cooldown:
+      default-days: 7
     groups:
       npm-development:
         dependency-type: development
@@ -33,3 +38,6 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    # Apply the same 7-day cooldown to devcontainer image/feature updates.
+    cooldown:
+      default-days: 7
