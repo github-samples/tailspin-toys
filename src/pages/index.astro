@@ -4,11 +4,13 @@ import GameCard from '../components/GameCard.astro';
 import PageHero from '../components/PageHero.astro';
 import EmptyState from '../components/EmptyState.astro';
 import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
+import { getAllCategories, getAllGames, getAllPublishers } from '../lib/games';
 
 export const prerender = true;
 
 const games = await getAllGames(getDatabase());
+const publishers = await getAllPublishers(getDatabase());
+const categories = await getAllCategories(getDatabase());
 ---
 
 <Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
@@ -19,7 +21,26 @@ const games = await getAllGames(getDatabase());
     />
 
     <div>
-      <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <h2 class="text-2xl font-medium text-slate-100">Featured Games</h2>
+        <form class="flex flex-col gap-3 sm:flex-row" data-testid="game-filters">
+          <div>
+            <label for="publisher-filter" class="mb-1 block text-sm text-slate-300">Publisher</label>
+            <select id="publisher-filter" name="publisher" data-testid="publisher-filter" class="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:w-48">
+              <option value="">All publishers</option>
+              {publishers.map((publisher) => <option value={publisher.id}>{publisher.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label for="category-filter" class="mb-1 block text-sm text-slate-300">Category</label>
+            <select id="category-filter" name="category" data-testid="category-filter" class="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:w-48">
+              <option value="">All categories</option>
+              {categories.map((category) => <option value={category.id}>{category.name}</option>)}
+            </select>
+          </div>
+          <button type="reset" data-testid="clear-filters" class="rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">Clear</button>
+        </form>
+      </div>
 
       {games.length === 0 ? (
         <EmptyState text="No games available at the moment." />
@@ -28,6 +49,51 @@ const games = await getAllGames(getDatabase());
           {games.map((game) => <GameCard game={game} />)}
         </div>
       )}
+      <div class="hidden" data-testid="filter-empty-state">
+        <EmptyState text="No games match those filters." />
+      </div>
     </div>
   </div>
 </Layout>
+
+<script>
+  const filterForm = document.querySelector<HTMLFormElement>('[data-testid="game-filters"]');
+  const publisherFilter = document.querySelector<HTMLSelectElement>('[data-testid="publisher-filter"]');
+  const categoryFilter = document.querySelector<HTMLSelectElement>('[data-testid="category-filter"]');
+  const clearFilters = document.querySelector<HTMLButtonElement>('[data-testid="clear-filters"]');
+  const gameCards = Array.from(document.querySelectorAll<HTMLElement>('[data-testid="game-card"]'));
+  const emptyState = document.querySelector<HTMLElement>('[data-testid="filter-empty-state"]');
+
+  if (filterForm && publisherFilter && categoryFilter && clearFilters && emptyState) {
+    const params = new URLSearchParams(window.location.search);
+    publisherFilter.value = params.get('publisher') ?? '';
+    categoryFilter.value = params.get('category') ?? '';
+
+    const applyFilters = (): void => {
+      const publisher = publisherFilter.value;
+      const category = categoryFilter.value;
+      let visibleCount = 0;
+
+      gameCards.forEach((card) => {
+        const matchesPublisher = !publisher || card.dataset.publisherId === publisher;
+        const matchesCategory = !category || card.dataset.categoryId === category;
+        const visible = matchesPublisher && matchesCategory;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+
+      emptyState.classList.toggle('hidden', visibleCount > 0);
+      const nextParams = new URLSearchParams();
+      if (publisher) nextParams.set('publisher', publisher);
+      if (category) nextParams.set('category', category);
+      const query = nextParams.toString();
+      window.history.replaceState({}, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+    };
+
+    filterForm.addEventListener('change', applyFilters);
+    clearFilters.addEventListener('click', () => {
+      window.requestAnimationFrame(applyFilters);
+    });
+    applyFilters();
+  }
+</script>
