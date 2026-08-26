@@ -1,3 +1,12 @@
+Basic workshop url: https://github-samples.github.io/copilot-workshops/vscode/0-prerequisites/
+Agentic devops workshop: https://copilot-dev-days.github.io/agentic-workflows-workshop/step.html?step=readme
+
+Free hack: 
+<img width="1238" height="646" alt="image" src="https://github.com/user-attachments/assets/889908e1-2d72-42c5-be0c-6382d6d4b023" />
+<img width="1243" height="646" alt="image" src="https://github.com/user-attachments/assets/7f891afb-1d87-4db1-af38-cefa93edab60" />
+
+
+
 # Tailspin Toys
 
 Tailspin Toys is a crowdfunding platform for games with a developer theme. The project is a website for a fictional game crowd-funding company, built as a single [Astro](https://astro.build/) site (fully prerendered/static output) styled with [Tailwind CSS](https://tailwindcss.com/). Its data lives in a local SQLite database accessed through [Drizzle ORM](https://orm.drizzle.team/) and Node.js's built-in SQLite driver; pages query the database directly in frontmatter at build time, so there is no separate backend service.
@@ -11,6 +20,11 @@ Tailspin Toys is a crowdfunding platform for games with a developer theme. The p
 - **Playwright** — end-to-end tests run against the built static site.
 
 The database is migrated and seeded automatically before `dev`/`build` (via the `predev`/`prebuild` npm scripts) and is written to the gitignored `tailspin.db` file.
+
+## Features
+
+- **Game catalog** (`/`) — lists all games as cards, each linking to a details page.
+- **Category & publisher filtering** — the homepage includes filter controls (`src/components/GameFilters.astro`) so visitors can narrow the catalog by one or more categories and/or a publisher; filters combine (category AND publisher, with OR between multiple selections in the same group). Since the site is fully prerendered, filtering runs client-side over the already-rendered game grid — no rebuild or server round-trip is needed. The underlying data-access helpers (`getAllGames` in `src/lib/games.ts`, plus `getAllCategories`/`getAllPublishers` in `src/lib/categories.ts`/`src/lib/publishers.ts`) also support filtering directly for reuse and testing.
 
 ## Using this template
 
