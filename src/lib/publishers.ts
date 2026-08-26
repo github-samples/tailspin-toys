@@ -1,3 +1,7 @@
+/**
+ * Data-access helpers for publisher filtering and selection.
+ */
+
 import { asc } from 'drizzle-orm';
 import { publishers } from '../../db/schema';
 import type { Publisher } from '../types/game';

@@ -123,6 +123,10 @@ start Astro. When Astro reports its local URL, the app opens it in the browser
 canvas automatically. The menu also provides static build and type-check
 commands for on-demand validation.
 
+## Coding Standards
+
+Coding guidance is maintained in the [Copilot instructions](.github/copilot-instructions.md), [Astro instructions](.github/instructions/astro.instructions.md), and [Drizzle instructions](.github/instructions/drizzle.instructions.md). Comments should explain intent, exported data-layer functions require TSDoc/JSDoc, and reusable Astro components should document their `Props` interface.
+
 ## License 
 
 This project is licensed under the terms of the MIT open source license. Please refer to the [LICENSE](./LICENSE) for the full terms.

@@ -25,8 +25,9 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Test code should be of the same quality as the rest of the project, and follow DRY principles
 - For frontend changes, verify the build (`npm run build`) directly, and run the end-to-end tests through the `quality-checks` skill, to ensure everything works correctly
 - When changing the data layer (schema, helpers, transforms), update and run the corresponding unit tests
-- Every exported function should have a TSDoc comment describing its purpose, parameters, and return value.
-- Before imports or any code, add a comment block to the file that explains its purpose.
+- Every exported function should have a TSDoc comment describing its purpose, parameters, and return value; reusable Astro components should document their `Props` interface.
+- Comments should explain intent and non-obvious decisions rather than restating code, and should be kept current.
+- Before imports or any code, add a short comment block to the file that explains its purpose when the role is not obvious.
 
 #### Project guidelines
 

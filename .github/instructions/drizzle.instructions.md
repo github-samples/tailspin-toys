@@ -55,6 +55,13 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 - Map raw rows to the app-facing `Game`/`Publisher`/`Category` types in one place; don't leak Drizzle row shapes into components.
 - Keep ordering/lookup logic in `games.ts`, not in pages.
 
+## Comments and Documentation
+
+- Comment intent and non-obvious data-layer decisions, not mechanics that merely restate the code
+- Every exported function in `db/` and `src/lib/` must have a TSDoc/JSDoc comment describing its purpose, parameters, and return value
+- Keep comments current; update or remove them when the related code changes
+- Add a short file-purpose comment block before imports or other code when a file's role is not obvious
+
 ## Determinism
 
 Seed-derived values must be reproducible across builds. Derive star ratings from a stable hash of the title (`ratingFromTitle`) — **never** `Math.random()`.
@@ -66,6 +73,11 @@ Unit-test transforms directly and helpers against `createTestDatabase()`. See [`
 ## Node.js requirement
 
 Node.js 22.13 or later is required because the data layer uses the built-in `node:sqlite` module without an experimental flag. Do not introduce third-party SQLite drivers that ship platform-specific binaries.
+
+## TypeScript Formatting
+
+- Use four-space indentation and explicit parameter and return types for exported helpers.
+- Keep imports grouped and formatted consistently with the surrounding file.
 
 ## Type checking
 
