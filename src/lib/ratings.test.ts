@@ -1,3 +1,7 @@
+/**
+ * Tests the pure star-rating formatting helpers.
+ */
+
 import { describe, it, expect } from 'vitest';
 import { clampRating, formatStarRating } from './ratings';
 

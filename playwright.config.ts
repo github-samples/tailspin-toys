@@ -1,3 +1,7 @@
+/**
+ * Configures Playwright's browser projects and static-site test server.
+ */
+
 import { defineConfig, devices } from '@playwright/test';
 
 /**

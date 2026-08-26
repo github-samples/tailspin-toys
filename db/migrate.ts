@@ -1,3 +1,7 @@
+/**
+ * Applies generated Drizzle migrations to the local SQLite database.
+ */
+
 import { migrate } from 'drizzle-orm/sqlite-proxy/migrator';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';

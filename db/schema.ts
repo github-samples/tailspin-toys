@@ -1,3 +1,7 @@
+/**
+ * Defines the Drizzle tables and inferred row types for Tailspin Toys data.
+ */
+
 import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 
 export const publishers = sqliteTable('publishers', {

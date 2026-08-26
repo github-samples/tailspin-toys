@@ -1,3 +1,7 @@
+/**
+ * Provides database access helpers for games and their related entities.
+ */
+
 import { eq, asc } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
@@ -50,19 +54,35 @@ function baseGamesQuery(db: Database) {
         .leftJoin(publishers, eq(games.publisherId, publishers.id));
 }
 
-/** All games ordered by title. */
+/**
+ * Returns all games ordered by title.
+ *
+ * @param db - The database connection used to query games.
+ * @returns A list of games with their related category and publisher data.
+ */
 export async function getAllGames(db: Database): Promise<Game[]> {
     const rows = await baseGamesQuery(db).orderBy(asc(games.title));
     return rows.map(mapGame);
 }
 
-/** All game ids ordered by title. */
+/**
+ * Returns all game IDs ordered by their game title.
+ *
+ * @param db - The database connection used to query game IDs.
+ * @returns A list of game IDs.
+ */
 export async function getAllGameIds(db: Database): Promise<number[]> {
     const rows = await db.select({ id: games.id }).from(games).orderBy(asc(games.title));
     return rows.map((row) => row.id);
 }
 
-/** A single game by id, or null when it does not exist. */
+/**
+ * Returns a single game by ID.
+ *
+ * @param db - The database connection used to query the game.
+ * @param id - The ID of the game to retrieve.
+ * @returns The matching game, or null when it does not exist.
+ */
 export async function getGameById(db: Database, id: number): Promise<Game | null> {
     const row = await baseGamesQuery(db).where(eq(games.id, id)).get();
     return row ? mapGame(row) : null;

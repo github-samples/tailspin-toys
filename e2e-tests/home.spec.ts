@@ -1,3 +1,7 @@
+/**
+ * Covers the homepage's core navigation and content behavior.
+ */
+
 import { test, expect } from '@playwright/test';
 
 test.describe('Home Page', () => {

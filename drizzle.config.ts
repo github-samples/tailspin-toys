@@ -1,3 +1,7 @@
+/**
+ * Configures Drizzle Kit for the SQLite schema and migrations.
+ */
+
 import { defineConfig } from 'drizzle-kit';
 
 const url = process.env.DATABASE_URL ?? 'file:tailspin.db';
