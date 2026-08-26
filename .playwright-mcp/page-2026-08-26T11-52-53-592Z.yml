@@ -1,0 +1,238 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - button "Toggle menu" [ref=e6]
+      - link "Tailspin Toys" [ref=e10] [cursor=pointer]:
+        - /url: /
+  - main [ref=e11]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - heading "Welcome to Tailspin Toys" [level=1] [ref=e15]
+        - paragraph [ref=e16]: Find your next game! And maybe even back one! Explore our collection!
+      - generic [ref=e17]:
+        - heading "Filter Games" [level=2] [ref=e18]
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - heading "Categories" [level=3] [ref=e21]
+            - group "Filter by categories" [ref=e22]:
+              - generic [ref=e23] [cursor=pointer]:
+                - checkbox "Action" [ref=e24]
+                - generic [ref=e25]: Action
+              - generic [ref=e26] [cursor=pointer]:
+                - checkbox "Adventure" [ref=e27]
+                - generic [ref=e28]: Adventure
+              - generic [ref=e29] [cursor=pointer]:
+                - checkbox "Puzzle" [ref=e30]
+                - generic [ref=e31]: Puzzle
+              - generic [ref=e32] [cursor=pointer]:
+                - checkbox "Simulation" [ref=e33]
+                - generic [ref=e34]: Simulation
+              - generic [ref=e35] [cursor=pointer]:
+                - checkbox "Strategy" [ref=e36]
+                - generic [ref=e37]: Strategy
+          - generic [ref=e38]:
+            - generic [ref=e39]: Publisher
+            - combobox "Publisher" [ref=e40] [cursor=pointer]:
+              - option "All Publishers" [selected]
+              - option "CodeForge Studios"
+              - option "DevMasters Inc."
+              - option "GitHub Games"
+              - option "Ops Interactive"
+          - button "Reset Filters" [ref=e41]
+      - generic [ref=e42]:
+        - heading "Featured Games" [level=2] [ref=e43]
+        - generic [ref=e44]:
+          - link "Binary Frontier Adventure DevMasters Inc. Binary Frontier transports you into an uncharted cyber-world where every innovative code unlocks a secret realm. Guided by Mona, explore vast digital landscapes and chart new territories in a narrative steeped in coding mystique. Support this game through our crowdfunding platform! View details" [ref=e45] [cursor=pointer]:
+            - /url: /game/14
+            - generic [ref=e48]:
+              - heading "Binary Frontier" [level=3] [ref=e49]
+              - generic [ref=e50]:
+                - generic [ref=e51]: Adventure
+                - generic [ref=e52]: DevMasters Inc.
+              - paragraph [ref=e53]: Binary Frontier transports you into an uncharted cyber-world where every innovative code unlocks a secret realm. Guided by Mona, explore vast digital landscapes and chart new territories in a narrative steeped in coding mystique. Support this game through our crowdfunding platform!
+              - generic [ref=e54]: View details
+          - link "Bug Buster Brainteaser Puzzle GitHub Games Bug Buster Brainteaser tests your analytical skills with clever puzzles that simulate real-world debugging adventures. Mona empowers you to track down elusive bugs, transforming each challenge into a rewarding quest for clarity and efficiency. Support this game through our crowdfunding platform! View details" [ref=e58] [cursor=pointer]:
+            - /url: /game/7
+            - generic [ref=e61]:
+              - heading "Bug Buster Brainteaser" [level=3] [ref=e62]
+              - generic [ref=e63]:
+                - generic [ref=e64]: Puzzle
+                - generic [ref=e65]: GitHub Games
+              - paragraph [ref=e66]: Bug Buster Brainteaser tests your analytical skills with clever puzzles that simulate real-world debugging adventures. Mona empowers you to track down elusive bugs, transforming each challenge into a rewarding quest for clarity and efficiency. Support this game through our crowdfunding platform!
+              - generic [ref=e67]: View details
+          - link "Cloud Conqueror Action CodeForge Studios Cloud Conqueror thrusts you into a high-stakes aerial battle against rogue cloud services. With Mona as your co-pilot, navigate through stormy skies and outmaneuver digital adversaries in a quest to reclaim control over your virtual domain. Support this game through our crowdfunding platform! View details" [ref=e71] [cursor=pointer]:
+            - /url: /game/21
+            - generic [ref=e74]:
+              - heading "Cloud Conqueror" [level=3] [ref=e75]
+              - generic [ref=e76]:
+                - generic [ref=e77]: Action
+                - generic [ref=e78]: CodeForge Studios
+              - paragraph [ref=e79]: Cloud Conqueror thrusts you into a high-stakes aerial battle against rogue cloud services. With Mona as your co-pilot, navigate through stormy skies and outmaneuver digital adversaries in a quest to reclaim control over your virtual domain. Support this game through our crowdfunding platform!
+              - generic [ref=e80]: View details
+          - link "Code Puzzle Chronicles Puzzle CodeForge Studios Code Puzzle Chronicles offers brain-teasing challenges that unravel cryptic algorithms and obscure debugging quests. Mona assists you through each twist, inviting coders to master logic puzzles inspired by real-world coding conundrums. Support this game through our crowdfunding platform! View details" [ref=e84] [cursor=pointer]:
+            - /url: /game/5
+            - generic [ref=e87]:
+              - heading "Code Puzzle Chronicles" [level=3] [ref=e88]
+              - generic [ref=e89]:
+                - generic [ref=e90]: Puzzle
+                - generic [ref=e91]: CodeForge Studios
+              - paragraph [ref=e92]: Code Puzzle Chronicles offers brain-teasing challenges that unravel cryptic algorithms and obscure debugging quests. Mona assists you through each twist, inviting coders to master logic puzzles inspired by real-world coding conundrums. Support this game through our crowdfunding platform!
+              - generic [ref=e93]: View details
+          - link "Code Quest Odyssey Adventure CodeForge Studios Code Quest Odyssey launches you on an epic journey through enchanted digital realms where coding skills are your passport to discovery. Accompanied by Mona, unravel ancient source codes and conquer challenges that blend narrative with technical ingenuity. Support this game through our crowdfunding platform! View details" [ref=e97] [cursor=pointer]:
+            - /url: /game/13
+            - generic [ref=e100]:
+              - heading "Code Quest Odyssey" [level=3] [ref=e101]
+              - generic [ref=e102]:
+                - generic [ref=e103]: Adventure
+                - generic [ref=e104]: CodeForge Studios
+              - paragraph [ref=e105]: Code Quest Odyssey launches you on an epic journey through enchanted digital realms where coding skills are your passport to discovery. Accompanied by Mona, unravel ancient source codes and conquer challenges that blend narrative with technical ingenuity. Support this game through our crowdfunding platform!
+              - generic [ref=e106]: View details
+          - link "Container Chaos Simulation DevMasters Inc. Container Chaos replicates the high-stakes environment of container orchestration where every command can either streamline or disrupt your systems. Mona's expert advice will help you navigate the wild world of Docker containers and scalable cloud services. Support this game through our crowdfunding platform! View details" [ref=e110] [cursor=pointer]:
+            - /url: /game/10
+            - generic [ref=e113]:
+              - heading "Container Chaos" [level=3] [ref=e114]
+              - generic [ref=e115]:
+                - generic [ref=e116]: Simulation
+                - generic [ref=e117]: DevMasters Inc.
+              - paragraph [ref=e118]: Container Chaos replicates the high-stakes environment of container orchestration where every command can either streamline or disrupt your systems. Mona's expert advice will help you navigate the wild world of Docker containers and scalable cloud services. Support this game through our crowdfunding platform!
+              - generic [ref=e119]: View details
+          - link "Deployment Dynasty Simulation Ops Interactive Deployment Dynasty enables you to craft and manage digital empires across complex simulated environments. Mona lends her expertise to help you master scaling, monitoring, and auto-healing routines to maintain your virtual dominion. Support this game through our crowdfunding platform! View details" [ref=e123] [cursor=pointer]:
+            - /url: /game/12
+            - generic [ref=e126]:
+              - heading "Deployment Dynasty" [level=3] [ref=e127]
+              - generic [ref=e128]:
+                - generic [ref=e129]: Simulation
+                - generic [ref=e130]: Ops Interactive
+              - paragraph [ref=e131]: Deployment Dynasty enables you to craft and manage digital empires across complex simulated environments. Mona lends her expertise to help you master scaling, monitoring, and auto-healing routines to maintain your virtual dominion. Support this game through our crowdfunding platform!
+              - generic [ref=e132]: View details
+          - link "DevOps Dominion Strategy CodeForge Studios In DevOps Dominion, strategic planning meets advanced deployment tactics in a fast-paced battlefield of code. Mona leads your team of digital warriors through orchestrated pipelines and microservice skirmishes, ensuring every command brings a competitive edge. Support this game through our crowdfunding platform! View details" [ref=e136] [cursor=pointer]:
+            - /url: /game/1
+            - generic [ref=e139]:
+              - heading "DevOps Dominion" [level=3] [ref=e140]
+              - generic [ref=e141]:
+                - generic [ref=e142]: Strategy
+                - generic [ref=e143]: CodeForge Studios
+              - paragraph [ref=e144]: In DevOps Dominion, strategic planning meets advanced deployment tactics in a fast-paced battlefield of code. Mona leads your team of digital warriors through orchestrated pipelines and microservice skirmishes, ensuring every command brings a competitive edge. Support this game through our crowdfunding platform!
+              - generic [ref=e145]: View details
+          - link "Digital Debugger's Dream Adventure GitHub Games Digital Debugger's Dream pioneers an immersive adventure that merges investigative quests with real-life debugging scenarios. As Mona champions your journey, each step deepens the mystery behind a cybernetic riddle waiting to be resolved. Support this game through our crowdfunding platform! View details" [ref=e149] [cursor=pointer]:
+            - /url: /game/15
+            - generic [ref=e152]:
+              - heading "Digital Debugger's Dream" [level=3] [ref=e153]
+              - generic [ref=e154]:
+                - generic [ref=e155]: Adventure
+                - generic [ref=e156]: GitHub Games
+              - paragraph [ref=e157]: Digital Debugger's Dream pioneers an immersive adventure that merges investigative quests with real-life debugging scenarios. As Mona champions your journey, each step deepens the mystery behind a cybernetic riddle waiting to be resolved. Support this game through our crowdfunding platform!
+              - generic [ref=e158]: View details
+          - link "Infrastructure Innovator Simulation GitHub Games Infrastructure Innovator simulates a sprawling digital ecosystem that challenges you to build robust networks from scratch. With Mona’s strategic tips, you’ll design and implement systems that stand up to relentless virtual stress tests. Support this game through our crowdfunding platform! View details" [ref=e162] [cursor=pointer]:
+            - /url: /game/11
+            - generic [ref=e165]:
+              - heading "Infrastructure Innovator" [level=3] [ref=e166]
+              - generic [ref=e167]:
+                - generic [ref=e168]: Simulation
+                - generic [ref=e169]: GitHub Games
+              - paragraph [ref=e170]: Infrastructure Innovator simulates a sprawling digital ecosystem that challenges you to build robust networks from scratch. With Mona’s strategic tips, you’ll design and implement systems that stand up to relentless virtual stress tests. Support this game through our crowdfunding platform!
+              - generic [ref=e171]: View details
+          - link "Merge Conflict Mystery Puzzle DevMasters Inc. Merge Conflict Mystery immerses you in a labyrinth of code merges where every puzzle piece is a potential breakthrough. With Mona helping decode errors, your task is to resolve conflicts and streamline integration across complex code branches. Support this game through our crowdfunding platform! View details" [ref=e175] [cursor=pointer]:
+            - /url: /game/6
+            - generic [ref=e178]:
+              - heading "Merge Conflict Mystery" [level=3] [ref=e179]
+              - generic [ref=e180]:
+                - generic [ref=e181]: Puzzle
+                - generic [ref=e182]: DevMasters Inc.
+              - paragraph [ref=e183]: Merge Conflict Mystery immerses you in a labyrinth of code merges where every puzzle piece is a potential breakthrough. With Mona helping decode errors, your task is to resolve conflicts and streamline integration across complex code branches. Support this game through our crowdfunding platform!
+              - generic [ref=e184]: View details
+          - link "Pipeline Conquest Strategy DevMasters Inc. Pipeline Conquest challenges players to optimize continuous integration workflows while countering unforeseen system failures. With Mona by your side, organize automated builds and deployment pipelines in real time to secure lasting digital victory. Support this game through our crowdfunding platform! View details" [ref=e188] [cursor=pointer]:
+            - /url: /game/2
+            - generic [ref=e191]:
+              - heading "Pipeline Conquest" [level=3] [ref=e192]
+              - generic [ref=e193]:
+                - generic [ref=e194]: Strategy
+                - generic [ref=e195]: DevMasters Inc.
+              - paragraph [ref=e196]: Pipeline Conquest challenges players to optimize continuous integration workflows while countering unforeseen system failures. With Mona by your side, organize automated builds and deployment pipelines in real time to secure lasting digital victory. Support this game through our crowdfunding platform!
+              - generic [ref=e197]: View details
+          - link "Refactor Realms Adventure Ops Interactive Refactor Realms beckons you into a world where systematic code improvement reshapes ancient digital civilizations. With Mona’s mentorship, transform legacy systems into streamlined masterpieces as you explore breathtaking virtual environments. Support this game through our crowdfunding platform! View details" [ref=e201] [cursor=pointer]:
+            - /url: /game/16
+            - generic [ref=e204]:
+              - heading "Refactor Realms" [level=3] [ref=e205]
+              - generic [ref=e206]:
+                - generic [ref=e207]: Adventure
+                - generic [ref=e208]: Ops Interactive
+              - paragraph [ref=e209]: Refactor Realms beckons you into a world where systematic code improvement reshapes ancient digital civilizations. With Mona’s mentorship, transform legacy systems into streamlined masterpieces as you explore breathtaking virtual environments. Support this game through our crowdfunding platform!
+              - generic [ref=e210]: View details
+          - link "Repo Rampart Action GitHub Games Repo Rampart immerses you in adrenaline-charged defense missions where every command must protect your precious codebases. With Mona leading your strategy, prevent intrusions and execute swift countermeasures in electrifying action sequences. Support this game through our crowdfunding platform! View details" [ref=e214] [cursor=pointer]:
+            - /url: /game/19
+            - generic [ref=e217]:
+              - heading "Repo Rampart" [level=3] [ref=e218]
+              - generic [ref=e219]:
+                - generic [ref=e220]: Action
+                - generic [ref=e221]: GitHub Games
+              - paragraph [ref=e222]: Repo Rampart immerses you in adrenaline-charged defense missions where every command must protect your precious codebases. With Mona leading your strategy, prevent intrusions and execute swift countermeasures in electrifying action sequences. Support this game through our crowdfunding platform!
+              - generic [ref=e223]: View details
+          - link "Repo Rulers Strategy Ops Interactive Repo Rulers demands razor-sharp tactics and agile repository management to dominate interconnected servers. Under Mona’s guidance, you'll enforce branch protections and manage pull requests in a high-stakes arena where precision is paramount. Support this game through our crowdfunding platform! View details" [ref=e227] [cursor=pointer]:
+            - /url: /game/4
+            - generic [ref=e230]:
+              - heading "Repo Rulers" [level=3] [ref=e231]
+              - generic [ref=e232]:
+                - generic [ref=e233]: Strategy
+                - generic [ref=e234]: Ops Interactive
+              - paragraph [ref=e235]: Repo Rulers demands razor-sharp tactics and agile repository management to dominate interconnected servers. Under Mona’s guidance, you'll enforce branch protections and manage pull requests in a high-stakes arena where precision is paramount. Support this game through our crowdfunding platform!
+              - generic [ref=e236]: View details
+          - link "Script Strike Action CodeForge Studios Script Strike propels you into a fast-paced coding battleground where every keystroke could change the tide of an intense conflict. Mona rallies your forces as you dive into real-time challenges that merge reflexes with smart script execution. Support this game through our crowdfunding platform! View details" [ref=e240] [cursor=pointer]:
+            - /url: /game/17
+            - generic [ref=e243]:
+              - heading "Script Strike" [level=3] [ref=e244]
+              - generic [ref=e245]:
+                - generic [ref=e246]: Action
+                - generic [ref=e247]: CodeForge Studios
+              - paragraph [ref=e248]: Script Strike propels you into a fast-paced coding battleground where every keystroke could change the tide of an intense conflict. Mona rallies your forces as you dive into real-time challenges that merge reflexes with smart script execution. Support this game through our crowdfunding platform!
+              - generic [ref=e249]: View details
+          - link "Server Siege Strategy GitHub Games Server Siege throws you into the midst of a digital fortress under siege by relentless cyber threats. As Mona rallies your defense, you'll coordinate load-balancers and version controls to fortify your network stronghold. Support this game through our crowdfunding platform! View details" [ref=e253] [cursor=pointer]:
+            - /url: /game/3
+            - generic [ref=e256]:
+              - heading "Server Siege" [level=3] [ref=e257]
+              - generic [ref=e258]:
+                - generic [ref=e259]: Strategy
+                - generic [ref=e260]: GitHub Games
+              - paragraph [ref=e261]: Server Siege throws you into the midst of a digital fortress under siege by relentless cyber threats. As Mona rallies your defense, you'll coordinate load-balancers and version controls to fortify your network stronghold. Support this game through our crowdfunding platform!
+              - generic [ref=e262]: View details
+          - link "Stack Trace Secrets Puzzle Ops Interactive Stack Trace Secrets invites you to decrypt layered error logs and reveal hidden insights within your code. With guidance from Mona, every error message becomes a clue in the puzzle of perfecting your software architecture. Support this game through our crowdfunding platform! View details" [ref=e266] [cursor=pointer]:
+            - /url: /game/8
+            - generic [ref=e269]:
+              - heading "Stack Trace Secrets" [level=3] [ref=e270]
+              - generic [ref=e271]:
+                - generic [ref=e272]: Puzzle
+                - generic [ref=e273]: Ops Interactive
+              - paragraph [ref=e274]: Stack Trace Secrets invites you to decrypt layered error logs and reveal hidden insights within your code. With guidance from Mona, every error message becomes a clue in the puzzle of perfecting your software architecture. Support this game through our crowdfunding platform!
+              - generic [ref=e275]: View details
+          - link "Syntax Smashdown Action Ops Interactive Syntax Smashdown offers an exhilarating arcade experience where rapid coding reflexes determine the outcome of explosive digital battles. Guided by the fearless Mona, your mission is to knock out glitches and secure the high-score in a realm where syntax is the ultimate weapon. Support this game through our crowdfunding platform! View details" [ref=e279] [cursor=pointer]:
+            - /url: /game/20
+            - generic [ref=e282]:
+              - heading "Syntax Smashdown" [level=3] [ref=e283]
+              - generic [ref=e284]:
+                - generic [ref=e285]: Action
+                - generic [ref=e286]: Ops Interactive
+              - paragraph [ref=e287]: Syntax Smashdown offers an exhilarating arcade experience where rapid coding reflexes determine the outcome of explosive digital battles. Guided by the fearless Mona, your mission is to knock out glitches and secure the high-score in a realm where syntax is the ultimate weapon. Support this game through our crowdfunding platform!
+              - generic [ref=e288]: View details
+          - link "Terminal Turbulence Action DevMasters Inc. Terminal Turbulence pits you against rapid-fire command line confrontations where timing and precision are of the essence. Let Mona’s digital savvy guide your response strategies as you navigate chaotic server environments in high-octane style. Support this game through our crowdfunding platform! View details" [ref=e292] [cursor=pointer]:
+            - /url: /game/18
+            - generic [ref=e295]:
+              - heading "Terminal Turbulence" [level=3] [ref=e296]
+              - generic [ref=e297]:
+                - generic [ref=e298]: Action
+                - generic [ref=e299]: DevMasters Inc.
+              - paragraph [ref=e300]: Terminal Turbulence pits you against rapid-fire command line confrontations where timing and precision are of the essence. Let Mona’s digital savvy guide your response strategies as you navigate chaotic server environments in high-octane style. Support this game through our crowdfunding platform!
+              - generic [ref=e301]: View details
+          - link "Virtual Server Simulator Simulation CodeForge Studios Virtual Server Simulator places you in a hyper-realistic data center where resource management is the key to survival. Mona guides you as you balance load distributions and optimize server performance in a dynamic virtual ecosystem. Support this game through our crowdfunding platform! View details" [ref=e305] [cursor=pointer]:
+            - /url: /game/9
+            - generic [ref=e308]:
+              - heading "Virtual Server Simulator" [level=3] [ref=e309]
+              - generic [ref=e310]:
+                - generic [ref=e311]: Simulation
+                - generic [ref=e312]: CodeForge Studios
+              - paragraph [ref=e313]: Virtual Server Simulator places you in a hyper-realistic data center where resource management is the key to survival. Mona guides you as you balance load distributions and optimize server performance in a dynamic virtual ecosystem. Support this game through our crowdfunding platform!
+              - generic [ref=e314]: View details
+  - generic [ref=e320]:
+    - button [ref=e321]
+    - button [ref=e327]
+    - button [ref=e331]
+    - button [ref=e336]

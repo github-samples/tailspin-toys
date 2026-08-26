@@ -3,12 +3,17 @@ import Layout from '../layouts/Layout.astro';
 import GameCard from '../components/GameCard.astro';
 import PageHero from '../components/PageHero.astro';
 import EmptyState from '../components/EmptyState.astro';
+import FilterControls from '../components/FilterControls.astro';
 import { getDatabase } from '../lib/db';
 import { getAllGames } from '../lib/games';
+import { getAllCategories } from '../lib/categories';
+import { getAllPublishers } from '../lib/publishers';
 
 export const prerender = true;
 
 const games = await getAllGames(getDatabase());
+const categories = await getAllCategories(getDatabase());
+const publishers = await getAllPublishers(getDatabase());
 ---
 
 <Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
@@ -17,6 +22,8 @@ const games = await getAllGames(getDatabase());
       title="Welcome to Tailspin Toys"
       subtitle="Find your next game! And maybe even back one! Explore our collection!"
     />
+
+    <FilterControls categories={categories} publishers={publishers} />
 
     <div>
       <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>

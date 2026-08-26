@@ -1,0 +1,57 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - button "Toggle menu" [ref=e6]
+      - link "Tailspin Toys" [ref=e10] [cursor=pointer]:
+        - /url: /
+  - main [ref=e11]:
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - heading "Welcome to Tailspin Toys" [level=1] [ref=e15]
+        - paragraph [ref=e16]: Find your next game! And maybe even back one! Explore our collection!
+      - generic [ref=e17]:
+        - heading "Filter Games" [level=2] [ref=e18]
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - heading "Categories" [level=3] [ref=e21]
+            - group "Filter by categories" [ref=e22]:
+              - generic [ref=e23] [cursor=pointer]:
+                - checkbox "Action" [ref=e24]
+                - generic [ref=e25]: Action
+              - generic [ref=e26] [cursor=pointer]:
+                - checkbox "Adventure" [ref=e27]
+                - generic [ref=e28]: Adventure
+              - generic [ref=e29] [cursor=pointer]:
+                - checkbox "Puzzle" [checked] [active] [ref=e30]
+                - generic [ref=e31]: Puzzle
+              - generic [ref=e32] [cursor=pointer]:
+                - checkbox "Simulation" [ref=e33]
+                - generic [ref=e34]: Simulation
+              - generic [ref=e35] [cursor=pointer]:
+                - checkbox "Strategy" [ref=e36]
+                - generic [ref=e37]: Strategy
+          - generic [ref=e38]:
+            - generic [ref=e39]: Publisher
+            - combobox "Publisher" [ref=e40] [cursor=pointer]:
+              - option "All Publishers"
+              - option "CodeForge Studios"
+              - option "DevMasters Inc."
+              - option "GitHub Games" [selected]
+              - option "Ops Interactive"
+          - button "Reset Filters" [ref=e41]
+      - generic [ref=e42]:
+        - heading "Featured Games" [level=2] [ref=e43]
+        - link "Bug Buster Brainteaser Puzzle GitHub Games Bug Buster Brainteaser tests your analytical skills with clever puzzles that simulate real-world debugging adventures. Mona empowers you to track down elusive bugs, transforming each challenge into a rewarding quest for clarity and efficiency. Support this game through our crowdfunding platform! View details" [ref=e58] [cursor=pointer]:
+          - /url: /game/7
+          - generic [ref=e61]:
+            - heading "Bug Buster Brainteaser" [level=3] [ref=e62]
+            - generic [ref=e63]:
+              - generic [ref=e64]: Puzzle
+              - generic [ref=e65]: GitHub Games
+            - paragraph [ref=e66]: Bug Buster Brainteaser tests your analytical skills with clever puzzles that simulate real-world debugging adventures. Mona empowers you to track down elusive bugs, transforming each challenge into a rewarding quest for clarity and efficiency. Support this game through our crowdfunding platform!
+            - generic [ref=e67]: View details
+  - generic [ref=e320]:
+    - button [ref=e321]
+    - button [ref=e327]
+    - button [ref=e331]
+    - button [ref=e336]
