@@ -1,4 +1,11 @@
-workshop url: https://github-samples.github.io/copilot-workshops/vscode/0-prerequisites/
+Basic workshop url: https://github-samples.github.io/copilot-workshops/vscode/0-prerequisites/
+Agentic devops workshop: https://copilot-dev-days.github.io/agentic-workflows-workshop/step.html?step=readme
+
+Free hack: 
+<img width="1238" height="646" alt="image" src="https://github.com/user-attachments/assets/889908e1-2d72-42c5-be0c-6382d6d4b023" />
+<img width="1243" height="646" alt="image" src="https://github.com/user-attachments/assets/7f891afb-1d87-4db1-af38-cefa93edab60" />
+
+
 
 # Tailspin Toys
 
