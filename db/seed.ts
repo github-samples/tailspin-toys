@@ -1,3 +1,7 @@
+/**
+ * Seeds the local database from the bundled games CSV file.
+ */
+
 import { readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
@@ -50,7 +54,13 @@ async function upsertPublishers(db: Database, names: string[]): Promise<Map<stri
     return map;
 }
 
-/** Seed the database from the games CSV. Idempotent: skips existing games by title. */
+/**
+ * Seeds the database from the games CSV, skipping existing games by title.
+ *
+ * @param db - The database connection to seed.
+ * @param csvPath - The path to the games CSV file.
+ * @returns A promise that resolves when seeding is complete.
+ */
 export async function seedDatabase(db: Database, csvPath: string = join(here, 'games.csv')): Promise<void> {
     const rows = parseGamesCsv(readFileSync(csvPath, 'utf-8'));
 

@@ -1,3 +1,7 @@
+/**
+ * Tests the pure CSV, description, de-duplication, and rating transforms.
+ */
+
 import { describe, it, expect } from 'vitest';
 import {
     parseGamesCsv,

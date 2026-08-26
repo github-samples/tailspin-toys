@@ -1,4 +1,5 @@
 ---
+/** Renders a statically generated game detail page. */
 import type { GetStaticPaths } from 'astro';
 import Layout from '../../layouts/Layout.astro';
 import StarRating from '../../components/StarRating.astro';
@@ -12,6 +13,11 @@ import { getAllGameIds, getGameById } from '../../lib/games';
 
 export const prerender = true;
 
+/**
+ * Generates one static route for every game in the database.
+ *
+ * @returns A promise resolving to the generated game route definitions.
+ */
 export const getStaticPaths = (async () => {
     const ids = await getAllGameIds(getDatabase());
     return ids.map((id) => ({ params: { id: String(id) } }));

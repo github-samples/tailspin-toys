@@ -1,3 +1,7 @@
+/**
+ * Covers the games listing and game detail page behavior.
+ */
+
 import { test, expect, type Response } from '@playwright/test';
 
 test.describe('Game Listing and Navigation', () => {

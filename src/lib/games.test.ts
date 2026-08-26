@@ -1,3 +1,7 @@
+/**
+ * Tests the game data-access helpers against an in-memory database.
+ */
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestDatabase } from '../../db/test-helpers';
 import { categories, publishers, games } from '../../db/schema';

@@ -1,3 +1,7 @@
+/**
+ * Provides the Drizzle database client and SQLite connection helpers.
+ */
+
 import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -59,7 +63,13 @@ function createRemoteCallback(sqlite: DatabaseSync): AsyncRemoteCallback {
     };
 }
 
-/** Run generated migration statements atomically through Node's SQLite driver. */
+/**
+ * Runs generated migration statements atomically through Node's SQLite driver.
+ *
+ * @param sqlite - The SQLite connection that executes the migration statements.
+ * @param queries - The SQL migration statements to execute in order.
+ * @returns Nothing. The database is committed when all statements succeed.
+ */
 export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[]): void {
     sqlite.exec('BEGIN');
     try {
@@ -73,12 +83,22 @@ export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[])
     }
 }
 
-/** Create a Drizzle client for the given local SQLite connection URL. */
+/**
+ * Creates a Drizzle client for the given local SQLite connection URL.
+ *
+ * @param url - The local SQLite URL, or the configured default when omitted.
+ * @returns A Drizzle database client.
+ */
 export function createDatabase(url: string = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL): Database {
     return createDatabaseConnection(url).db;
 }
 
-/** Create the Drizzle client and its Node SQLite connection for migration workflows. */
+/**
+ * Creates the Drizzle client and its Node SQLite connection for migration workflows.
+ *
+ * @param url - The local SQLite URL, or the configured default when omitted.
+ * @returns The Drizzle client and its underlying SQLite connection.
+ */
 export function createDatabaseConnection(
     url: string = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
 ): DatabaseConnection {
@@ -88,7 +108,11 @@ export function createDatabaseConnection(
     return { db, sqlite };
 }
 
-/** Shared singleton database client used by pages at build time. */
+/**
+ * Returns the shared singleton database client used by pages at build time.
+ *
+ * @returns The shared Drizzle database client.
+ */
 export function getDatabase(): Database {
     if (!cachedDb) {
         cachedDb = createDatabase();
