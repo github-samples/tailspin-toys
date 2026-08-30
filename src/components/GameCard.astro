@@ -39,11 +39,24 @@ const { game } = Astro.props;
 
             <p class="text-slate-400 mb-4 text-sm line-clamp-2" data-testid="game-description">{game.description}</p>
 
-            <div class="mb-4 text-sm text-slate-400" data-testid="game-rating">
+            <div class="mb-4 flex items-center gap-1" data-testid="game-rating">
                 {game.starRating !== null ? (
-                    <span class="text-yellow-500 font-medium">{game.starRating.toFixed(1)}/5 ⭐</span>
+                    <>
+                        <div class="flex gap-0.5">
+                            {Array.from({ length: 5 }).map((_, i) => {
+                                const fillPercentage = Math.max(0, Math.min(1, game.starRating! - i));
+                                return (
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="relative" data-star={i} aria-hidden="true">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" class="text-slate-400" />
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" class="text-yellow-500" style={{ clipPath: `inset(0 ${(1 - fillPercentage) * 100}% 0 0)` }} />
+                                    </svg>
+                                );
+                            })}
+                        </div>
+                        <span class="text-sm text-slate-400 ml-1">{game.starRating.toFixed(1)}</span>
+                    </>
                 ) : (
-                    <span>No rating yet</span>
+                    <span class="text-sm text-slate-400">No rating yet</span>
                 )}
             </div>
 
