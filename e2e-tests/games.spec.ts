@@ -25,8 +25,12 @@ test.describe('Game Listing and Navigation', () => {
 
     await test.step('Verify every game card has a rating', async () => {
       const gameCards = page.getByTestId('game-card');
-      await expect(page.getByTestId('game-rating')).toHaveCount(await gameCards.count());
-      await expect(gameCards.first().getByTestId('game-rating')).not.toBeEmpty();
+      const gameCardCount = await gameCards.count();
+      await expect(gameCards.getByTestId('game-rating')).toHaveCount(gameCardCount);
+
+      for (let index = 0; index < gameCardCount; index += 1) {
+        await expect(gameCards.nth(index).getByTestId('game-rating')).not.toBeEmpty();
+      }
     });
   });
 
