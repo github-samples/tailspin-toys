@@ -1,6 +1,32 @@
 import { test, expect, type Response } from '@playwright/test';
 
 test.describe('Game Listing and Navigation', () => {
+  test('should filter games by category and publisher', async ({ page }) => {
+    await page.goto('/');
+
+    const categoryFilter = page.getByTestId('category-filter');
+    const publisherFilter = page.getByTestId('publisher-filter');
+    await expect(categoryFilter).toBeVisible();
+    await expect(publisherFilter).toBeVisible();
+
+    await categoryFilter.selectOption({ label: 'Strategy' });
+    await publisherFilter.selectOption({ label: 'CodeForge Studios' });
+    await page.getByTestId('apply-filters').click();
+
+    await expect(page).toHaveURL(/category=\d+.*publisher=\d+/);
+    const visibleCards = page.locator('[data-testid="game-card"]:visible');
+    await expect(visibleCards).toHaveCount(1);
+    await expect(visibleCards.first().getByTestId('game-title')).toHaveText('DevOps Dominion');
+  });
+
+  test('should display a no-results state when filters match no games', async ({ page }) => {
+    await page.goto('/?category=99999');
+
+    await expect(page.getByTestId('games-grid')).toBeHidden();
+    await expect(page.getByTestId('filtered-empty-state')).toBeVisible();
+    await expect(page.getByTestId('empty-state-text')).toHaveText('No games match the selected filters.');
+  });
+
   test('should display games with titles on index page', async ({ page }) => {
     await test.step('Navigate to homepage', async () => {
       await page.goto('/');
