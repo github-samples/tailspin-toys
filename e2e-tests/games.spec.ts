@@ -12,13 +12,13 @@ test.describe('Game Listing and Navigation', () => {
     });
 
     await test.step('Verify game cards are displayed', async () => {
-      const gameCards = page.getByTestId('game-card');
+      const gameCards = page.locator('[data-testid^="game-card-"]');
       await expect(gameCards.first()).toBeVisible();
       expect(await gameCards.count()).toBeGreaterThan(0);
     });
 
     await test.step('Verify game cards have titles with content', async () => {
-      const gameCards = page.getByTestId('game-card');
+      const gameCards = page.locator('[data-testid^="game-card-"]');
       await expect(gameCards.first().getByTestId('game-title')).toBeVisible();
       await expect(gameCards.first().getByTestId('game-title')).not.toBeEmpty();
     });
@@ -35,7 +35,7 @@ test.describe('Game Listing and Navigation', () => {
     });
 
     await test.step('Get first game information and click it', async () => {
-      const firstGameCard = page.getByTestId('game-card').first();
+      const firstGameCard = page.locator('[data-testid^="game-card-"]').first();
       gameId = await firstGameCard.getAttribute('data-game-id');
       gameTitle = await firstGameCard.getAttribute('data-game-title');
       await firstGameCard.click();

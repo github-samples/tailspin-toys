@@ -13,9 +13,11 @@ const { game } = Astro.props;
 <a
     href={`/game/${game.id}`}
     class="group block bg-slate-800/60 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-slate-700/50 hover:border-blue-500/50 hover:shadow-blue-500/10 hover:shadow-xl transition-all duration-300 hover:translate-y-[-6px]"
-    data-testid="game-card"
+    data-testid={`game-card-${game.id}`}
     data-game-id={game.id}
     data-game-title={game.title}
+    data-category-id={game.category?.id}
+    data-publisher-id={game.publisher?.id}
 >
     <div class="p-6 relative">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
