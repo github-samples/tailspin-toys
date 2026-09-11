@@ -31,12 +31,17 @@ network: defaults
 # Closing and commenting run in a permission-scoped job, not in the agent.
 # Both close outputs post the agent-supplied comment as part of the closure,
 # so no separate add-comment output is needed. Default state reason is
-# "completed" (a plain close, not "not planned").
+# "completed" (a plain close, not "not planned"). Both outputs are pinned to
+# this repository via target-repo so that even a prompt injection in untrusted
+# issue/PR text cannot make the agent close items in any other repository the
+# write token might reach.
 safe-outputs:
   close-issue:
     max: 25
+    target-repo: "github-samples/tailspin-toys"
   close-pull-request:
     max: 25
+    target-repo: "github-samples/tailspin-toys"
 ---
 
 # Weekly workshop triage
