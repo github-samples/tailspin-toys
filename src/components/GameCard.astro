@@ -2,12 +2,16 @@
 import type { Game } from '../types/game';
 import Tag from './Tag.astro';
 import ArrowRight from '../assets/icons/arrow-right.svg';
+import { clampRating, formatStarRating } from '../lib/ratings';
 
 interface Props {
     game: Game;
 }
 
 const { game } = Astro.props;
+const ratingLabel = game.starRating === null
+    ? 'No rating yet'
+    : `${formatStarRating(game.starRating)} ${clampRating(game.starRating).toFixed(1)}/5`;
 ---
 
 <a
@@ -36,6 +40,8 @@ const { game } = Astro.props;
                     )}
                 </div>
             )}
+
+            <p class="text-sm text-slate-300 mb-3" data-testid="game-card-rating">{ratingLabel}</p>
 
             <p class="text-slate-400 mb-4 text-sm line-clamp-2" data-testid="game-description">{game.description}</p>
 
