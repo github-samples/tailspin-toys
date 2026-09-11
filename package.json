@@ -27,24 +27,24 @@
   "dependencies": {
     "@astrojs/check": "^0.9.10",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.1.6",
+    "astro": "^7.2.8",
     "drizzle-orm": "^0.45.2",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.12.1",
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.61.1",
-    "@types/node": "^26.1.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.3.0",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^10.7.0",
-    "eslint-plugin-astro": "^3.0.0",
-    "globals": "^17.7.0",
-    "postcss": "^8.5.15",
+    "eslint": "^10.9.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "globals": "^17.11.0",
+    "postcss": "^8.5.28",
     "tailwindcss": "^4.3.1",
-    "tsx": "^4.23.1",
-    "typescript-eslint": "^8.64.0",
-    "vitest": "^4.1.10"
+    "tsx": "^4.23.12",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^5.0.0"
   }
 }
