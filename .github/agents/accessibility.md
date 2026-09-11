@@ -202,11 +202,11 @@ Prefer the Tailwind variant over a hand-written media query:
 - Missing `alt`, redundant alt text, and `aria-*` correctness on elements
 - Interactive handlers on non-interactive elements without keyboard support and focusability
 
-Surface these by running lint through the `quality-checks` skill (if avaialble) — do not call eslint directly. **Never silence a rule with an inline `eslint-disable` without a written justification** — fix the underlying markup instead.
+Surface these by running lint through the `quality-checks` skill (if available) — do not call eslint directly. **Never silence a rule with an inline `eslint-disable` without a written justification** — fix the underlying markup instead.
 
-### Verification Workflow (always use the `quality-checks` skill (if avaialble))
+### Verification Workflow (always use the `quality-checks` skill (if available))
 
-Run all tests and lint through the `quality-checks` skill  (if avaialble) — never invoke the underlying commands directly. The skill handles setup, ordering, and troubleshooting.
+Run all tests and lint through the `quality-checks` skill  (if available) — never invoke the underlying commands directly. The skill handles setup, ordering, and troubleshooting.
 
 1. Lint — ESLint (including `eslint-plugin-astro` a11y rules)
 2. E2E — Playwright, including the accessibility specs

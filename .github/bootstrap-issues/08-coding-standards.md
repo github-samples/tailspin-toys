@@ -16,4 +16,4 @@ Clear, documented coding standards keep the codebase consistent and make it easi
 - [ ] Documentation expectations for `.astro` component `Props` interfaces are documented
 - [ ] TypeScript formatting rules are documented and, where possible, enforced through ESLint
 - [ ] The README links to or summarizes the updated coding standards
-- [ ] Linting passes with any newly added rules (run through the `quality-checks` skill (if avaialble) / `npm run lint`)
+- [ ] Linting passes with any newly added rules (run through the `quality-checks` skill (if available) / `npm run lint`)
