@@ -69,7 +69,7 @@ If any of these are unclear, ask the user before proceeding.
 
 ### Phase 4 — Run Verification Suite
 
-Run **all** checks through the `quality-checks` skill — never invoke the test, lint, or E2E scripts directly. The skill wraps environment setup, ordering, and the troubleshooting runbook:
+Run **all** checks through the `quality-checks` skill  (if available) — never invoke the test, lint, or E2E scripts directly. The skill wraps environment setup, ordering, and the troubleshooting runbook:
 
 - Unit tests (Vitest)
 - Frontend lint (ESLint)
@@ -77,7 +77,7 @@ Run **all** checks through the `quality-checks` skill — never invoke the test,
 
 Then:
 
-- If any check fails, diagnose the root cause using the troubleshooting runbook in the `quality-checks` skill.
+- If any check fails, diagnose the root cause using the troubleshooting runbook in the `quality-checks` skill (if available).
 - Attempt to fix failures caused by your own test additions from Phase 3.
 - If a pre-existing failure is discovered (unrelated to the changes under review), flag it in the report but do not fix it — it is out of scope.
 - Re-run through the skill after any fixes to confirm a clean pass.
@@ -86,7 +86,7 @@ Then:
 
 > **Always perform this phase for every PR Readiness run.** Manual validation through the Playwright MCP server is mandatory and must cover the feature or fix under review.
 
-Use the Playwright MCP server to manually validate the implemented feature, and defer accessibility-specific review to the Accessibility agent when appropriate. This phase is **interactive, exploratory validation** — driving the browser directly via the Playwright MCP server is required here, and is distinct from running the E2E suite (which always goes through the `quality-checks` skill):
+Use the Playwright MCP server to manually validate the implemented feature, and defer accessibility-specific review to the Accessibility agent when appropriate. This phase is **interactive, exploratory validation** — driving the browser directly via the Playwright MCP server is required here, and is distinct from running the E2E suite (which always goes through the `quality-checks` skill (if available)):
 
 1. Start the app with `npm run dev` (the `predev` script migrates + seeds the database) and wait for the Astro dev server to be ready.
 2. Navigate to the relevant page(s) or flow entry point(s).
