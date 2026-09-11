@@ -53,6 +53,50 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter the games list by category, publisher, and both together', async ({ page }) => {
+    await test.step('Navigate to homepage and locate the filter controls', async () => {
+      await page.goto('/');
+      await expect(page.getByTestId('category-filter')).toBeVisible();
+      await expect(page.getByTestId('publisher-filter')).toBeVisible();
+      await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(21);
+    });
+
+    await test.step('Apply a category filter and verify all visible cards match the category', async () => {
+      await page.getByTestId('category-filter').selectOption({ label: 'Action' });
+      const actionCards = page.locator('[data-testid="game-card"]:visible');
+      await expect(actionCards).not.toHaveCount(0);
+
+      const actionCardTexts = await actionCards.allTextContents();
+      for (const cardText of actionCardTexts) {
+        expect(cardText).toContain('Action');
+      }
+    });
+
+    await test.step('Clear category and apply a publisher filter', async () => {
+      await page.getByTestId('clear-filters-button').click();
+      await page.getByTestId('publisher-filter').selectOption({ label: 'CodeForge Studios' });
+      const publisherCards = page.locator('[data-testid="game-card"]:visible');
+      await expect(publisherCards).not.toHaveCount(0);
+
+      const publisherCardTexts = await publisherCards.allTextContents();
+      for (const cardText of publisherCardTexts) {
+        expect(cardText).toContain('CodeForge Studios');
+      }
+    });
+
+    await test.step('Apply category and publisher together and ensure both conditions are respected', async () => {
+      await page.getByTestId('category-filter').selectOption({ label: 'Action' });
+      const combinedCards = page.locator('[data-testid="game-card"]:visible');
+      await expect(combinedCards).not.toHaveCount(0);
+
+      const combinedCardTexts = await combinedCards.allTextContents();
+      for (const cardText of combinedCardTexts) {
+        expect(cardText).toContain('Action');
+        expect(cardText).toContain('CodeForge Studios');
+      }
+    });
+  });
+
   test('should display game details with all required information', async ({ page }) => {
     await test.step('Navigate to specific game details page', async () => {
       await page.goto('/game/1');

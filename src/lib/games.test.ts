@@ -6,6 +6,8 @@ import {
     getAllGames,
     getAllGameIds,
     getGameById,
+    getGamesByCategory,
+    getGamesByPublisher,
 } from './games';
 
 async function seedGames(db: Database, count: number): Promise<void> {
@@ -62,5 +64,28 @@ describe('games data-access helpers', () => {
     it('returns null for a non-existent game', async () => {
         await seedGames(db, 2);
         expect(await getGameById(db, 99999)).toBeNull();
+    });
+
+    it('filters games by category and publisher', async () => {
+        const [strategy] = await db.insert(categories).values({ name: 'Strategy', description: 'Strategy category' }).returning({ id: categories.id });
+        const [adventure] = await db.insert(categories).values({ name: 'Adventure', description: 'Adventure category' }).returning({ id: categories.id });
+        const [pubOne] = await db.insert(publishers).values({ name: 'Pub One', description: 'pub one' }).returning({ id: publishers.id });
+        const [pubTwo] = await db.insert(publishers).values({ name: 'Pub Two', description: 'pub two' }).returning({ id: publishers.id });
+
+        await db.insert(games).values([
+            { title: 'Alpha', description: 'Alpha desc', starRating: 4.1, categoryId: strategy.id, publisherId: pubOne.id },
+            { title: 'Bravo', description: 'Bravo desc', starRating: 4.3, categoryId: strategy.id, publisherId: pubTwo.id },
+            { title: 'Charlie', description: 'Charlie desc', starRating: 4.5, categoryId: adventure.id, publisherId: pubOne.id },
+            { title: 'Delta', description: 'Delta desc', starRating: 4.7, categoryId: adventure.id, publisherId: pubTwo.id },
+        ]);
+
+        const byCategory = await getGamesByCategory(db, strategy.id);
+        expect(byCategory.map((game) => game.title)).toEqual(['Alpha', 'Bravo']);
+
+        const byPublisher = await getGamesByPublisher(db, pubTwo.id);
+        expect(byPublisher.map((game) => game.title)).toEqual(['Bravo', 'Delta']);
+
+        const combined = await getAllGames(db, { categoryId: strategy.id, publisherId: pubTwo.id });
+        expect(combined.map((game) => game.title)).toEqual(['Bravo']);
     });
 });
