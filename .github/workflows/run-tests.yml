@@ -105,7 +105,7 @@ jobs:
     # network-variable `playwright install --with-deps` apt step on each run.
     # The tag MUST match the @playwright/test version in package-lock.json
     # so the bundled browsers resolve; bump it whenever Playwright is upgraded.
-    container: mcr.microsoft.com/playwright:v1.61.1-noble
+    container: mcr.microsoft.com/playwright:v1.62.1-noble
     permissions:
       contents: read
 
