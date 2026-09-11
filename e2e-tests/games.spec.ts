@@ -24,6 +24,31 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter games by publisher and category', async ({ page }) => {
+    await page.goto('/');
+    const visibleCards = page.locator('[data-testid="game-card"]:not([hidden])');
+    const allCardCount = await visibleCards.count();
+
+    await test.step('Filter by publisher', async () => {
+      await page.getByLabel('Publisher').selectOption({ label: 'CodeForge Studios' });
+      await expect(visibleCards).toHaveCount(6);
+      await expect(page.getByTestId('publisher-filter')).toHaveValue('1');
+    });
+
+    await test.step('Refine the publisher results by category', async () => {
+      await page.getByLabel('Category').selectOption({ label: 'Strategy' });
+      await expect(visibleCards).toHaveCount(1);
+      await expect(visibleCards.first()).toContainText('DevOps Dominion');
+    });
+
+    await test.step('Clear filters', async () => {
+      await page.getByTestId('clear-filters').click();
+      await expect(visibleCards).toHaveCount(allCardCount);
+      await expect(page.getByTestId('publisher-filter')).toHaveValue('');
+      await expect(page.getByTestId('category-filter')).toHaveValue('');
+    });
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
