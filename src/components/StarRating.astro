@@ -1,7 +1,9 @@
 ---
 import { clampRating, formatStarRating } from '../lib/ratings';
 
+/** Props for rendering a game's numeric and glyph-based rating. */
 interface Props {
+    /** Rating to display, or `null` to render no rating. */
     rating: number | null;
 }
 

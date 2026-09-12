@@ -220,4 +220,41 @@ test.describe('Accessibility Tests', () => {
       await expect(gameCardSvgs.nth(i)).toHaveAttribute('aria-hidden', 'true');
     }
   });
+
+  test('game filters should be labeled and keyboard operable', async ({ page }) => {
+    await page.goto('/');
+
+    const categoryFilter = page.getByRole('checkbox', { name: 'Strategy' });
+    const publisherFilter = page.getByRole('combobox', { name: 'Publisher' });
+    const clearFilters = page.getByRole('button', { name: 'Clear filters' });
+    const resultsStatus = page.getByRole('status');
+
+    await test.step('Use category and publisher controls from the keyboard', async () => {
+      await categoryFilter.focus();
+      await page.keyboard.press('Space');
+      await expect(categoryFilter).toBeChecked();
+      await expect(resultsStatus).toHaveText('Showing 4 of 21 games');
+
+      await page.keyboard.press('Tab');
+      await expect(publisherFilter).toBeFocused();
+    });
+
+    await test.step('Reset filters from the keyboard', async () => {
+      await clearFilters.focus();
+      await expect(clearFilters).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(categoryFilter).not.toBeChecked();
+      await expect(publisherFilter).toHaveValue('');
+      await expect(resultsStatus).toHaveText('Showing 21 of 21 games');
+    });
+
+    await test.step('Verify the focused reset control has a visible indicator', async () => {
+      await clearFilters.focus();
+      const hasVisibleFocus = await clearFilters.evaluate((element) => {
+        const styles = window.getComputedStyle(element);
+        return styles.outline !== 'none' || styles.boxShadow !== 'none';
+      });
+      expect(hasVisibleFocus).toBeTruthy();
+    });
+  });
 });

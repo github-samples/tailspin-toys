@@ -1,4 +1,4 @@
-import { test, expect, type Response } from '@playwright/test';
+import { test, expect, type Page, type Response } from '@playwright/test';
 
 test.describe('Game Listing and Navigation', () => {
   test('should display games with titles on index page', async ({ page }) => {
@@ -22,6 +22,76 @@ test.describe('Game Listing and Navigation', () => {
       await expect(gameCards.first().getByTestId('game-title')).toBeVisible();
       await expect(gameCards.first().getByTestId('game-title')).not.toBeEmpty();
     });
+  });
+
+  test.describe('Game filtering', () => {
+      const visibleGameCards = (page: Page) =>
+          page.locator('[data-testid="game-card"]:visible');
+
+      test.beforeEach(async ({ page }) => {
+          await page.goto('/');
+          await expect(page.getByTestId('game-filters')).toBeVisible();
+      });
+
+      test('filters by one or more categories', async ({ page }) => {
+          await test.step('Select one category', async () => {
+              await page.getByRole('checkbox', { name: 'Strategy' }).check();
+              await expect(visibleGameCards(page)).toHaveCount(4);
+              await expect(page.getByTestId('filter-results-status')).toHaveText('Showing 4 of 21 games');
+          });
+
+          await test.step('Add a second category with OR semantics', async () => {
+              await page.getByRole('checkbox', { name: 'Puzzle' }).check();
+              await expect(visibleGameCards(page)).toHaveCount(8);
+              await expect(page.getByTestId('filter-results-status')).toHaveText('Showing 8 of 21 games');
+          });
+      });
+
+      test('filters by publisher', async ({ page }) => {
+          await page.getByRole('combobox', { name: 'Publisher' }).selectOption({
+              label: 'GitHub Games',
+          });
+
+          await expect(visibleGameCards(page)).toHaveCount(5);
+          await expect(
+              visibleGameCards(page).getByTestId('game-publisher'),
+          ).toHaveText(Array(5).fill('GitHub Games'));
+      });
+
+      test('combines categories and publisher', async ({ page }) => {
+          await test.step('Select categories and a publisher', async () => {
+              await page.getByRole('checkbox', { name: 'Strategy' }).check();
+              await page.getByRole('checkbox', { name: 'Puzzle' }).check();
+              await page.getByRole('combobox', { name: 'Publisher' }).selectOption({
+                  label: 'GitHub Games',
+              });
+          });
+
+          await test.step('Verify both criteria apply', async () => {
+              await expect(visibleGameCards(page)).toHaveCount(2);
+              await expect(
+                  visibleGameCards(page).getByTestId('game-category'),
+              ).toHaveText(['Puzzle', 'Strategy']);
+              await expect(
+                  visibleGameCards(page).getByTestId('game-publisher'),
+              ).toHaveText(['GitHub Games', 'GitHub Games']);
+          });
+      });
+
+      test('clears every selected filter', async ({ page }) => {
+          await page.getByRole('checkbox', { name: 'Action' }).check();
+          await page.getByRole('combobox', { name: 'Publisher' }).selectOption({
+              label: 'CodeForge Studios',
+          });
+          await expect(visibleGameCards(page)).toHaveCount(2);
+
+          await page.getByRole('button', { name: 'Clear filters' }).click();
+
+          await expect(page.getByRole('checkbox', { name: 'Action' })).not.toBeChecked();
+          await expect(page.getByRole('combobox', { name: 'Publisher' })).toHaveValue('');
+          await expect(visibleGameCards(page)).toHaveCount(21);
+          await expect(page.getByTestId('filter-results-status')).toHaveText('Showing 21 of 21 games');
+      });
   });
 
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {

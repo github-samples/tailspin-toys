@@ -5,7 +5,11 @@ import { createDatabaseConnection, executeMigrationQueries, type Database } from
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-/** Create a fresh in-memory Node SQLite database with the schema migrated in. */
+/**
+ * Creates a fresh in-memory Node SQLite database with all migrations applied.
+ *
+ * @returns A migrated database isolated for a single test.
+ */
 export async function createTestDatabase(): Promise<Database> {
     const { db, sqlite } = createDatabaseConnection(':memory:');
     await migrate(
