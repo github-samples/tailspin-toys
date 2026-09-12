@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+/** Props for a styled button or link, plus standard button HTML attributes. */
 interface Props extends Omit<HTMLAttributes<'button'>, 'type'> {
     /** Visual style of the button. */
     variant?: 'solid' | 'gradient';
