@@ -1,14 +1,30 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import GameCard from '../components/GameCard.astro';
+import GameFilters from '../components/GameFilters.astro';
 import PageHero from '../components/PageHero.astro';
 import EmptyState from '../components/EmptyState.astro';
 import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
+import { getFilteredGames } from '../lib/games';
+import type { Category, Publisher } from '../types/game';
 
 export const prerender = true;
 
-const games = await getAllGames(getDatabase());
+const games = await getFilteredGames(getDatabase());
+const categories = Array.from(
+    new Map(
+        games
+            .filter((game) => game.category !== null)
+            .map((game) => [game.category!.id, game.category!]),
+    ).values(),
+).sort((first: Category, second: Category) => first.name.localeCompare(second.name));
+const publishers = Array.from(
+    new Map(
+        games
+            .filter((game) => game.publisher !== null)
+            .map((game) => [game.publisher!.id, game.publisher!]),
+    ).values(),
+).sort((first: Publisher, second: Publisher) => first.name.localeCompare(second.name));
 ---
 
 <Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
@@ -24,9 +40,15 @@ const games = await getAllGames(getDatabase());
       {games.length === 0 ? (
         <EmptyState text="No games available at the moment." />
       ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
-        </div>
+        <>
+          <GameFilters {categories} {publishers} totalGames={games.length} />
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
+            {games.map((game) => <GameCard game={game} />)}
+          </div>
+          <div data-testid="filter-empty-state" hidden>
+            <EmptyState text="No games match the selected filters." />
+          </div>
+        </>
       )}
     </div>
   </div>

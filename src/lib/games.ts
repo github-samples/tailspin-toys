@@ -1,7 +1,15 @@
-import { eq, asc } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
+
+/** Criteria used to narrow the game catalog. */
+export interface GameFilters {
+    /** Category identifiers matched with OR semantics. */
+    categoryIds?: readonly number[];
+    /** Publisher identifier combined with the category criteria using AND. */
+    publisherId?: number;
+}
 
 const gameSelection = {
     id: games.id,
@@ -57,7 +65,35 @@ function baseGamesQuery(db: Database) {
  * @returns Games mapped to the application model in deterministic title order.
  */
 export async function getAllGames(db: Database): Promise<Game[]> {
-    const rows = await baseGamesQuery(db).orderBy(asc(games.title));
+    return getFilteredGames(db);
+}
+
+/**
+ * Loads games matching optional category and publisher criteria.
+ *
+ * Selected categories use OR semantics, while a publisher criterion is
+ * combined with the categories using AND. Empty criteria return every game.
+ *
+ * @param db - Injectable database supplied by an Astro page or a test.
+ * @param filters - Optional category identifiers and publisher identifier.
+ * @returns Matching games mapped to the application model in title order.
+ */
+export async function getFilteredGames(
+    db: Database,
+    filters: GameFilters = {},
+): Promise<Game[]> {
+    const categoryCondition = filters.categoryIds && filters.categoryIds.length > 0
+        ? inArray(games.categoryId, [...filters.categoryIds])
+        : undefined;
+    const publisherCondition = filters.publisherId === undefined
+        ? undefined
+        : eq(games.publisherId, filters.publisherId);
+    const condition = and(categoryCondition, publisherCondition);
+    const query = baseGamesQuery(db);
+    const rows = condition
+        ? await query.where(condition).orderBy(asc(games.title))
+        : await query.orderBy(asc(games.title));
+
     return rows.map(mapGame);
 }
 
