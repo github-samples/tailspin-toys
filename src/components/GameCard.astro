@@ -3,7 +3,9 @@ import type { Game } from '../types/game';
 import Tag from './Tag.astro';
 import ArrowRight from '../assets/icons/arrow-right.svg';
 
+/** Props identifying the game summarized and linked by this card. */
 interface Props {
+    /** Game model whose details populate the card. */
     game: Game;
 }
 

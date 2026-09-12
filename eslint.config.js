@@ -39,5 +39,15 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
     },
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { fixStyle: "inline-type-imports" },
+      ],
+      "eol-last": ["error", "always"],
+      "object-curly-spacing": ["error", "always"],
+      quotes: ["error", "single", { allowTemplateLiterals: true }],
+      semi: ["error", "always"],
+    },
   },
 ];

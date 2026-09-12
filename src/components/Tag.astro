@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+/** Props for a themed inline tag, plus standard span HTML attributes. */
 interface Props extends Omit<HTMLAttributes<'span'>, 'color'> {
     /** Color theme for the tag. */
     color?: 'blue' | 'purple';

@@ -50,19 +50,35 @@ function baseGamesQuery(db: Database) {
         .leftJoin(publishers, eq(games.publisherId, publishers.id));
 }
 
-/** All games ordered by title. */
+/**
+ * Loads every game with its category and publisher in title order.
+ *
+ * @param db - Injectable database supplied by an Astro page or a test.
+ * @returns Games mapped to the application model in deterministic title order.
+ */
 export async function getAllGames(db: Database): Promise<Game[]> {
     const rows = await baseGamesQuery(db).orderBy(asc(games.title));
     return rows.map(mapGame);
 }
 
-/** All game ids ordered by title. */
+/**
+ * Loads game identifiers in title order for static route generation.
+ *
+ * @param db - Injectable database supplied by an Astro page or a test.
+ * @returns Game identifiers in deterministic title order.
+ */
 export async function getAllGameIds(db: Database): Promise<number[]> {
     const rows = await db.select({ id: games.id }).from(games).orderBy(asc(games.title));
     return rows.map((row) => row.id);
 }
 
-/** A single game by id, or null when it does not exist. */
+/**
+ * Loads one game and its related category and publisher.
+ *
+ * @param db - Injectable database supplied by an Astro page or a test.
+ * @param id - Numeric identifier of the game to retrieve.
+ * @returns The mapped game, or `null` when no matching game exists.
+ */
 export async function getGameById(db: Database, id: number): Promise<Game | null> {
     const row = await baseGamesQuery(db).where(eq(games.id, id)).get();
     return row ? mapGame(row) : null;
