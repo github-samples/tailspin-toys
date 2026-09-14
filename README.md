@@ -88,40 +88,33 @@ npm run typecheck:all    # both of the above
 > [!NOTE]
 > The native compiler is used only for type checking (`--noEmit`); the site is still built by `astro build` (Vite/esbuild). The classic `typescript` package stays on v6 until `typescript-eslint` and `@astrojs/check` support the native API (~TS 7.1); a Dependabot `ignore` in `.github/dependabot.yml` holds the classic `typescript@7` bump until then.
 
-## Copilot Agents & Skills
+## Verification and troubleshooting
 
-This project ships Copilot customizations to assist with quality assurance:
+Run commands from the repository root after [getting started](#getting-started). Use an applicable available Copilot skill when one exists; otherwise run the documented npm commands directly. No skill is required to run these checks.
+
+For focused iteration, run unit tests after data-layer, transform, or helper changes; lint and type checking after TypeScript or Astro changes; and a build plus E2E tests after UI, page, or component changes. Before committing or merging, run the full verification suite: `npm run lint`, `npm run typecheck:all`, `npm run test:unit`, and `npm run test:e2e`. All checks must pass with zero errors. New functionality needs appropriate coverage; do not skip or disable tests without explicit justification, and treat failing tests as merge blockers.
+
+### Setup and test failures
+
+- **Missing tools, packages, or browser:** Check `node --version` (22.13+ required) and the [setup instructions](#getting-started). On Linux, missing Chromium system libraries may require `npx playwright install --with-deps chromium`. Agents must obtain user approval before installing software or dependencies. For missing generated Astro types, run `npm run astro -- sync`; `npm run typecheck:astro` also performs this step.
+- **Empty pages or missing tables:** `predev` and `prebuild` migrate and seed automatically. If needed, run `npm run db:setup` and check `DATABASE_URL` (default: `file:tailspin.db`). For stale seed data, see the [Database note](#database); seeding does not reconcile existing rows.
+- **Port conflicts or stale HTML:** Playwright locally reuses a server already running on port 4321, including one from another checkout. Confirm the server belongs to this worktree and serves the current production build. Stop only a server you own via its original terminal or managed process handle; do not terminate an unrelated process. Once the port is available, rerun `npm run test:e2e` so Playwright builds and previews fresh `dist/` output.
+- **E2E assertion failures:** Read the failing assertion and failure screenshots/videos in `test-results/`; traces are captured on the first retry. Check changed locators and `data-testid` values. Unknown game routes return real HTTP 404s: assert on the not-found page rather than an in-page error. Use auto-retrying assertions, never `waitForTimeout`. Iterate on one spec with `npm run test:e2e -- e2e-tests/games.spec.ts`.
+- **Unit test failures:** Read expected versus received values and iterate with `npm run test:unit -- src/lib/games.test.ts`. Helper tests use fresh in-memory SQLite databases with migrations and fixtures; schema changes need a generated migration. Keep seed-derived values deterministic. Follow the [unit-test instructions](.github/instructions/unit-tests.instructions.md) and [Playwright instructions](.github/instructions/playwright.instructions.md) for test-authoring conventions.
+- **Lint failures:** Use `npm run lint -- --fix` for auto-fixable issues and review the changes. Resolve remaining errors rather than suppressing rules without written justification; type checking is a separate check, not a replacement for lint.
+- **Local versus CI differences:** Compare Node versions with CI's current LTS version and account for local database state versus CI's clean seed. Reproduce against the production build with `npm run test:e2e`, not an existing `astro dev` server.
+
+## Copilot customizations
+
+This template includes repository instructions and the Database Explorer canvas, but no custom agent profiles or skills. Learners create their own customizations during the workshop; the npm verification commands above work without them.
 
 ### Database Explorer Canvas
 
 The shared **Database Explorer** canvas (`.github/extensions/database-explorer/`) provides a small UI and agent actions for browsing the project's SQLite tables and running one read-only `SELECT` or `WITH` query at a time. It uses the database at `.data/tailspin.db` (or `DATABASE_URL` when set), so run `npm run db:setup` before opening it in a fresh checkout.
 
-### PR Readiness Agent
-
-The **PR Readiness** agent (`.github/agents/pr-readiness.md`) is a pre-PR quality gate. Invoke it before opening a pull request to:
-
-- Verify all acceptance criteria have been implemented
-- Audit test coverage and fill any gaps
-- Run the full verification suite (unit tests, lint, E2E tests)
-- Manually validate the feature in the browser via Playwright MCP (required for every run)
-- Produce a go/no-go report
-
-### quality-checks Skill
-
-The **quality-checks** skill (`.github/skills/quality-checks/SKILL.md`) wraps the project's npm test and lint commands with a detailed debugging and troubleshooting runbook. Use it via `/quality-checks` when:
-
-- Running tests or lint for the first time after setup
-- Diagnosing test failures (port conflicts, stale servers, flaky tests, CI divergence)
-- Validating readiness before commits, pushes, or merges
-
 ### GitHub Copilot App Run Menu
 
-The [GitHub Copilot app](https://github.com/github/github-app) reads
-`.github/github-app.yml` to provide project commands in its **Run** menu.
-New sessions automatically install dependencies; use **Run development site** to
-start Astro. When Astro reports its local URL, the app opens it in the browser
-canvas automatically. The menu also provides static build and type-check
-commands for on-demand validation.
+The [GitHub Copilot app](https://github.com/github/github-app) reads `.github/github-app.yml` to provide project commands in its **Run** menu. New sessions automatically install dependencies; use **Run development site** to start Astro. When Astro reports its local URL, the app opens it in the browser canvas automatically. The menu also provides static build and type-check commands for on-demand validation.
 
 ## License 
 

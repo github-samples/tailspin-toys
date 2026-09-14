@@ -18,12 +18,13 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 #### Testing guidelines
 
-- **Always run tests and lint through the `quality-checks` skill if it is enabled — never invoke `npm run test:unit`, `npm run test:e2e`, or `npm run lint` directly.** The skill wraps environment setup, ordering, and troubleshooting. (Starting the app for manual validation is not a quality check — run `npm run dev` directly for that.)
+- Use an applicable available skill for verification when one exists; otherwise run the npm checks below directly. See the README's verification and troubleshooting guidance for setup and failures. Starting the app for manual validation is not a quality check — run `npm run dev` directly for that.
 - Run Vitest unit tests to verify the data layer and transforms, and Playwright tests to verify e2e and frontend functionality
 - Run ESLint to check frontend code quality before committing
+- Run `npm run typecheck:all` for TypeScript and Astro type checking; both type checking and lint must pass with zero errors before committing
 - Review the existing tests to ensure we're not duplicating efforts
 - Test code should be of the same quality as the rest of the project, and follow DRY principles
-- For frontend changes, verify the build (`npm run build`) directly, and run the end-to-end tests through the `quality-checks` skill if it is available, to ensure everything works correctly
+- For frontend changes, verify the build (`npm run build`) and run the end-to-end tests (`npm run test:e2e`) to ensure everything works correctly
 - When changing the data layer (schema, helpers, transforms), update and run the corresponding unit tests
 
 #### Project guidelines
@@ -67,8 +68,8 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 ## Scripts
 
-- The project uses **npm scripts** for all development tasks — there is no `scripts/` directory.
-- **Skills take precedence.** Before running a command directly, check whether a skill covers the task (e.g. the `quality-checks` skill wraps tests and lint). If one applies, follow it.
+- The project uses **npm scripts** for development tasks — there is no root-level `scripts/` directory.
+- **Available skills take precedence when applicable.** Before running a command directly, check whether an available skill covers the task. If one applies, follow it; otherwise use the npm scripts below.
 - Key npm scripts:
   - `npm run dev` — start the Astro dev server (`predev` migrates + seeds the local SQLite database)
   - `npm run build` — build the static site (`prebuild` migrates + seeds the local SQLite database)
