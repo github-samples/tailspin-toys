@@ -51,6 +51,7 @@ npm run db:generate   # generate a migration after editing db/schema.ts
 npm run db:migrate    # apply migrations
 npm run db:seed       # seed from games.csv (idempotent)
 npm run db:setup      # migrate + seed (run automatically by predev/prebuild)
+npm run db:export     # write the seeded catalog to db/catalog.json
 ```
 
 > [!NOTE]
