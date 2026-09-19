@@ -39,6 +39,10 @@ const { game } = Astro.props;
 
             <p class="text-slate-400 mb-4 text-sm line-clamp-2" data-testid="game-description">{game.description}</p>
 
+            <div class="mb-4 text-sm text-slate-300" data-testid="game-rating">
+                {game.starRating !== null ? `★ ${game.starRating.toFixed(1)}/5` : 'No rating yet'}
+            </div>
+
             <div class="mt-4 text-sm text-blue-400 font-medium flex items-center">
                 <span>View details</span>
                 <ArrowRight class="h-4 w-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-2" aria-hidden="true" />
