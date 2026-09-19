@@ -1,5 +1,6 @@
 ---
 import type { Game } from '../types/game';
+import { formatStarRating } from '../lib/ratings';
 import Tag from './Tag.astro';
 import ArrowRight from '../assets/icons/arrow-right.svg';
 
@@ -36,6 +37,16 @@ const { game } = Astro.props;
                     )}
                 </div>
             )}
+
+            <div
+                class="mb-3 text-sm text-slate-300"
+                data-testid="game-rating"
+                aria-label={game.starRating === null ? 'No rating yet' : `${game.starRating.toFixed(1)} out of 5 stars`}
+            >
+                {game.starRating === null
+                    ? 'No rating yet'
+                    : `${formatStarRating(game.starRating)} ${game.starRating.toFixed(1)}/5`}
+            </div>
 
             <p class="text-slate-400 mb-4 text-sm line-clamp-2" data-testid="game-description">{game.description}</p>
 

@@ -3,6 +3,23 @@ import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
 
+/**
+ * Filter a list of games by title, ignoring case and surrounding whitespace.
+ *
+ * @param availableGames - The games to search within.
+ * @param searchTerm - The raw query typed by the user.
+ * @returns The matching games in their original order.
+ */
+export function filterGamesByTitle(availableGames: Game[], searchTerm: string): Game[] {
+    const normalizedTerm = searchTerm.trim().toLowerCase();
+
+    if (!normalizedTerm) {
+        return availableGames;
+    }
+
+    return availableGames.filter((game) => game.title.toLowerCase().includes(normalizedTerm));
+}
+
 const gameSelection = {
     id: games.id,
     title: games.title,

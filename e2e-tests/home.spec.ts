@@ -24,4 +24,24 @@ test.describe('Home Page', () => {
     // Check that the welcome message is present using more specific locator
     await expect(page.getByText('Find your next game! And maybe even back one! Explore our collection!')).toBeVisible();
   });
+
+  test('should filter games by title as the user types', async ({ page }) => {
+    const searchInput = page.getByRole('searchbox', { name: 'Search games by title' });
+    const serverSiegeCard = page.locator('[data-game-title="Server Siege"]');
+    const devOpsCard = page.locator('[data-game-title="DevOps Dominion"]');
+
+    await expect(searchInput).toBeVisible();
+    await expect(serverSiegeCard).toBeVisible();
+    await expect(devOpsCard).toBeVisible();
+
+    await searchInput.fill('server');
+
+    await expect(serverSiegeCard).toBeVisible();
+    await expect(devOpsCard).toBeHidden();
+    await expect(page.getByTestId('game-search-summary')).toContainText('Showing 2 matching games');
+
+    await searchInput.fill('not-a-game');
+    await expect(page.getByTestId('empty-state')).toBeVisible();
+    await expect(page.getByTestId('empty-state-text')).toContainText('No games match "not-a-game"');
+  });
 });

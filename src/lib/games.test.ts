@@ -2,7 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createTestDatabase } from '../../db/test-helpers';
 import { categories, publishers, games } from '../../db/schema';
 import type { Database } from './db';
+import type { Game } from '../types/game';
 import {
+    filterGamesByTitle,
     getAllGames,
     getAllGameIds,
     getGameById,
@@ -35,6 +37,19 @@ describe('games data-access helpers', () => {
 
     beforeEach(async () => {
         db = await createTestDatabase();
+    });
+
+    it('filters games by title without regard to case', () => {
+        const gamesForSearch: Game[] = [
+            { id: 1, title: 'Code Quest', description: 'Adventure', category: null, publisher: null, starRating: 4.4 },
+            { id: 2, title: 'Stack Trace', description: 'Puzzle', category: null, publisher: null, starRating: 4.2 },
+            { id: 3, title: 'Server Siege', description: 'Strategy', category: null, publisher: null, starRating: 4.8 },
+        ];
+
+        expect(filterGamesByTitle(gamesForSearch, 'server')).toEqual([gamesForSearch[2]]);
+        expect(filterGamesByTitle(gamesForSearch, '  CODE  ')).toEqual([gamesForSearch[0]]);
+        expect(filterGamesByTitle(gamesForSearch, 'missing')).toEqual([]);
+        expect(filterGamesByTitle(gamesForSearch, '')).toEqual(gamesForSearch);
     });
 
     it('returns all games ordered by title', async () => {

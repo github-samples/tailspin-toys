@@ -4,11 +4,14 @@ import GameCard from '../components/GameCard.astro';
 import PageHero from '../components/PageHero.astro';
 import EmptyState from '../components/EmptyState.astro';
 import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
+import { filterGamesByTitle, getAllGames } from '../lib/games';
 
 export const prerender = true;
 
+const searchTerm = Astro.url.searchParams.get('q') ?? '';
 const games = await getAllGames(getDatabase());
+const filteredGames = filterGamesByTitle(games, searchTerm);
+const hasActiveSearch = searchTerm.trim().length > 0;
 ---
 
 <Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
@@ -19,15 +22,113 @@ const games = await getAllGames(getDatabase());
     />
 
     <div>
-      <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
+      <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 class="text-2xl font-medium text-slate-100">Featured Games</h2>
+        </div>
 
-      {games.length === 0 ? (
-        <EmptyState text="No games available at the moment." />
-      ) : (
+        <form
+          method="get"
+          class="flex w-full max-w-md gap-2"
+          data-testid="game-search-form"
+          aria-label="Search games by title"
+        >
+          <label class="sr-only" for="game-search">Search games by title</label>
+          <input
+            id="game-search"
+            name="q"
+            type="search"
+            value={searchTerm}
+            placeholder="Search by title"
+            autocomplete="off"
+            aria-label="Search games by title"
+            data-testid="game-search-input"
+            class="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          />
+          <button
+            type="submit"
+            class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+            data-testid="game-search-button"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      <p class="mb-6 text-sm text-slate-300" data-testid="game-search-summary">
+        {hasActiveSearch
+          ? `Showing ${filteredGames.length} matching game${filteredGames.length === 1 ? '' : 's'}`
+          : `Showing ${games.length} games`}
+      </p>
+
+      <EmptyState
+        text={hasActiveSearch ? `No games match "${searchTerm.trim()}"` : 'No games available at the moment.'}
+        hidden={filteredGames.length > 0}
+      />
+
+      {filteredGames.length > 0 && (
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
+          {filteredGames.map((game) => <GameCard game={game} />)}
         </div>
       )}
     </div>
   </div>
 </Layout>
+
+<script is:inline>
+  const searchForm = document.querySelector('[data-testid="game-search-form"]');
+  const searchInput = document.querySelector('[data-testid="game-search-input"]');
+  const summary = document.querySelector('[data-testid="game-search-summary"]');
+  const emptyState = document.querySelector('[data-testid="empty-state"]');
+  const cards = [...document.querySelectorAll('[data-testid="game-card"]')];
+
+  const applySearch = (rawValue) => {
+    const term = rawValue.trim().toLowerCase();
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+      const title = (card.dataset.gameTitle || '').toLowerCase();
+      const isMatch = !term || title.includes(term);
+      card.hidden = !isMatch;
+      if (isMatch) {
+        visibleCount += 1;
+      }
+    });
+
+    if (summary) {
+      summary.textContent = term
+        ? `Showing ${visibleCount} matching game${visibleCount === 1 ? '' : 's'}`
+        : `Showing ${cards.length} games`;
+    }
+
+    if (emptyState) {
+      const emptyText = document.querySelector('[data-testid="empty-state-text"]');
+      const message = term ? `No games match "${rawValue.trim()}"` : 'No games available at the moment.';
+      emptyState.hidden = visibleCount !== 0;
+      if (emptyText) {
+        emptyText.textContent = message;
+      }
+    }
+
+    const url = new URL(window.location.href);
+    if (term) {
+      url.searchParams.set('q', term);
+    } else {
+      url.searchParams.delete('q');
+    }
+    window.history.replaceState({}, '', url);
+  };
+
+  if (searchForm && searchInput) {
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      applySearch(searchInput.value);
+    });
+
+    searchInput.addEventListener('input', (event) => {
+      applySearch(event.target.value);
+    });
+
+    applySearch(searchInput.value);
+  }
+</script>
