@@ -6,6 +6,7 @@ import {
     getAllGames,
     getAllGameIds,
     getGameById,
+    getGamesByFilters,
 } from './games';
 
 async function seedGames(db: Database, count: number): Promise<void> {
@@ -28,6 +29,61 @@ async function seedGames(db: Database, count: number): Promise<void> {
             publisherId: publisher.id,
         });
     }
+}
+
+async function seedFilteredGames(db: Database): Promise<{
+    strategyId: number;
+    puzzleId: number;
+    codeForgeId: number;
+    devMastersId: number;
+}> {
+    const [strategy] = await db
+        .insert(categories)
+        .values({ name: 'Strategy', description: 'Strategic games' })
+        .returning({ id: categories.id });
+    const [puzzle] = await db
+        .insert(categories)
+        .values({ name: 'Puzzle', description: 'Puzzle games' })
+        .returning({ id: categories.id });
+    const [codeForge] = await db
+        .insert(publishers)
+        .values({ name: 'CodeForge Studios', description: 'CodeForge' })
+        .returning({ id: publishers.id });
+    const [devMasters] = await db
+        .insert(publishers)
+        .values({ name: 'DevMasters Inc.', description: 'DevMasters' })
+        .returning({ id: publishers.id });
+
+    await db.insert(games).values([
+        {
+            title: 'Game Alpha',
+            description: 'Strategy by CodeForge',
+            starRating: 4.5,
+            categoryId: strategy.id,
+            publisherId: codeForge.id,
+        },
+        {
+            title: 'Game Beta',
+            description: 'Strategy by DevMasters',
+            starRating: 4.1,
+            categoryId: strategy.id,
+            publisherId: devMasters.id,
+        },
+        {
+            title: 'Game Gamma',
+            description: 'Puzzle by CodeForge',
+            starRating: 3.8,
+            categoryId: puzzle.id,
+            publisherId: codeForge.id,
+        },
+    ]);
+
+    return {
+        strategyId: strategy.id,
+        puzzleId: puzzle.id,
+        codeForgeId: codeForge.id,
+        devMastersId: devMasters.id,
+    };
 }
 
 describe('games data-access helpers', () => {
@@ -62,5 +118,39 @@ describe('games data-access helpers', () => {
     it('returns null for a non-existent game', async () => {
         await seedGames(db, 2);
         expect(await getGameById(db, 99999)).toBeNull();
+    });
+
+    it('filters games by a single category', async () => {
+        const { strategyId } = await seedFilteredGames(db);
+
+        const filtered = await getGamesByFilters(db, { categoryIds: [strategyId] });
+
+        expect(filtered.map((game) => game.title)).toEqual(['Game Alpha', 'Game Beta']);
+        expect(filtered.every((game) => game.category?.name === 'Strategy')).toBe(true);
+    });
+
+    it('filters games by a single publisher', async () => {
+        const { codeForgeId } = await seedFilteredGames(db);
+
+        const filtered = await getGamesByFilters(db, { publisherIds: [codeForgeId] });
+
+        expect(filtered.map((game) => game.title)).toEqual(['Game Alpha', 'Game Gamma']);
+        expect(filtered.every((game) => game.publisher?.name === 'CodeForge Studios')).toBe(true);
+    });
+
+    it('combines category and publisher filters', async () => {
+        const { strategyId, codeForgeId } = await seedFilteredGames(db);
+
+        const filtered = await getGamesByFilters(db, {
+            categoryIds: [strategyId],
+            publisherIds: [codeForgeId],
+        });
+
+        expect(filtered).toHaveLength(1);
+        expect(filtered[0]).toMatchObject({
+            title: 'Game Alpha',
+            category: { name: 'Strategy' },
+            publisher: { name: 'CodeForge Studios' },
+        });
     });
 });
