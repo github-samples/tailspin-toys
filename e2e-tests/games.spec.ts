@@ -24,6 +24,36 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter games by category and publisher', async ({ page }) => {
+    await test.step('Navigate to the game catalog', async () => {
+      await page.goto('/');
+      await expect(page.getByTestId('game-filters')).toBeVisible();
+    });
+
+    await test.step('Apply a category and publisher filter', async () => {
+      await page.getByTestId('category-filter-1').check();
+      await page.getByTestId('publisher-filter').selectOption({ label: 'CodeForge Studios' });
+      await page.getByTestId('apply-filters').click();
+    });
+
+    await test.step('Verify the combined filter state and results', async () => {
+      await expect(page).toHaveURL(/category=1/);
+      await expect(page).toHaveURL(/publisher=1/);
+      await expect(page.getByTestId('category-filter-1')).toBeChecked();
+      await expect(page.getByTestId('publisher-filter')).toHaveValue('1');
+      await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(1);
+      await expect(page.locator('[data-testid="game-card"]:visible').first()).toContainText('DevOps Dominion');
+    });
+  });
+
+  test('should show an empty state when filters match no games', async ({ page }) => {
+    await page.goto('/?category=99999');
+
+    await expect(page.getByTestId('no-filter-results')).toBeVisible();
+    await expect(page.getByTestId('no-filter-results')).toContainText('No games match the selected filters.');
+    await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(0);
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
