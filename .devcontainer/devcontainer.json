@@ -4,7 +4,8 @@
 	"name": "Tailspin Toys (Astro + Drizzle + Node SQLite)",
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 	"features": {
-		"ghcr.io/schlich/devcontainer-features/playwright:0": {}
+		"ghcr.io/schlich/devcontainer-features/playwright:0": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	"customizations": {
 		"vscode": {
