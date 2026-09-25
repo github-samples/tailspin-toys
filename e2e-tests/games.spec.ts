@@ -24,6 +24,28 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should display a star rating on every game card', async ({ page }) => {
+    await test.step('Navigate to homepage and wait for games to load', async () => {
+      await page.goto('/');
+      await expect(page.getByTestId('games-grid')).toBeVisible();
+    });
+
+    await test.step('Verify every game card shows a rating badge matching its card count', async () => {
+      const gameCards = page.getByTestId('game-card');
+      const ratingBadges = page.getByTestId('game-rating');
+      await expect(ratingBadges).toHaveCount(await gameCards.count());
+    });
+
+    await test.step('Verify each rating badge shows a star score or the no-rating fallback', async () => {
+      const ratingBadges = page.getByTestId('game-rating');
+      const count = await ratingBadges.count();
+
+      for (let i = 0; i < count; i++) {
+        await expect(ratingBadges.nth(i)).toContainText(/^[★☆½]{5}\s*\d\.\d$|^No rating yet$/);
+      }
+    });
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
