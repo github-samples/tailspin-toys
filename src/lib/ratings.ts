@@ -3,7 +3,7 @@
  *
  * Kept framework-free and side-effect-free so the logic is unit-testable
  * without the Astro runtime (see `ratings.test.ts`). Consumed by the
- * `StarRating.astro` component.
+ * `StarRating.astro` component and game cards.
  */
 
 /**
@@ -11,6 +11,13 @@
  */
 export function clampRating(rating: number): number {
     return Math.min(5, Math.max(0, rating));
+}
+
+/**
+ * Formats a rating for display in a game card.
+ */
+export function formatCardRating(rating: number | null): string {
+    return rating === null ? 'No rating yet' : `Rating: ${rating.toFixed(1)}/5`;
 }
 
 /**

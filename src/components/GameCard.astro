@@ -2,6 +2,7 @@
 import type { Game } from '../types/game';
 import Tag from './Tag.astro';
 import ArrowRight from '../assets/icons/arrow-right.svg';
+import { formatCardRating } from '../lib/ratings';
 
 interface Props {
     game: Game;
@@ -39,9 +40,12 @@ const { game } = Astro.props;
 
             <p class="text-slate-400 mb-4 text-sm line-clamp-2" data-testid="game-description">{game.description}</p>
 
-            <div class="mt-4 text-sm text-blue-400 font-medium flex items-center">
-                <span>View details</span>
-                <ArrowRight class="h-4 w-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-2" aria-hidden="true" />
+            <div class="mt-4 text-sm font-medium flex items-center justify-between">
+                <span class="text-blue-400 flex items-center">
+                    <span>View details</span>
+                    <ArrowRight class="h-4 w-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-2" aria-hidden="true" />
+                </span>
+                <span class="text-slate-300" data-testid="game-card-rating">{formatCardRating(game.starRating)}</span>
             </div>
         </div>
     </div>
