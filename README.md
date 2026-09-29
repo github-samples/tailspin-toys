@@ -89,31 +89,21 @@ npm run typecheck:all    # both of the above
 > [!NOTE]
 > The native compiler is used only for type checking (`--noEmit`); the site is still built by `astro build` (Vite/esbuild). The classic `typescript` package stays on v6 until `typescript-eslint` and `@astrojs/check` support the native API (~TS 7.1); a Dependabot `ignore` in `.github/dependabot.yml` holds the classic `typescript@7` bump until then.
 
-## Copilot Agents & Skills
+## Copilot Customizations
 
-This project ships Copilot customizations to assist with quality assurance:
+This project ships Copilot customizations to assist with development:
 
 ### Database Explorer Canvas
 
 The shared **Database Explorer** canvas (`.github/extensions/database-explorer/`) provides a small UI and agent actions for browsing the project's SQLite tables and running one read-only `SELECT` or `WITH` query at a time. It uses the database at `.data/tailspin.db` (or `DATABASE_URL` when set), so run `npm run db:setup` before opening it in a fresh checkout.
 
-### PR Readiness Agent
-
-The **PR Readiness** agent (`.github/agents/pr-readiness.md`) is a pre-PR quality gate. Invoke it before opening a pull request to:
-
-- Verify all acceptance criteria have been implemented
-- Audit test coverage and fill any gaps
-- Run the full verification suite (unit tests, lint, E2E tests)
-- Manually validate the feature in the browser via Playwright MCP (required for every run)
-- Produce a go/no-go report
-
 ### quality-checks Skill
 
-The **quality-checks** skill (`.github/skills/quality-checks/SKILL.md`) wraps the project's npm test and lint commands with a detailed debugging and troubleshooting runbook. Use it via `/quality-checks` when:
+The **quality-checks** skill (`.github/skills/quality-checks/SKILL.md`) runs the project's unit tests (Vitest), lint (ESLint), and type checks (tsgo + astro check), with a debugging and troubleshooting runbook. Use it via `/quality-checks` when:
 
-- Running tests or lint for the first time after setup
-- Diagnosing test failures (port conflicts, stale servers, flaky tests, CI divergence)
-- Validating readiness before commits, pushes, or merges
+- Running unit tests, lint, or type checks for the first time after setup
+- Diagnosing failures in these checks (environment setup, database state, CI divergence)
+- Checking unit test, lint, and type-check results before commits, pushes, or merges
 
 ### GitHub Copilot App Run Menu
 

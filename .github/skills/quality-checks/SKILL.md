@@ -1,17 +1,17 @@
 ---
 name: quality-checks
-description: Handles all test, lint, and quality-check execution for this project — running Vitest unit tests and ESLint; debugging failures; verifying code changes; and validating readiness before commits, pushes, or merges. Use this skill instead of running test, lint, or verification commands (such as npm run test:unit or npm run lint) directly.
+description: Runs this project's unit tests (Vitest), lint (ESLint), and type checks (tsgo + astro check), with guidance for debugging failures before commits, pushes, or merges. Use this skill when running npm run test:unit, npm run lint, or npm run typecheck:all.
 allowed-tools:
   - shell
 ---
 
 # Quality Checks
 
-This is a single Astro application (Astro 7 + Drizzle ORM/Node SQLite). All commands run from the repository root via npm scripts.
+This skill runs unit tests, lint, and type checks for a single Astro application (Astro 7 + Drizzle ORM/Node SQLite). All commands run from the repository root via npm scripts.
 
 ## Quick Reference
 
-| Test Suite | Command | When to Use |
+| Check | Command | When to Use |
 |------------|----------------------------|-------------|
 | Unit tests (Vitest) | `npm run test:unit` | After any data-layer / transform / helper change |
 | Lint (ESLint) | `npm run lint` | After any TypeScript or Astro change |
@@ -21,7 +21,7 @@ All commands assume dependencies are installed (`npm ci`).
 
 ---
 
-## Running the Verification Suite
+## Running Unit Tests, Lint, and Type Checks
 
 ### Unit Tests
 
@@ -112,7 +112,7 @@ npx vitest run src/lib/games.test.ts
 
 ### Local vs CI Divergence
 
-**Symptom**: Tests pass locally but fail in CI (or vice versa).
+**Symptom**: Unit tests, lint, or type checks pass locally but fail in CI (or vice versa).
 
 - **Node version mismatch**: CI uses the current Node LTS release.
 - **Database state**: CI always builds from a clean seed. Locally, delete `tailspin.db` and rebuild if you suspect stale data.
@@ -121,16 +121,16 @@ npx vitest run src/lib/games.test.ts
 
 ## Verification Policy
 
-### Tests Must Pass Before Commit/Merge
+### Unit Tests, Lint, and Type Checks Must Pass Before Commit/Merge
 
-- All existing tests must pass before committing changes
-- Never skip or disable tests without explicit justification
-- Broken tests block merges — fix them, don't ignore them
-- Run the full test suite, not just tests for changed code
-- New functionality must ship with appropriate test coverage
+- All existing unit tests, lint, and type checks must pass before committing changes
+- Never skip or disable unit tests without explicit justification
+- Failing unit tests, lint, or type checks block merges — fix them, don't ignore them
+- Run the full unit test suite, not just tests for changed code
+- New functionality must ship with appropriate unit test coverage
 
 > [!NOTE]
-> This skill covers **running, verifying, and debugging** tests. For **how to author** test code — structure, fixtures, naming, and quality standards — follow the instructions files, which are the single source of truth:
+> This skill covers **running, verifying, and debugging** unit tests, lint, and type checks. For **how to author** unit test code — structure, fixtures, naming, and quality standards — follow the instructions files, which are the single source of truth:
 > - Unit tests (`**/*.test.ts`): [unit-tests.instructions.md](../../instructions/unit-tests.instructions.md)
 
 ---
@@ -140,5 +140,5 @@ npx vitest run src/lib/games.test.ts
 1. Run lint (if any frontend files changed): `npm run lint`
 2. Run type check (if any TypeScript / Astro files changed): `npm run typecheck:all`
 3. Run unit tests (if data layer / helpers changed): `npm run test:unit`
-4. Verify new functionality has appropriate test coverage
-5. Confirm no tests were broken, skipped, or disabled
+4. Verify new functionality has appropriate unit test coverage
+5. Confirm no unit tests were broken, skipped, or disabled
