@@ -27,6 +27,10 @@ npm ci
 npx playwright install chromium   # only needed to run the E2E tests
 ```
 
+### GitHub Copilot App Run Menu
+
+The [GitHub Copilot app](https://github.com/github/github-app) reads `.github/github-app.yml` to provide project commands in its **Run** menu. New sessions automatically install dependencies; use **Run development site** to start Astro. When Astro reports its local URL, the app opens it in the browser canvas automatically. The menu also provides static build and type-check commands for on-demand validation.
+
 ## Launch the site
 
 ```bash
@@ -88,31 +92,6 @@ npm run typecheck:all    # both of the above
 
 > [!NOTE]
 > The native compiler is used only for type checking (`--noEmit`); the site is still built by `astro build` (Vite/esbuild). The classic `typescript` package stays on v6 until `typescript-eslint` and `@astrojs/check` support the native API (~TS 7.1); a Dependabot `ignore` in `.github/dependabot.yml` holds the classic `typescript@7` bump until then.
-
-## Copilot Customizations
-
-This project ships Copilot customizations to assist with development:
-
-### Database Explorer Canvas
-
-The shared **Database Explorer** canvas (`.github/extensions/database-explorer/`) provides a small UI and agent actions for browsing the project's SQLite tables and running one read-only `SELECT` or `WITH` query at a time. It uses the database at `.data/tailspin.db` (or `DATABASE_URL` when set), so run `npm run db:setup` before opening it in a fresh checkout.
-
-### quality-checks Skill
-
-The **quality-checks** skill (`.github/skills/quality-checks/SKILL.md`) runs the project's unit tests (Vitest), lint (ESLint), and type checks (tsgo + astro check), with a debugging and troubleshooting runbook. Use it via `/quality-checks` when:
-
-- Running unit tests, lint, or type checks for the first time after setup
-- Diagnosing failures in these checks (environment setup, database state, CI divergence)
-- Checking unit test, lint, and type-check results before commits, pushes, or merges
-
-### GitHub Copilot App Run Menu
-
-The [GitHub Copilot app](https://github.com/github/github-app) reads
-`.github/github-app.yml` to provide project commands in its **Run** menu.
-New sessions automatically install dependencies; use **Run development site** to
-start Astro. When Astro reports its local URL, the app opens it in the browser
-canvas automatically. The menu also provides static build and type-check
-commands for on-demand validation.
 
 ## License 
 
