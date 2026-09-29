@@ -27,10 +27,6 @@ npm ci
 npx playwright install chromium   # only needed to run the E2E tests
 ```
 
-### GitHub Copilot App Run Menu
-
-The [GitHub Copilot app](https://github.com/github/github-app) reads `.github/github-app.yml` to provide project commands in its **Run** menu. New sessions automatically install dependencies; use **Run development site** to start Astro. When Astro reports its local URL, the app opens it in the browser canvas automatically. The menu also provides static build and type-check commands for on-demand validation.
-
 ## Launch the site
 
 ```bash
