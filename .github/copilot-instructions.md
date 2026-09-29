@@ -65,9 +65,9 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Make sure to explicitly set the workflow permissions
 - Add comments to document what tasks are being performed
 
-## Scripts
+## npm Commands
 
-- The project uses **npm scripts** for all development tasks — there is no `scripts/` directory.
+- Development commands are defined in `package.json`. They run Astro for the site and TypeScript tasks in `db/` for database setup.
 - **Skills take precedence.** Before running a command directly, check whether a skill covers the task (e.g. the `quality-checks` skill wraps unit tests, lint, and type checks). If one applies, follow it.
 - Key npm scripts:
   - `npm run dev` — start the Astro dev server (`predev` migrates + seeds the local SQLite database)

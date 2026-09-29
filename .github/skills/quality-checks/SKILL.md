@@ -7,7 +7,7 @@ allowed-tools:
 
 # Quality Checks
 
-This skill runs unit tests, lint, and type checks for a single Astro application (Astro 7 + Drizzle ORM/Node SQLite). All commands run from the repository root via npm scripts.
+This skill runs unit tests, lint, and type checks for a single Astro application (Astro 7 + Drizzle ORM/Node SQLite). Run the npm commands defined in `package.json` from the repository root.
 
 ## Quick Reference
 
@@ -72,7 +72,7 @@ npm ci
 
 **Symptom**: Empty pages, `no such table`, or a build that produces no game pages.
 
-The SQLite database must be migrated and seeded **before** `astro build`. The `prebuild`/`predev` scripts do this automatically, but you can run it manually:
+The SQLite database must be migrated and seeded **before** `astro build`. The `prebuild` and `predev` npm hooks run the TypeScript migration and seed tasks in `db/` automatically when you use `npm run build` or `npm run dev`. To set up the database on its own:
 
 ```bash
 npm run db:setup     # db:migrate + db:seed
