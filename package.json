@@ -36,17 +36,17 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.3",
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.5",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^10.11.0",
+    "eslint": "^10.12.0",
     "eslint-plugin-astro": "^3.2.1",
-    "globals": "^17.12.0",
-    "postcss": "^8.5.28",
+    "globals": "^17.13.0",
+    "postcss": "^8.5.30",
     "tailwindcss": "^4.3.1",
     "tsx": "^4.23.15",
-    "typescript-eslint": "^8.71.0",
-    "vitest": "^5.0.2"
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.4"
   }
 }
