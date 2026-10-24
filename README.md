@@ -64,6 +64,8 @@ npm run test:unit   # Vitest unit tests (transforms + data-access helpers)
 npm run test:e2e    # Playwright E2E tests (builds + previews the static site first)
 ```
 
+CI runs the E2E suite in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner.
+
 ## Linting
 
 The frontend uses ESLint to enforce code quality across TypeScript and Astro files. Run it with:

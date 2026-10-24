@@ -96,16 +96,39 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
+  # Resolve the image before starting the E2E container so dependency updates
+  # always use the browser binaries for the locked Playwright version.
+  playwright-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+
+      - name: Resolve Playwright image from lockfile
+        id: image
+        run: |
+          node -p "'image=mcr.microsoft.com/playwright:v' + require('./package-lock.json').packages['node_modules/@playwright/test'].version + '-noble'" >> "$GITHUB_OUTPUT"
+
   # Build the static site and run the Playwright end-to-end suite against it
   frontend-tests:
+    needs: playwright-image
     runs-on: ubuntu-latest
     # Run inside Playwright's official image so the browsers and their OS-level
     # dependencies are preinstalled. This is the approach recommended by the
     # Playwright CI docs (https://playwright.dev/docs/ci) and avoids the slow,
     # network-variable `playwright install --with-deps` apt step on each run.
-    # The tag MUST match the @playwright/test version in package-lock.json
-    # so the bundled browsers resolve; bump it whenever Playwright is upgraded.
-    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    # Derive the tag from package-lock.json so the bundled browsers resolve.
+    container: ${{ needs.playwright-image.outputs.image }}
     permissions:
       contents: read
 

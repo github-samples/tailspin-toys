@@ -64,6 +64,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Follow good security practices
 - Make sure to explicitly set the workflow permissions
 - Add comments to document what tasks are being performed
+- Keep the Playwright CI container image derived from the locked `@playwright/test` version so dependency updates use matching browsers.
 
 ## npm Commands
 
