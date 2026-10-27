@@ -27,7 +27,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.11",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
     "drizzle-orm": "^0.45.4",
