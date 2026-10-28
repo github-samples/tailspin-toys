@@ -18,6 +18,12 @@ This repository is a GitHub template. When you create a new repository from it, 
 
 The workflow only runs on repositories created from the template (the `if: ${{ !github.event.repository.is_template }}` guard skips the template itself), and after creating the issues it removes itself and the `.github/bootstrap-issues/` folder in a cleanup commit so it never runs again.
 
+## Context infrastructure demo
+
+A small rehearsal for treating AI context as shared, versioned team infrastructure lives in [`docs/context-infrastructure-demo.md`](docs/context-infrastructure-demo.md). It explains the `Choose -> Compose -> Ship -> Maintain + Learn` loop, copyable prompts, acceptance evidence, and client-specific setup checks that the repo expects before any delegated or multi-agent workflow is trusted.
+
+The QA gate for this pattern is defined in [`.github/agents/context-qa-reviewer.md`](.github/agents/context-qa-reviewer.md). It reviews repo constraints, instructions, and evidence without silently patching the codebase.
+
 ## Getting started
 
 Install dependencies once with Node.js 22.13 or later:
