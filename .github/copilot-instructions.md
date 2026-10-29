@@ -98,5 +98,13 @@ The application lives at the repository root:
 - `src/styles/`: CSS and Tailwind configuration
 - `src/types/`: TypeScript interfaces (Game, Publisher, Category)
 - `e2e-tests/`: Playwright E2E tests (home, games, accessibility)
+- `.github/extensions/`: project-scoped Copilot SDK extensions and canvases
 - `drizzle.config.ts`, `vitest.config.ts`, `astro.config.mjs`, `playwright.config.ts`: tooling config
 - `README.md`: Project documentation
+
+### Copilot extension canvases
+
+- Keep project-shared canvas extensions in an immediate subdirectory of `.github/extensions/` with an `extension.mjs` entry point.
+- Use the bundled `@github/copilot-sdk/extension` API, bind embedded HTTP servers to `127.0.0.1`, and close each instance's server in `onClose`.
+- Put substantial renderer HTML/CSS/JavaScript in sibling assets, use semantic accessible controls, and keep canvas data access read-only unless a feature explicitly requires writes.
+- Never use `console.log` in an extension entry point; stdout is reserved for the SDK protocol.
