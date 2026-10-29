@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { createServer } from "node:http";
+// Use SQLite's read-only mode so the canvas cannot mutate the seeded catalog.
 import { DatabaseSync } from "node:sqlite";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
