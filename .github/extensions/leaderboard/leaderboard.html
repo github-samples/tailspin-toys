@@ -1,0 +1,410 @@
+<!doctype html>
+<!--
+THESIS: The ranked table is the leaderboard; it refuses invented popularity or player-score claims.
+OWN-WORLD: Tailspin's dark slate UI, crisp blue action states, restrained row dividers, and compact rating numerals.
+STORY: Compare games by their existing star ratings, then scan publisher and genre context.
+FIRST VIEWPORT: Title and explanation align left, refresh aligns right; category filter and rating summary sit above the ranked table.
+FORM: Operate-mode data table extending the established product UI; local canvas, no concept seed.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Game Leaderboard | Tailspin Toys</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: var(--font-sans, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+        --page: #0f172a;
+        --surface: #172338;
+        --surface-hover: #1e293b;
+        --text: #f8fafc;
+        --muted: #a7b3c5;
+        --line: #334155;
+        --accent: #60a5fa;
+        --accent-strong: #3b82f6;
+        --focus: #93c5fd;
+        --error: #fca5a5;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 28px clamp(16px, 3vw, 36px) 36px;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 20px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 650;
+        letter-spacing: -0.035em;
+        line-height: 1.2;
+      }
+
+      .lede {
+        max-width: 65ch;
+        margin: 8px 0 0;
+        color: var(--muted);
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 18px 0 14px;
+      }
+
+      .filter {
+        display: grid;
+        gap: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      select, button {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        font: inherit;
+      }
+
+      select {
+        min-width: 190px;
+        padding: 7px 34px 7px 10px;
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      button {
+        padding: 7px 13px;
+        background: var(--accent-strong);
+        border-color: var(--accent-strong);
+        color: #fff;
+        font-weight: 650;
+        cursor: pointer;
+        transition: background-color 160ms ease, border-color 160ms ease;
+      }
+
+      button:hover:not(:disabled) {
+        background: #2563eb;
+        border-color: #2563eb;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      select:focus-visible, button:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+      }
+
+      .summary {
+        min-height: 24px;
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      th, td {
+        padding: 13px 15px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: middle;
+      }
+
+      th {
+        color: var(--muted);
+        background: #111d30;
+        font-size: 11px;
+        font-weight: 650;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      tbody tr:last-child td { border-bottom: 0; }
+      tbody tr:hover { background: var(--surface-hover); }
+      tbody tr.top-ranked td { background: rgb(59 130 246 / 7%); }
+
+      .rank {
+        width: 76px;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+      }
+
+      .game-title {
+        color: var(--text);
+        font-weight: 650;
+      }
+
+      .publisher, .category { color: var(--muted); }
+
+      .score {
+        min-width: 100px;
+        color: var(--text);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .score-scale {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .not-rated {
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .table-state {
+        padding: 28px 18px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .table-state strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--text);
+        font-size: 15px;
+      }
+
+      .error { color: var(--error); }
+
+      .skeleton {
+        display: inline-block;
+        width: min(100%, 150px);
+        height: 12px;
+        border-radius: 4px;
+        background: #334155;
+      }
+
+      @media (max-width: 640px) {
+        main { padding-top: 20px; }
+        .page-header { align-items: flex-start; flex-direction: column; }
+        h1 { font-size: 24px; }
+        .toolbar { align-items: stretch; }
+        .filter { flex: 1 1 100%; }
+        select { width: 100%; }
+        .table-wrap { border-radius: 8px; }
+        th, td { padding: 11px 12px; }
+        .publisher { display: none; }
+        table { table-layout: fixed; }
+        th, td { padding: 10px 8px; }
+        th:first-child { width: 52px; }
+        th:nth-child(2) { width: 39%; }
+        th:nth-child(4) { width: 23%; }
+        th:nth-child(5) { width: 22%; }
+        .score { min-width: 0; }
+        .game-title { overflow-wrap: anywhere; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="page-header">
+        <div>
+          <h1>Game leaderboard</h1>
+          <p class="lede">Compare Tailspin Toys games by their existing star ratings.</p>
+        </div>
+      </header>
+
+      <section aria-label="Game ratings">
+        <div class="toolbar">
+          <label class="filter" for="category-filter">
+            Genre
+            <select id="category-filter" data-testid="leaderboard-category">
+              <option value="">All genres</option>
+            </select>
+          </label>
+          <button id="refresh" type="button" data-testid="leaderboard-refresh">Refresh ratings</button>
+        </div>
+
+        <p id="summary" class="summary" role="status" aria-live="polite">Loading game ratings…</p>
+
+        <div class="table-wrap">
+          <table aria-label="Games ranked by star rating">
+            <thead>
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Game</th>
+                <th scope="col" class="publisher">Publisher</th>
+                <th scope="col">Genre</th>
+                <th scope="col">Score</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body" aria-live="polite">
+              <tr aria-hidden="true"><td colspan="5"><span class="skeleton"></span></td></tr>
+              <tr aria-hidden="true"><td colspan="5"><span class="skeleton"></span></td></tr>
+              <tr aria-hidden="true"><td colspan="5"><span class="skeleton"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const body = document.querySelector("#leaderboard-body");
+      const categoryFilter = document.querySelector("#category-filter");
+      const refreshButton = document.querySelector("#refresh");
+      const summary = document.querySelector("#summary");
+
+      function createCell(className, text) {
+        const cell = document.createElement("td");
+        cell.className = className;
+        cell.textContent = text;
+        return cell;
+      }
+
+      function renderRows(games) {
+        body.replaceChildren();
+        if (!games.length) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 5;
+          cell.className = "table-state";
+          const heading = document.createElement("strong");
+          heading.textContent = "No games in this genre";
+          const detail = document.createElement("span");
+          detail.textContent = "Choose another genre to see its ratings.";
+          cell.append(heading, detail);
+          row.append(cell);
+          body.append(row);
+          return;
+        }
+
+        for (const game of games) {
+          const row = document.createElement("tr");
+          if (game.rank === 1) row.classList.add("top-ranked");
+          row.append(createCell("rank", game.rank === null ? "—" : `#${game.rank}`));
+          row.append(createCell("game-title", game.title));
+          row.append(createCell("publisher", game.publisher));
+          row.append(createCell("category", game.category));
+
+          const score = document.createElement("td");
+          score.className = "score";
+          if (game.score === null) {
+            score.textContent = "Not rated";
+            score.classList.add("not-rated");
+          } else {
+            score.setAttribute("aria-label", `${game.score.toFixed(1)} out of 5 stars`);
+            score.append(
+              document.createTextNode(game.score.toFixed(1)),
+              Object.assign(document.createElement("span"), {
+                className: "score-scale",
+                textContent: " / 5",
+              }),
+            );
+          }
+          row.append(score);
+          body.append(row);
+        }
+      }
+
+      function renderCategories(categories) {
+        const selected = categoryFilter.value;
+        categoryFilter.replaceChildren(new Option("All genres", ""));
+        for (const category of categories) {
+          categoryFilter.add(new Option(category, category));
+        }
+        categoryFilter.value = categories.includes(selected) ? selected : "";
+      }
+
+      function renderLoading() {
+        summary.textContent = "Loading game ratings…";
+        summary.classList.remove("error");
+        body.replaceChildren();
+        for (let index = 0; index < 3; index += 1) {
+          const row = document.createElement("tr");
+          row.setAttribute("aria-hidden", "true");
+          const cell = document.createElement("td");
+          cell.colSpan = 5;
+          cell.append(document.createElement("span"));
+          cell.firstElementChild.className = "skeleton";
+          row.append(cell);
+          body.append(row);
+        }
+      }
+
+      async function loadLeaderboard() {
+        const selectedCategory = categoryFilter.value;
+        const query = selectedCategory ? `?category=${encodeURIComponent(selectedCategory)}` : "";
+        refreshButton.disabled = true;
+        categoryFilter.disabled = true;
+        renderLoading();
+
+        try {
+          const response = await fetch(`/api/leaderboard${query}`, { cache: "no-store" });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "Could not load game ratings.");
+          }
+
+          renderCategories(data.categories);
+          renderRows(data.games);
+          const { total, rated, unrated, average } = data.summary;
+          if (total === 0) {
+            summary.textContent = "No games are available in this genre.";
+          } else if (rated === 0) {
+            summary.textContent = `${total} ${total === 1 ? "game" : "games"} listed · no ratings yet`;
+          } else {
+            const ratingSummary = `${rated} rated · ${unrated} not rated`;
+            summary.textContent = `${total} ${total === 1 ? "game" : "games"} listed · ${ratingSummary} · ${average.toFixed(1)} average`;
+          }
+        } catch (error) {
+          body.replaceChildren();
+          summary.textContent = `Could not load game ratings. ${error instanceof Error ? error.message : "Refresh to try again."}`;
+          summary.classList.add("error");
+        } finally {
+          refreshButton.disabled = false;
+          categoryFilter.disabled = false;
+        }
+      }
+
+      categoryFilter.addEventListener("change", loadLeaderboard);
+      refreshButton.addEventListener("click", loadLeaderboard);
+      loadLeaderboard();
+    </script>
+  </body>
+</html>
