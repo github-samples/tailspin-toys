@@ -30,3 +30,12 @@ export function formatStarRating(rating: number | null): string {
 
     return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
 }
+
+/**
+ * Formats the score displayed alongside a game's stars.
+ */
+export function formatRatingSummary(rating: number | null): string {
+    if (rating === null) return 'no rating yet';
+
+    return `${clampRating(rating).toFixed(1)} / 5`;
+}
