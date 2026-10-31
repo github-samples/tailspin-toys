@@ -122,7 +122,7 @@ describe('toCatalogExport', () => {
         expect(game.category).toBe('Uncategorized');
         expect(game.publisher).toBe('Unknown publisher');
         expect(game.starRating).toBeUndefined();
-        expect(game.ratingLabel).toBe('Not yet rated');
+        expect(game.ratingLabel).toBe('No rating yet');
     });
 
     it('never emits null values', () => {

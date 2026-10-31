@@ -17,11 +17,11 @@ export function clampRating(rating: number): number {
  * Builds a star glyph string for a rating between 0 and 5.
  *
  * Renders full (★), an optional half (½) and empty (☆) stars. Returns
- * `'Not yet rated'` when the rating is `null`. Ratings are clamped to the
+ * `'No rating yet'` when the rating is `null`. Ratings are clamped to the
  * 0–5 range so the output always contains exactly five star positions.
  */
 export function formatStarRating(rating: number | null): string {
-    if (rating === null) return 'Not yet rated';
+    if (rating === null) return 'No rating yet';
 
     const clamped = clampRating(rating);
     const fullStars = Math.floor(clamped);
