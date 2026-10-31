@@ -1,5 +1,5 @@
 ---
-import { clampRating, formatStarRating } from '../lib/ratings';
+import { formatRatingOutOfFive, formatStarRating } from '../lib/ratings';
 
 interface Props {
     rating: number | null;
@@ -8,11 +8,15 @@ interface Props {
 const { rating } = Astro.props;
 ---
 
-{rating !== null && (
-    <div class="flex items-center">
-        <span class="bg-blue-500/20 text-blue-400 text-sm px-3 py-1 rounded-full" data-testid="game-rating">
-            <span class="text-yellow-400">{formatStarRating(rating)}</span>
-            {clampRating(rating).toFixed(1)}
-        </span>
-    </div>
-)}
+<div class="flex items-center">
+    <span class="bg-blue-500/20 text-blue-400 text-sm px-3 py-1 rounded-full" data-testid="game-rating">
+        {rating === null ? (
+            formatRatingOutOfFive(rating)
+        ) : (
+            <>
+                <span class="text-yellow-400 mr-1" aria-hidden="true">{formatStarRating(rating)}</span>
+                {formatRatingOutOfFive(rating)}
+            </>
+        )}
+    </span>
+</div>
