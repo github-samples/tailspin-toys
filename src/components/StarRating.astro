@@ -1,18 +1,19 @@
 ---
-import { clampRating, formatStarRating } from '../lib/ratings';
+import { clampRating, formatRatingDisplay, formatStarRating } from '../lib/ratings';
 
 interface Props {
     rating: number | null;
+    listing?: boolean;
 }
 
-const { rating } = Astro.props;
+const { rating, listing = false } = Astro.props;
 ---
 
-{rating !== null && (
+{(rating !== null || listing) && (
     <div class="flex items-center">
         <span class="bg-blue-500/20 text-blue-400 text-sm px-3 py-1 rounded-full" data-testid="game-rating">
-            <span class="text-yellow-400">{formatStarRating(rating)}</span>
-            {clampRating(rating).toFixed(1)}
+            {rating !== null && <span class="text-yellow-400">{formatStarRating(rating)}</span>}
+            {listing ? formatRatingDisplay(rating) : rating !== null && clampRating(rating).toFixed(1)}
         </span>
     </div>
 )}
