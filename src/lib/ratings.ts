@@ -30,3 +30,8 @@ export function formatStarRating(rating: number | null): string {
 
     return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
 }
+
+/** Formats the numeric rating for game listings. */
+export function formatRatingOutOfFive(rating: number | null): string {
+    return rating === null ? 'No rating yet' : `${rating} / 5`;
+}
