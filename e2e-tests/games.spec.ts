@@ -24,6 +24,20 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should display each game rating out of five on its card', async ({ page }) => {
+    await page.goto('/');
+
+    const gameCards = page.getByTestId('game-card');
+    const gameRatings = page.getByTestId('game-rating');
+
+    await expect(gameCards.first()).toBeVisible();
+    await expect(gameRatings).toHaveCount(await gameCards.count());
+
+    for (const gameRating of await gameRatings.all()) {
+      await expect(gameRating).toHaveText(/[★½☆]+\d\.\d \/ 5/);
+    }
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
