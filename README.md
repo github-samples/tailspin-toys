@@ -60,7 +60,7 @@ npm run db:export     # write the seeded catalog to db/catalog.json
 ## Running tests
 
 ```bash
-npm run test:unit   # Vitest unit tests (transforms + data-access helpers)
+npm run test:unit   # Vitest unit tests (transforms, data-access helpers, Database Explorer read-only query policy)
 npm run test:e2e    # Playwright E2E tests (builds + previews the static site first)
 ```
 
