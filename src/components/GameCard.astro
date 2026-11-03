@@ -1,6 +1,7 @@
 ---
 import type { Game } from '../types/game';
 import Tag from './Tag.astro';
+import StarRating from './StarRating.astro';
 import ArrowRight from '../assets/icons/arrow-right.svg';
 
 interface Props {
@@ -21,6 +22,10 @@ const { game } = Astro.props;
         <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div class="relative z-10">
             <h3 class="text-xl font-semibold text-slate-100 mb-2 group-hover:text-blue-400 transition-colors" data-testid="game-title">{game.title}</h3>
+
+            <div class="mb-3">
+                <StarRating rating={game.starRating} />
+            </div>
 
             {(game.category?.name || game.publisher?.name) && (
                 <div class="flex gap-2 mb-3">
