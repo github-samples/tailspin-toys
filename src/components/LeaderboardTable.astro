@@ -1,0 +1,55 @@
+---
+import type { LeaderboardEntry } from '../lib/leaderboard';
+import { formatStarRating } from '../lib/ratings';
+
+interface Props {
+    /** Ranked entries to display, in display order. */
+    entries: LeaderboardEntry[];
+    /** Accessible table caption describing the list. */
+    caption: string;
+}
+
+const { entries, caption } = Astro.props;
+---
+
+<div class="overflow-x-auto rounded-lg border border-slate-700">
+  <table class="min-w-full text-left text-sm text-slate-200" data-testid="leaderboard-table">
+    <caption class="sr-only">{caption}</caption>
+    <thead class="bg-slate-800 text-slate-100">
+      <tr>
+        <th scope="col" class="px-4 py-3 font-semibold">Rank</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Game</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Genre</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Rating</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-700">
+      {entries.map((entry) => (
+        <tr class="bg-slate-900 hover:bg-slate-800 transition-colors duration-200" data-testid="leaderboard-row" data-game-id={entry.id}>
+          <td class="px-4 py-3 font-medium text-slate-100" data-testid="leaderboard-rank">
+            {entry.rank ?? '—'}
+          </td>
+          <td class="px-4 py-3">
+            <a href={`/game/${entry.id}`} class="text-blue-400 hover:underline focus:ring-2 focus:ring-blue-500 focus:outline-none rounded" data-testid="leaderboard-game-link">
+              {entry.title}
+            </a>
+          </td>
+          <td class="px-4 py-3 text-slate-400" data-testid="leaderboard-genre">
+            {entry.category?.name ?? 'Uncategorised'}
+          </td>
+          <td class="px-4 py-3" data-testid="leaderboard-rating">
+            {entry.starRating === null ? (
+              <span class="text-slate-400">Not yet rated</span>
+            ) : (
+              <span>
+                <span aria-hidden="true" class="text-yellow-400">{formatStarRating(entry.starRating)}</span>
+                <span class="sr-only">{`${entry.starRating} out of 5 stars`}</span>
+                <span class="ml-2 text-slate-400">{entry.starRating.toFixed(1)}</span>
+              </span>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

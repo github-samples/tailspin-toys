@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import EmptyState from '../components/EmptyState.astro';
+import GenreFilter from '../components/GenreFilter.astro';
+import LeaderboardTable from '../components/LeaderboardTable.astro';
+import { getDatabase } from '../lib/db';
+import { getAllGames } from '../lib/games';
+import { buildLeaderboard, listGenres } from '../lib/leaderboard';
+
+export const prerender = true;
+
+const games = await getAllGames(getDatabase());
+const entries = buildLeaderboard(games);
+const genres = listGenres(games);
+---
+
+<Layout title="Leaderboard - Tailspin Toys">
+  <div class="py-8">
+    <PageHero
+      title="Game Leaderboard"
+      subtitle="Games ranked by their star ratings. Ratings reflect player opinion, not gameplay scores."
+    />
+
+    <div class="flex flex-col gap-6">
+      <GenreFilter genres={genres} activeId={null} />
+
+      {entries.length === 0 ? (
+        <EmptyState text="No games available at the moment." />
+      ) : (
+        <LeaderboardTable entries={entries} caption="All games ranked by star rating" />
+      )}
+    </div>
+  </div>
+</Layout>
