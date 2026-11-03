@@ -34,6 +34,13 @@ updates:
     ignore:
       - dependency-name: "typescript"
         versions: ["7.x"]
+  # Keep SHA-pinned GitHub Actions up to date (same 7-day cooldown).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
