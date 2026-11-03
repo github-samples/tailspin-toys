@@ -1,3 +1,4 @@
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
@@ -105,6 +106,12 @@ function validateReadOnlyQuery(query) {
         throw new Error("Only read-only SELECT and WITH queries are allowed.");
     }
 
+    // Blocks data-modifying statements hidden behind WITH; the read-only connection is the primary defense.
+    const withoutLiterals = statement.replace(/'(?:[^']|'')*'|"(?:[^"]|"")*"|`(?:[^`]|``)*`/g, " ");
+    if (/\b(INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|ATTACH|DETACH|PRAGMA|VACUUM|REINDEX)\b/i.test(withoutLiterals)) {
+        throw new Error("Only read-only SELECT and WITH queries are allowed.");
+    }
+
     return statement;
 }
 
@@ -115,6 +122,7 @@ function normalizeValue(value) {
 async function executeQuery(url, query) {
     const client = createClient({ url });
     try {
+        await client.execute("PRAGMA query_only = ON");
         const result = await client.execute(query);
         const columns = result.columns;
         const rows = result.rows.slice(0, MAX_DISPLAY_ROWS).map((row) =>
@@ -133,7 +141,21 @@ async function listTables(url) {
     );
 }
 
-function renderHtml() {
+function isAuthorizedRequest(request, port, token) {
+    const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`];
+    if (!allowedHosts.includes(request.headers.host ?? "")) {
+        return false;
+    }
+    const origin = request.headers.origin;
+    if (origin && !allowedHosts.some((host) => origin === `http://${host}`)) {
+        return false;
+    }
+    const supplied = Buffer.from(String(request.headers["x-explorer-token"] ?? ""));
+    const expected = Buffer.from(token);
+    return supplied.length === expected.length && timingSafeEqual(supplied, expected);
+}
+
+function renderHtml(token) {
     return `<!doctype html>
 <html>
   <head>
@@ -226,8 +248,9 @@ function renderHtml() {
         if (!data.rows.length) { result.innerHTML = '<div class="empty-state"><h3>No rows returned</h3><p>Try adjusting the query or selecting a table from the list.</p></div>'; return; }
         result.innerHTML = \`<p class="result-summary">\${data.rows.length} row(s) returned\${data.truncated ? "; showing the first 250" : ""}.</p><table><thead><tr>\${data.columns.map((column) => \`<th>\${escapeHtml(column)}</th>\`).join("")}</tr></thead><tbody>\${data.rows.map((row) => \`<tr>\${data.columns.map((column) => \`<td>\${escapeHtml(row[column])}</td>\`).join("")}</tr>\`).join("")}</tbody></table>\`;
       };
+      const token = ${JSON.stringify(token)};
       const request = async (path, options = {}) => {
-        const response = await fetch(path, options);
+        const response = await fetch(path, { ...options, headers: { ...options.headers, "X-Explorer-Token": token } });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error ?? "Request failed.");
         return data;
@@ -283,8 +306,18 @@ function renderHtml() {
 }
 
 async function startServer(url) {
+    const token = randomBytes(32).toString("hex");
+    let port = 0;
     const server = createServer(async (request, response) => {
         try {
+            const isApi = request.url === "/api/tables" || request.url === "/api/query";
+            const hostOk = [`127.0.0.1:${port}`, `localhost:${port}`].includes(request.headers.host ?? "");
+            if (!hostOk || (isApi && !isAuthorizedRequest(request, port, token))) {
+                response.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
+                response.end(JSON.stringify({ error: "Forbidden." }));
+                return;
+            }
+
             if (request.url === "/api/tables" && request.method === "GET") {
                 const data = await listTables(url);
                 response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
@@ -293,6 +326,11 @@ async function startServer(url) {
             }
 
             if (request.url === "/api/query" && request.method === "POST") {
+                if (!/^application\/json\b/i.test(request.headers["content-type"] ?? "")) {
+                    response.writeHead(415, { "Content-Type": "application/json; charset=utf-8" });
+                    response.end(JSON.stringify({ error: "Content-Type must be application/json." }));
+                    return;
+                }
                 const body = JSON.parse(await readRequestBody(request));
                 const data = await executeQuery(url, validateReadOnlyQuery(body.query));
                 response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
@@ -301,7 +339,7 @@ async function startServer(url) {
             }
 
             response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-            response.end(renderHtml());
+            response.end(renderHtml(token));
         } catch (error) {
             response.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
             response.end(JSON.stringify({ error: error instanceof Error ? error.message : "The request failed." }));
@@ -309,7 +347,7 @@ async function startServer(url) {
     });
     await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
     const address = server.address();
-    const port = typeof address === "object" && address ? address.port : 0;
+    port = typeof address === "object" && address ? address.port : 0;
     return { server, url: `http://127.0.0.1:${port}/` };
 }
 
