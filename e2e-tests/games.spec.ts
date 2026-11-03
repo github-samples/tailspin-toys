@@ -24,6 +24,17 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should display a star rating on every game listing card', async ({ page }) => {
+    await page.goto('/');
+
+    const gameCards = page.getByTestId('game-card');
+    const ratings = page.getByTestId('game-rating');
+    await expect(gameCards.first()).toBeVisible();
+    await expect(ratings).toHaveCount(await gameCards.count());
+    await expect(ratings.first()).toContainText(/\d\.\d \/ 5/);
+    await expect(ratings.first().locator('[aria-hidden="true"]')).not.toBeEmpty();
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
@@ -69,6 +80,10 @@ test.describe('Game Listing and Navigation', () => {
       const gameDescription = page.getByTestId('game-details-description');
       await expect(gameDescription).toBeVisible();
       await expect(gameDescription).not.toBeEmpty();
+    });
+
+    await test.step('Verify the game rating is displayed out of five', async () => {
+      await expect(page.getByTestId('game-rating')).toContainText(/\d\.\d \/ 5/);
     });
 
     await test.step('Verify publisher or category information is present', async () => {
