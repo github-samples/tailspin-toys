@@ -24,6 +24,21 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should display a formatted rating badge on every game card', async ({ page }) => {
+    await page.goto('/');
+
+    const gameCards = page.getByTestId('game-card');
+    const ratings = page.getByTestId('game-rating');
+    await expect(gameCards.first()).toBeVisible();
+    await expect(ratings).toHaveCount(await gameCards.count());
+
+    for (const gameCard of await gameCards.all()) {
+      const rating = gameCard.getByTestId('game-rating');
+      await expect(rating).toBeVisible();
+      await expect(rating).toHaveText(/^(?:[★½☆]+\s*)?\d\.\d \/ 5$|^No rating yet$/);
+    }
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
