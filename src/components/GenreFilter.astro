@@ -1,0 +1,42 @@
+---
+import type { Category } from '../types/game';
+
+interface Props {
+    /** Genres (categories) available for filtering. */
+    genres: Category[];
+    /** Currently selected genre id, or null for all games. */
+    activeId: number | null;
+}
+
+const { genres, activeId } = Astro.props;
+
+const linkClass =
+    'inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none';
+---
+
+<nav aria-label="Filter leaderboard by genre" data-testid="genre-filter">
+  <ul class="flex flex-wrap gap-2">
+    <li>
+      <a
+        href="/leaderboard"
+        class:list={[linkClass, activeId === null ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700']}
+        aria-current={activeId === null ? 'page' : undefined}
+        data-testid="genre-filter-all"
+      >
+        All genres
+      </a>
+    </li>
+    {genres.map((genre) => (
+      <li>
+        <a
+          href={`/leaderboard/genre/${genre.id}`}
+          class:list={[linkClass, activeId === genre.id ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700']}
+          aria-current={activeId === genre.id ? 'page' : undefined}
+          data-testid={`genre-filter-${genre.id}`}
+        >
+          {genre.name}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

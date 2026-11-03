@@ -1,0 +1,46 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
+import EmptyState from '../../../components/EmptyState.astro';
+import GenreFilter from '../../../components/GenreFilter.astro';
+import LeaderboardTable from '../../../components/LeaderboardTable.astro';
+import { getDatabase } from '../../../lib/db';
+import { getAllGames } from '../../../lib/games';
+import { buildLeaderboard, listGenres } from '../../../lib/leaderboard';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+    const games = await getAllGames(getDatabase());
+    return listGenres(games).map((genre) => ({
+        params: { id: String(genre.id) },
+        props: { genreName: genre.name },
+    }));
+}
+
+const { id } = Astro.params;
+const { genreName } = Astro.props;
+const games = await getAllGames(getDatabase());
+const genreId = Number(id);
+const entries = buildLeaderboard(games, genreId);
+const genres = listGenres(games);
+---
+
+<Layout title={`${genreName} Leaderboard - Tailspin Toys`}>
+  <div class="py-8">
+    <PageHero
+      title={`${genreName} Leaderboard`}
+      subtitle="Games in this genre ranked by their star ratings. Ratings reflect player opinion, not gameplay scores."
+    />
+
+    <div class="flex flex-col gap-6">
+      <GenreFilter genres={genres} activeId={genreId} />
+
+      {entries.length === 0 ? (
+        <EmptyState text="No games in this genre yet." />
+      ) : (
+        <LeaderboardTable entries={entries} caption={`${genreName} games ranked by star rating`} />
+      )}
+    </div>
+  </div>
+</Layout>
