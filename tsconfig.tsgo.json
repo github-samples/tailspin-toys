@@ -4,6 +4,7 @@
     "noEmit": true
   },
   "include": [
+    ".github/extensions/**/*.ts",
     "db/**/*.ts",
     "src/lib/**/*.ts",
     "src/types/**/*.ts",
