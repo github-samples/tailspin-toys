@@ -1,0 +1,5 @@
+Feature: Home page smoke
+Scenario: Visitor sees the welcome heading
+  Given I open "/"
+  Then the page title should be "Tailspin Toys - Crowdfunding your new favorite game!"
+  And I should see heading "Welcome to Tailspin Toys"

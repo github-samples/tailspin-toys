@@ -20,6 +20,8 @@
     "predb:export": "npm run db:setup",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report",
+    "test:generate": "tsx scripts/test-generator/cli.ts",
     "test:e2e:install": "playwright install chromium",
     "typecheck": "tsgo --noEmit -p tsconfig.tsgo.json",
     "typecheck:astro": "astro sync && astro check",
