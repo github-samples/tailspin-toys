@@ -24,6 +24,21 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should display a rating or fallback on every game card', async ({ page }) => {
+    await page.goto('/');
+
+    const gameCards = page.getByTestId('game-card');
+    const gameRatings = page.getByTestId('game-rating');
+    const gameCount = await gameCards.count();
+
+    expect(gameCount).toBeGreaterThan(0);
+    await expect(gameRatings).toHaveCount(gameCount);
+
+    for (const gameRating of await gameRatings.all()) {
+      await expect(gameRating).toContainText(/(?:[0-5]\.\d \/ 5|No rating yet)$/);
+    }
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
