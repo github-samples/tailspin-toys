@@ -158,9 +158,6 @@ describe('database explorer read-only query policy', () => {
     expect(snapshotDatabase()).toEqual(before);
     expect(before.games).toHaveLength(3);
   });
-
-  // Tracked privately per SECURITY.md; enable once the policy gap is resolved.
-  it.todo('rejects statements that begin with WITH but are not read-only queries');
 });
 
 describe('database explorer entry points', () => {
