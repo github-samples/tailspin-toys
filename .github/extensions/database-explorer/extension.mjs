@@ -105,6 +105,12 @@ function validateReadOnlyQuery(query) {
         throw new Error("Only read-only SELECT and WITH queries are allowed.");
     }
 
+    // Blank out quoted text so keywords inside literals/identifiers are ignored.
+    const unquoted = statement.replace(/'(?:[^']|'')*'|"(?:[^"]|"")*"|`(?:[^`]|``)*`|\[[^\]]*\]/g, "''");
+    if (/\b(INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|ATTACH|DETACH|PRAGMA|VACUUM|REINDEX|ANALYZE)\b|\bREPLACE\s+INTO\b/i.test(unquoted)) {
+        throw new Error("Only read-only queries are allowed; statements that modify the database are rejected.");
+    }
+
     return statement;
 }
 
@@ -115,6 +121,12 @@ function normalizeValue(value) {
 async function executeQuery(url, query) {
     const client = createClient({ url });
     try {
+        // Defense in depth: the database itself refuses writes on this connection.
+        await client.execute("PRAGMA query_only = ON");
+        const guard = await client.execute("PRAGMA query_only");
+        if (Number(Object.values(guard.rows[0] ?? {})[0]) !== 1) {
+            throw new Error("Unable to enforce read-only mode; the query was not run.");
+        }
         const result = await client.execute(query);
         const columns = result.columns;
         const rows = result.rows.slice(0, MAX_DISPLAY_ROWS).map((row) =>
