@@ -106,7 +106,7 @@ function validateReadOnlyQuery(query) {
     }
 
     // Blank out quoted text so keywords inside literals/identifiers are ignored.
-    const unquoted = statement.replace(/'(?:[^']|'')*'|"(?:[^"]|"")*"|`(?:[^`]|``)*`/g, "''");
+    const unquoted = statement.replace(/'(?:[^']|'')*'|"(?:[^"]|"")*"|`(?:[^`]|``)*`|\[[^\]]*\]/g, "''");
     if (/\b(INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|ATTACH|DETACH|PRAGMA|VACUUM|REINDEX|ANALYZE)\b|\bREPLACE\s+INTO\b/i.test(unquoted)) {
         throw new Error("Only read-only queries are allowed; statements that modify the database are rejected.");
     }
