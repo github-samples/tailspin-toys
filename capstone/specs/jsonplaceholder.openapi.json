@@ -1,0 +1,101 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "JSONPlaceholder (subset)", "version": "1.0.0" },
+  "servers": [{ "url": "https://jsonplaceholder.typicode.com" }],
+  "paths": {
+    "/posts": {
+      "get": {
+        "operationId": "listPosts",
+        "summary": "List posts",
+        "tags": ["posts"],
+        "parameters": [{ "name": "userId", "in": "query", "required": false, "schema": { "type": "integer", "example": 1 } }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } } } } }
+        }
+      },
+      "post": {
+        "operationId": "createPost",
+        "summary": "Create a post",
+        "tags": ["posts"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewPost" } } } },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Post" } } } }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "example": 1 } }],
+      "get": {
+        "operationId": "getPost",
+        "summary": "Get a post by id",
+        "tags": ["posts"],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Post" } } } }
+        }
+      },
+      "put": {
+        "operationId": "updatePost",
+        "summary": "Update a post",
+        "tags": ["posts"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Post" } } } },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Post" } } } }
+        }
+      },
+      "delete": {
+        "operationId": "deletePost",
+        "summary": "Delete a post",
+        "tags": ["posts"],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/users/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "example": 1 } }],
+      "get": {
+        "operationId": "getUser",
+        "summary": "Get a user by id",
+        "tags": ["users"],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NewPost": {
+        "type": "object",
+        "required": ["title", "body", "userId"],
+        "properties": {
+          "title": { "type": "string", "example": "capstone title" },
+          "body": { "type": "string", "example": "capstone body" },
+          "userId": { "type": "integer", "example": 1 }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "required": ["id", "title", "body", "userId"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "title": { "type": "string", "example": "updated title" },
+          "body": { "type": "string", "example": "updated body" },
+          "userId": { "type": "integer", "example": 1 }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["id", "name", "email"],
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "address": {
+            "type": "object",
+            "properties": { "city": { "type": "string" }, "zipcode": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}
