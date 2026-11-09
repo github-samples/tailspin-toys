@@ -19,6 +19,11 @@ describe('formatStarRating', () => {
         expect(formatStarRating(null)).toBe('Not yet rated');
     });
 
+    it('returns a not-rated message for non-finite ratings', () => {
+        expect(formatStarRating(NaN)).toBe('Not yet rated');
+        expect(formatStarRating(Infinity)).toBe('Not yet rated');
+    });
+
     it('renders only full and empty stars for whole numbers', () => {
         expect(formatStarRating(0)).toBe('☆☆☆☆☆');
         expect(formatStarRating(3)).toBe('★★★☆☆');

@@ -89,9 +89,9 @@ export function parseGamesCsv(content: string): GameCsvRow[] {
         .filter((row) => (row.Title ?? '').trim().length > 0)
         .map((row) => ({
             title: row.Title.trim(),
-            category: row.Category.trim(),
-            publisher: row.Publisher.trim(),
-            description: row.Description.trim(),
+            category: (row.Category ?? '').trim(),
+            publisher: (row.Publisher ?? '').trim(),
+            description: (row.Description ?? '').trim(),
         }));
 }
 

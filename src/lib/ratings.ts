@@ -21,7 +21,7 @@ export function clampRating(rating: number): number {
  * 0–5 range so the output always contains exactly five star positions.
  */
 export function formatStarRating(rating: number | null): string {
-    if (rating === null) return 'Not yet rated';
+    if (rating === null || !Number.isFinite(rating)) return 'Not yet rated';
 
     const clamped = clampRating(rating);
     const fullStars = Math.floor(clamped);
