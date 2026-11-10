@@ -1,6 +1,8 @@
 export interface Step {
   keyword: string;
   text: string;
+  /** Raw data table rows (first row is the header), if the step has one. */
+  table?: string[][];
 }
 
 export interface Scenario {
@@ -13,30 +15,56 @@ export interface Feature {
   scenarios: Scenario[];
 }
 
+export interface StepMatch {
+  call: string;
+  module: string;
+}
+
 interface StepPattern {
   regex: RegExp;
-  render: (args: string[]) => string;
+  method: string;
+  module: string;
+  /** Quoted values captured from the step text become method arguments. */
+  takesTable?: boolean;
 }
 
 const q = (value: string): string => JSON.stringify(value);
 
-// Each pattern maps a plain-English step to a method in e2e-tests/steps/common-steps.ts.
+// Each pattern maps a plain-English step to a method in e2e-tests/steps/<module>.ts.
 const STEP_PATTERNS: StepPattern[] = [
-  { regex: /^I open "([^"]*)"$/i, render: ([path]) => `openPage(page, ${q(path)})` },
-  { regex: /^I click "([^"]*)"$/i, render: ([name]) => `clickByName(page, ${q(name)})` },
+  { regex: /^I open "([^"]*)"$/i, method: 'openPage', module: 'common-steps' },
+  { regex: /^I click "([^"]*)"$/i, method: 'clickByName', module: 'common-steps' },
+  { regex: /^I fill "([^"]*)" with "([^"]*)"$/i, method: 'fillField', module: 'common-steps' },
+  { regex: /^I should see text "([^"]*)"$/i, method: 'expectText', module: 'common-steps' },
+  { regex: /^I should see heading "([^"]*)"$/i, method: 'expectHeading', module: 'common-steps' },
+  { regex: /^I should be on "([^"]*)"$/i, method: 'expectPath', module: 'common-steps' },
+  { regex: /^the page title should be "([^"]*)"$/i, method: 'expectTitle', module: 'common-steps' },
+
+  // Payroll demo steps (e2e-tests/steps/payroll-steps.ts)
+  { regex: /^Navigate to Payroll$/i, method: 'navigateToPayroll', module: 'payroll-steps' },
   {
-    regex: /^I fill "([^"]*)" with "([^"]*)"$/i,
-    render: ([label, value]) => `fillField(page, ${q(label)}, ${q(value)})`,
+    regex: /^Navigate to payroll manage page for file upload$/i,
+    method: 'navigateToPayrollManagePage',
+    module: 'payroll-steps',
   },
-  { regex: /^I should see text "([^"]*)"$/i, render: ([text]) => `expectText(page, ${q(text)})` },
-  { regex: /^I should see heading "([^"]*)"$/i, render: ([name]) => `expectHeading(page, ${q(name)})` },
-  { regex: /^I should be on "([^"]*)"$/i, render: ([path]) => `expectPath(page, ${q(path)})` },
-  { regex: /^the page title should be "([^"]*)"$/i, render: ([title]) => `expectTitle(page, ${q(title)})` },
+  {
+    regex: /^Edit the Combined Excel file for Duplicate rows with the following details$/i,
+    method: 'editCombinedExcelFile',
+    module: 'payroll-steps',
+    takesTable: true,
+  },
+  { regex: /^Payroll file is executed to upload$/i, method: 'executePayrollUpload', module: 'payroll-steps' },
+  {
+    regex: /^Verify The Error Count On Ecr Page$/i,
+    method: 'verifyErrorCount',
+    module: 'payroll-steps',
+    takesTable: true,
+  },
 ];
 
 const STEP_KEYWORDS = ['Given', 'When', 'Then', 'And', 'But'];
 
-/** Parses a plain-text, Gherkin-like test case into a Feature. */
+/** Parses a plain-text, Gherkin-like test case (with optional `| a | b |` data tables) into a Feature. */
 export function parseFeature(source: string): Feature {
   const feature: Feature = { name: '', scenarios: [] };
   let current: Scenario | undefined;
@@ -44,6 +72,18 @@ export function parseFeature(source: string): Feature {
   source.split(/\r?\n/).forEach((rawLine, index) => {
     const line = rawLine.trim();
     if (!line || line.startsWith('#')) return;
+
+    if (line.startsWith('|')) {
+      const lastStep = current?.steps[current.steps.length - 1];
+      if (!lastStep) throw new Error(`Line ${index + 1}: data table found before any step`);
+      const cells = line
+        .replace(/^\|/, '')
+        .replace(/\|$/, '')
+        .split('|')
+        .map((c) => c.trim());
+      (lastStep.table ??= []).push(cells);
+      return;
+    }
 
     const featureMatch = /^Feature:\s*(.+)$/i.exec(line);
     if (featureMatch) {
@@ -89,31 +129,49 @@ function toCamelCase(text: string): string {
   return /^[a-z]/.test(camel) ? camel : `step${camel}`;
 }
 
-/** Returns the call expression for a step, or undefined when no built-in step method matches. */
-export function matchStep(text: string): string | undefined {
-  for (const { regex, render } of STEP_PATTERNS) {
+/** Converts a raw table (header row + data rows) into a list of header-keyed records. */
+export function tableToRecords(table: string[][]): Record<string, string>[] {
+  const [header, ...rows] = table;
+  return rows.map((row) => Object.fromEntries(header.map((h, i) => [h, row[i] ?? ''])));
+}
+
+/** Returns the call expression and module for a step, or undefined when no built-in step method matches. */
+export function matchStep(text: string, table?: string[][]): StepMatch | undefined {
+  for (const { regex, method, module, takesTable } of STEP_PATTERNS) {
     const match = regex.exec(text);
-    if (match) return render(match.slice(1));
+    if (!match) continue;
+    const args = ['page', ...match.slice(1).map(q)];
+    if (takesTable) {
+      if (!table) return undefined;
+      args.push(JSON.stringify(tableToRecords(table)));
+    }
+    return { call: `${method}(${args.join(', ')})`, module };
   }
   return undefined;
 }
 
 /** Generates a Playwright spec; unmatched steps become stub methods that fail until implemented. */
 export function generateSpec(feature: Feature): string {
-  const stubs = new Map<string, string>();
-  const imports = new Set<string>();
+  const stubs = new Map<string, { text: string; hasTable: boolean }>();
+  const imports = new Map<string, Set<string>>();
 
   const scenarioBlocks = feature.scenarios.map((scenario) => {
     const body = scenario.steps
       .map((step) => {
-        let call = matchStep(step.text);
-        if (call) {
-          imports.add(call.slice(0, call.indexOf('(')));
+        const matched = matchStep(step.text, step.table);
+        let call: string;
+        if (matched) {
+          call = matched.call;
+          const names = imports.get(matched.module) ?? new Set<string>();
+          names.add(call.slice(0, call.indexOf('(')));
+          imports.set(matched.module, names);
         } else {
           let name = toCamelCase(step.text);
-          while (stubs.has(name) && stubs.get(name) !== step.text) name += '_';
-          stubs.set(name, step.text);
-          call = `${name}(page)`;
+          while (stubs.has(name) && stubs.get(name)?.text !== step.text) name += '_';
+          stubs.set(name, { text: step.text, hasTable: !!step.table });
+          call = step.table
+            ? `${name}(page, ${JSON.stringify(tableToRecords(step.table))})`
+            : `${name}(page)`;
         }
         return `    await test.step(${q(`${step.keyword} ${step.text}`)}, async () => {\n      await ${call};\n    });`;
       })
@@ -122,16 +180,18 @@ export function generateSpec(feature: Feature): string {
   });
 
   const stubBlock = [...stubs]
-    .map(
-      ([name, text]) =>
-        `// TODO: implement step ${q(text)}\nasync function ${name}(_page: Page): Promise<void> {\n  throw new Error(${q(`Step not implemented: ${text}`)});\n}`,
-    )
+    .map(([name, { text, hasTable }]) => {
+      const params = hasTable ? '_page: Page, _table: Record<string, string>[]' : '_page: Page';
+      return `// TODO: implement step ${q(text)}\nasync function ${name}(${params}): Promise<void> {\n  throw new Error(${q(`Step not implemented: ${text}`)});\n}`;
+    })
     .join('\n\n');
 
   const header = '// Generated by `npm run test:generate`. Re-running overwrites this file.\n';
   const importLines = [
     `import { test${stubs.size ? ', type Page' : ''} } from '@playwright/test';`,
-    ...(imports.size ? [`import { ${[...imports].sort().join(', ')} } from '../steps/common-steps';`] : []),
+    ...[...imports]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([module, names]) => `import { ${[...names].sort().join(', ')} } from '../steps/${module}';`),
   ].join('\n');
 
   return `${header}${importLines}\n\n${stubBlock ? `${stubBlock}\n\n` : ''}test.describe(${q(feature.name)}, () => {\n${scenarioBlocks.join('\n\n')}\n});\n`;
