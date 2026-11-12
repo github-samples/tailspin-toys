@@ -7,7 +7,7 @@ Tailspin Toys is a crowdfunding platform for games with a developer theme. The p
 - **Astro 7** — pages, layouts, components, and routing. `output: 'static'`, so the whole site is prerendered to HTML at build time.
 - **Drizzle ORM + Node SQLite** — the data layer. The schema lives in `db/schema.ts`; data is seeded from `db/games.csv`. Migrations are managed with `drizzle-kit`.
 - **Tailwind CSS v4** — styling via utility classes (dark theme).
-- **Vitest** — unit tests for the data layer and pure transforms.
+- **Vitest** — tests for the data layer, pure transforms, and Database Explorer's query contract.
 - **Playwright** — end-to-end tests run against the built static site.
 
 Development commands are defined in `package.json`: npm runs Astro for the dev server, static build, and preview. The `predev` and `prebuild` npm hooks run the TypeScript database migration and seed tasks in `db/`, writing to the gitignored `tailspin.db` file.
@@ -60,9 +60,21 @@ npm run db:export     # write the seeded catalog to db/catalog.json
 ## Running tests
 
 ```bash
-npm run test:unit   # Vitest unit tests (transforms + data-access helpers)
+npm run test:unit   # Vitest tests (transforms, data-access helpers, Database Explorer)
 npm run test:e2e    # Playwright E2E tests (builds + previews the static site first)
 ```
+
+Database Explorer's regression suite lives in `.github/extensions/database-explorer/query-policy.test.ts` and is included in the standard unit-test command. It tests the production validator and HTTP/canvas query handlers using the extension's real `@libsql/client` driver against disposable, writable local databases. Only Copilot host registration is stubbed; no hosted session, credentials, application database setup, or remote database is needed. The suite checks explicit results/errors, rejection before execution, and unchanged fixture rows/schema, then closes clients/servers and removes its fixtures.
+
+Database Explorer validates supported statement structure before opening a client. Database errors remain explicit failures rather than successful empty results.
+
+To run just this suite with individual case names:
+
+```bash
+npm run test:unit -- .github/extensions/database-explorer/query-policy.test.ts --reporter=verbose
+```
+
+This is regression coverage for the tested cases, not a complete SQL security audit or hosted-extension compatibility test. Report newly discovered security defects through [coordinated disclosure](SECURITY.md), not public issues or pull requests.
 
 CI runs the E2E suite in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner.
 

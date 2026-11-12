@@ -25,6 +25,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Test code should be of the same quality as the rest of the project, and follow DRY principles
 - For frontend changes, verify the build (`npm run build`) and run the end-to-end tests (`npm run test:e2e`) directly, to ensure everything works correctly
 - When changing the data layer (schema, helpers, transforms), update and run the corresponding unit tests
+- Database Explorer tests under `.github/extensions/database-explorer/` also run with `test:unit`. Keep its shared query policy importable without host startup. Use the existing extension driver's locked development dependency with disposable local fixtures; stub host registration, not SQL execution, and never open a project/remote database in tests.
 
 #### Project guidelines
 
@@ -75,7 +76,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
   - `npm run build` — build the static site (`prebuild` migrates + seeds the local SQLite database)
   - `npm run preview` — serve the built `dist/` output
   - `npm run lint` — ESLint
-  - `npm run test:unit` — Vitest unit tests
+  - `npm run test:unit` — Vitest tests for transforms, data-access helpers, and Database Explorer's query contract
   - `npm run test:e2e` — Playwright E2E tests (builds + previews first)
   - `npm run typecheck` — type-check the pure TypeScript with `tsgo` (TypeScript 7 native compiler, via `@typescript/native-preview`) using `tsconfig.tsgo.json`
   - `npm run typecheck:astro` — type-check `.astro` files with `astro check` (classic TypeScript package)
@@ -91,6 +92,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 The application lives at the repository root:
 
 - `db/`: Drizzle schema, migrations, transforms, seed, and `games.csv`
+- `.github/extensions/database-explorer/`: Copilot canvas extension, shared query policy, and isolated regression tests (real libSQL fixtures; test-only host stub)
 - `src/lib/`: Node SQLite client (`db.ts`) and data-access helpers (`games.ts`)
 - `src/components/`: reusable `.astro` components
 - `src/layouts/`: Astro layout templates

@@ -29,8 +29,9 @@ All commands assume dependencies are installed (`npm ci`).
 npm run test:unit
 ```
 
-- Runs Vitest (`vitest run`) over `db/**/*.test.ts` and `src/**/*.test.ts`.
-- Covers the pure seed/transform functions and the Drizzle data-access helpers against an in-memory Node SQLite database.
+- Runs Vitest (`vitest run`) over `db/**/*.test.ts`, `src/**/*.test.ts`, and `.github/extensions/database-explorer/**/*.test.ts`.
+- Covers pure seed/transform functions, Drizzle helpers against in-memory Node SQLite, and Database Explorer's query policy/entry points against disposable file-backed databases with its real libSQL driver.
+- Extension tests stub only Copilot host registration. They require no hosted session, credentials, project database setup, or remote database.
 
 ### Lint
 
@@ -47,7 +48,7 @@ npm run lint
 npm run typecheck:all
 ```
 
-- `npm run typecheck` runs the native **TypeScript 7** compiler (`tsgo`, from `@typescript/native-preview`) over the pure TypeScript (`db/`, `src/lib/`, `src/types/`, configs, tests) via `tsconfig.tsgo.json` (`--noEmit`).
+- `npm run typecheck` runs the native **TypeScript 7** compiler (`tsgo`, from `@typescript/native-preview`) over the pure TypeScript (`db/`, `src/lib/`, `src/types/`, configs, tests including Database Explorer) via `tsconfig.tsgo.json` (`--noEmit`).
 - `npm run typecheck:astro` runs `astro sync` then `astro check` over `.astro` files (on the classic `typescript` package).
 - Type checking is independent of linting — `tsgo` does not affect ESLint, which still uses the classic `typescript` package. Both must pass with zero errors before committing.
 
@@ -96,6 +97,14 @@ Run a single file:
 ```bash
 npx vitest run src/lib/games.test.ts
 ```
+
+For Database Explorer, show individual contract cases with:
+
+```bash
+npm run test:unit -- .github/extensions/database-explorer/query-policy.test.ts --reporter=verbose
+```
+
+The extension uses fresh writable fixtures with an explicit local URL. Investigate fixture cleanup, environment restoration, and adapter errors for failures; do not run `db:setup` or use the project database to repair this suite. Follow `SECURITY.md` for any newly discovered security defect rather than weakening an assertion or publishing sensitive reproduction details.
 
 ---
 
