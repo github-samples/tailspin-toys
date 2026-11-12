@@ -56,6 +56,13 @@ describe('parseGamesCsv', () => {
         const rows = parseGamesCsv('Title,Category,Publisher,Description\n,,,');
         expect(rows).toHaveLength(0);
     });
+
+    it('defaults missing columns to empty strings', () => {
+        const rows = parseGamesCsv('Title\nGame A');
+        expect(rows).toEqual([
+            { title: 'Game A', category: '', publisher: '', description: '' },
+        ]);
+    });
 });
 
 describe('description helpers', () => {
