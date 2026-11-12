@@ -75,7 +75,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
   - `npm run build` — build the static site (`prebuild` migrates + seeds the local SQLite database)
   - `npm run preview` — serve the built `dist/` output
   - `npm run lint` — ESLint
-  - `npm run test:unit` — Vitest unit tests
+  - `npm run test:unit` — Vitest unit tests (includes `.github/extensions/**/*.test.ts`, e.g. the Database Explorer read-only query policy in `.github/extensions/database-explorer/`)
   - `npm run test:e2e` — Playwright E2E tests (builds + previews first)
   - `npm run typecheck` — type-check the pure TypeScript with `tsgo` (TypeScript 7 native compiler, via `@typescript/native-preview`) using `tsconfig.tsgo.json`
   - `npm run typecheck:astro` — type-check `.astro` files with `astro check` (classic TypeScript package)

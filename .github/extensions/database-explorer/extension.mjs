@@ -1,136 +1,14 @@
-import { createServer } from "node:http";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
-import { createClient } from "@libsql/client";
 import { CanvasError, createCanvas, joinSession } from "@github/copilot-sdk/extension";
+import { createRunQueryHandler, listTables } from "./query-policy.mjs";
+import { startServer as startQueryServer } from "./server.mjs";
 
 const servers = new Map();
-const MAX_DISPLAY_ROWS = 250;
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
 function databaseUrl() {
     return process.env.DATABASE_URL ?? `file:${join(PROJECT_ROOT, ".data", "tailspin.db")}`;
-}
-
-function readRequestBody(request) {
-    return new Promise((resolve, reject) => {
-        let body = "";
-        request.setEncoding("utf8");
-        request.on("data", (chunk) => {
-            body += chunk;
-            if (body.length > 100_000) {
-                reject(new Error("Request body is too large."));
-                request.destroy();
-            }
-        });
-        request.on("end", () => resolve(body));
-        request.on("error", reject);
-    });
-}
-
-function stripCommentsAndValidateSingleStatement(sql) {
-    let output = "";
-    let quote = "";
-    let statementEnded = false;
-
-    for (let index = 0; index < sql.length; index += 1) {
-        const character = sql[index];
-        const next = sql[index + 1];
-
-        if (quote) {
-            output += character;
-            if (character === quote) {
-                if (next === quote) {
-                    output += next;
-                    index += 1;
-                } else {
-                    quote = "";
-                }
-            }
-            continue;
-        }
-
-        if (character === "'" || character === '"' || character === "`") {
-            quote = character;
-            output += character;
-            continue;
-        }
-
-        if (character === "-" && next === "-") {
-            index = sql.indexOf("\n", index + 2);
-            if (index === -1) {
-                break;
-            }
-            output += " ";
-            continue;
-        }
-
-        if (character === "/" && next === "*") {
-            const end = sql.indexOf("*/", index + 2);
-            if (end === -1) {
-                throw new Error("The SQL comment is not closed.");
-            }
-            index = end + 1;
-            output += " ";
-            continue;
-        }
-
-        if (character === ";") {
-            statementEnded = true;
-            continue;
-        }
-
-        if (statementEnded && !/\s/.test(character)) {
-            throw new Error("Run one SQL statement at a time.");
-        }
-
-        output += character;
-    }
-
-    if (quote) {
-        throw new Error("The SQL string is not closed.");
-    }
-
-    return output.trim();
-}
-
-function validateReadOnlyQuery(query) {
-    if (typeof query !== "string" || !query.trim()) {
-        throw new Error("Enter a SQL query.");
-    }
-
-    const statement = stripCommentsAndValidateSingleStatement(query);
-    const keyword = statement.match(/^([a-zA-Z]+)/)?.[1]?.toUpperCase();
-    if (keyword !== "SELECT" && keyword !== "WITH") {
-        throw new Error("Only read-only SELECT and WITH queries are allowed.");
-    }
-
-    return statement;
-}
-
-function normalizeValue(value) {
-    return typeof value === "bigint" ? value.toString() : value;
-}
-
-async function executeQuery(url, query) {
-    const client = createClient({ url });
-    try {
-        const result = await client.execute(query);
-        const columns = result.columns;
-        const rows = result.rows.slice(0, MAX_DISPLAY_ROWS).map((row) =>
-            Object.fromEntries(columns.map((column) => [column, normalizeValue(row[column])])),
-        );
-        return { columns, rows, truncated: result.rows.length > MAX_DISPLAY_ROWS };
-    } finally {
-        client.close();
-    }
-}
-
-async function listTables(url) {
-    return executeQuery(
-        url,
-        "SELECT name, type FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' ORDER BY type, name",
-    );
 }
 
 function renderHtml() {
@@ -282,37 +160,6 @@ function renderHtml() {
 </html>`;
 }
 
-async function startServer(url) {
-    const server = createServer(async (request, response) => {
-        try {
-            if (request.url === "/api/tables" && request.method === "GET") {
-                const data = await listTables(url);
-                response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-                response.end(JSON.stringify(data));
-                return;
-            }
-
-            if (request.url === "/api/query" && request.method === "POST") {
-                const body = JSON.parse(await readRequestBody(request));
-                const data = await executeQuery(url, validateReadOnlyQuery(body.query));
-                response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-                response.end(JSON.stringify(data));
-                return;
-            }
-
-            response.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-            response.end(renderHtml());
-        } catch (error) {
-            response.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
-            response.end(JSON.stringify({ error: error instanceof Error ? error.message : "The request failed." }));
-        }
-    });
-    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const address = server.address();
-    const port = typeof address === "object" && address ? address.port : 0;
-    return { server, url: `http://127.0.0.1:${port}/` };
-}
-
 await joinSession({
     canvases: [
         createCanvas({
@@ -334,19 +181,16 @@ await joinSession({
                         required: ["query"],
                         additionalProperties: false,
                     },
-                    handler: async (ctx) => {
-                        try {
-                            return executeQuery(databaseUrl(), validateReadOnlyQuery(ctx.input?.query));
-                        } catch (error) {
-                            throw new CanvasError("database_query_invalid", error instanceof Error ? error.message : "The query is invalid.");
-                        }
-                    },
+                    handler: createRunQueryHandler({
+                        getUrl: databaseUrl,
+                        createError: (code, message) => new CanvasError(code, message),
+                    }),
                 },
             ],
             open: async (ctx) => {
                 let entry = servers.get(ctx.instanceId);
                 if (!entry) {
-                    entry = await startServer(databaseUrl());
+                    entry = await startQueryServer(databaseUrl(), renderHtml);
                     servers.set(ctx.instanceId, entry);
                 }
                 return { title: "Database Explorer", url: entry.url };
