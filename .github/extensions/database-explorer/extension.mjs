@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { createClient } from "@libsql/client";
 import { CanvasError, createCanvas, joinSession } from "@github/copilot-sdk/extension";
+import { executeReadOnlyQuery } from "./query-execution.mjs";
 
 const servers = new Map();
 const MAX_DISPLAY_ROWS = 250;
@@ -115,7 +116,7 @@ function normalizeValue(value) {
 async function executeQuery(url, query) {
     const client = createClient({ url });
     try {
-        const result = await client.execute(query);
+        const result = await executeReadOnlyQuery(client, query);
         const columns = result.columns;
         const rows = result.rows.slice(0, MAX_DISPLAY_ROWS).map((row) =>
             Object.fromEntries(columns.map((column) => [column, normalizeValue(row[column])])),
