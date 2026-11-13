@@ -1,0 +1,12 @@
+# Demo test case: describe steps in plain English, then run
+#   npm run test:generate -- e2e-tests/test-cases/demo-navigation.txt
+# Supported steps: see the "Test case generator" section of the README.
+Feature: Demo navigation
+Scenario: Visitor views a game page
+  Given I open "/game/1"
+  Then I should be on "/game/1"
+  And I should see text "Support This Game"
+
+Scenario: Visitor hits an unknown page
+  Given I open "/this-page-does-not-exist"
+  Then I should see heading "Page not found"

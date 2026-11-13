@@ -1,0 +1,5 @@
+# Shows an unknown step becoming a stub that fails until implemented.
+Feature: Custom step stub
+Scenario: Unknown step is stubbed
+  Given I open "/"
+  And I check the loyalty banner

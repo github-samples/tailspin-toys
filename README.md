@@ -64,8 +64,19 @@ npm run test:unit   # Vitest unit tests (transforms + data-access helpers)
 npm run test:e2e    # Playwright E2E tests (builds + previews the static site first)
 ```
 
-CI runs the E2E suite in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner.
+## Test case generator
 
+Describe a test case as plain steps and generate a Playwright spec that calls reusable step methods (`e2e-tests/steps/common-steps.ts`), with every step wrapped in `test.step` so it shows up in the report.
+
+```bash
+npm run test:generate -- e2e-tests/test-cases/demo-navigation.txt   # writes e2e-tests/generated/demo-navigation.spec.ts
+npx playwright test e2e-tests/generated                             # run the generated spec
+npm run test:e2e:report                                             # open the HTML report (playwright-report/)
+```
+
+Supported steps (`Given`/`When`/`Then`/`And`/`But`): `I open "/path"`, `I click "name"`, `I fill "label" with "value"`, `I should see text "x"`, `I should see heading "x"`, `I should be on "/path"`, `the page title should be "x"`. Any other step is generated as a stub that fails with "Step not implemented" until you implement it. A `| a | b |` data table under a step is passed to its method as `Record<string, string>[]`; see `e2e-tests/test-cases/payroll-duplicate-rows.txt` and `e2e-tests/steps/payroll-steps.ts` for a table-driven example, and `docs/demo-presentation.md` for a demo walkthrough. See `e2e-tests/test-cases/` for examples. in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner.
+
+CI runs the E2E suite in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner. in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner.
 ## Linting
 
 The frontend uses ESLint to enforce code quality across TypeScript and Astro files. Run it with:

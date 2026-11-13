@@ -1,0 +1,18 @@
+Feature: Payroll duplicate rows
+Scenario: Duplicate rows raise an error on the ECR page
+  Given Navigate to Payroll
+  And Navigate to payroll manage page for file upload
+  When Edit the Combined Excel file for Duplicate rows with the following details
+    | Row | Field     | Value    |
+    |   1 | HIRE DATE | 1/1/2025 |
+    |   1 | PAY DATE  | 2/2/2025 |
+    |   1 | HOURS     |      510 |
+    |   1 | EEPRETAX  |      500 |
+    |   2 | HIRE DATE | 1/1/2025 |
+    |   2 | PAY DATE  | 2/2/2025 |
+    |   2 | HOURS     |      500 |
+    |   2 | EEPRETAX  |      300 |
+  And Payroll file is executed to upload
+  Then Verify The Error Count On Ecr Page
+    | Warning Count | Error Count |
+    |             2 |           1 |
