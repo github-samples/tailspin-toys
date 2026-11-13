@@ -99,4 +99,5 @@ The application lives at the repository root:
 - `src/types/`: TypeScript interfaces (Game, Publisher, Category)
 - `e2e-tests/`: Playwright E2E tests (home, games, accessibility)
 - `drizzle.config.ts`, `vitest.config.ts`, `astro.config.mjs`, `playwright.config.ts`: tooling config
+- `.github/extensions/`: Copilot canvas extensions (`database-explorer`, `game-leaderboard` — read-only; ranking logic in `game-leaderboard/ranking.mjs`, tested by `src/lib/leaderboard.test.ts`)
 - `README.md`: Project documentation
