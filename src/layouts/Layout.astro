@@ -20,7 +20,16 @@ const { title = "Tailspin Toys" } = Astro.props;
         <!-- Preconnect to improve font loading -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <!-- Load the font stylesheet without blocking first paint; display=swap keeps text visible meanwhile -->
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            media="print"
+            onload="this.media='all'"
+        />
+        <noscript>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+        </noscript>
     </head>
     <body class="min-h-screen bg-slate-900 text-white transition-colors duration-300 m-0 w-full h-full font-sans">
         <Header />
