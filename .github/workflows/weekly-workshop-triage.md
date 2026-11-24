@@ -36,6 +36,11 @@ network: defaults
 # issue/PR text cannot make the agent close items in any other repository the
 # write token might reach.
 safe-outputs:
+  # Use a concrete detector model instead of the unresolved "detection" alias.
+  threat-detection:
+    engine:
+      id: copilot
+      model: claude-sonnet-5
   close-issue:
     max: 25
     target-repo: "github-samples/tailspin-toys"
