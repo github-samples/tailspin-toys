@@ -16,7 +16,7 @@ Please note that this project is released with a [Contributor Code of Conduct][c
 
 Before you can run and test the application locally, you'll need to install:
 
-- **Node.js 22.13+** - [Download](https://nodejs.org/) | [Homebrew](https://formulae.brew.sh/formula/node)
+- **Node.js LTS, 22.23.4+** - [Download](https://nodejs.org/) | [Homebrew](https://formulae.brew.sh/formula/node)
 - **Git** - [Download](https://git-scm.com/downloads) | [Homebrew](https://formulae.brew.sh/formula/git)
 
 ### Setting Up Your Development Environment

@@ -63,7 +63,7 @@ npm run typecheck:all
 npm ci
 ```
 
-- Ensure Node 22.13+ is available: `node --version`.
+- Ensure a current Node.js LTS release is available: `node --version`.
 - Run `npx astro sync` if editor/type errors reference missing generated Astro types.
 
 ---

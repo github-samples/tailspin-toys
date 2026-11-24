@@ -20,12 +20,16 @@ The workflow only runs on repositories created from the template (the `if: ${{ !
 
 ## Getting started
 
-Install dependencies once with Node.js 22.13 or later:
+Install dependencies once with [Node.js LTS](https://nodejs.org/), version 22.23.4 or later:
 
 ```bash
 npm ci
 npx playwright install chromium   # only needed to run the E2E tests
 ```
+
+### npm registry
+
+Cloud dependency installation uses [public npm](https://registry.npmjs.org/). GitHub Actions and Copilot setup set `NPM_CONFIG_REGISTRY` to public npm. Committed lockfiles must contain only public npm tarball URLs; CI rejects other tarball origins.
 
 ## Launch the site
 
@@ -45,6 +49,8 @@ npm run preview
 ## Database
 
 The SQLite database is built from `db/games.csv` — there is no live data to migrate.
+
+The legacy `@esbuild-kit/core-utils` dependency used by `drizzle-kit` is scoped to patched `esbuild` 0.25.12 through [`package.json`](package.json). Other esbuild consumers keep their own dependency ranges.
 
 ```bash
 npm run db:generate   # generate a migration after editing db/schema.ts
