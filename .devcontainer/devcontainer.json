@@ -18,7 +18,7 @@
 		}
 	},
 	// Install Node dependencies, Playwright's Chromium browser, and set up the local SQLite database.
-	"postCreateCommand": "npm ci && npx playwright install --with-deps chromium && npm run db:setup",
+	"postCreateCommand": "npm ci --registry=https://registry.npmjs.org/ && npx --registry=https://registry.npmjs.org/ playwright install --with-deps chromium && npm run db:setup",
 	// Astro dev/preview server.
 	"forwardPorts": [4321]
 }
