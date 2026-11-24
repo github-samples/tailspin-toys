@@ -53,6 +53,7 @@ safe-outputs:
     screen-pull-request:
       description: "Label an open outside-contributor PR in Tailspin Toys for maintainer screening."
       max: 25
+      if: needs.detection.result == 'success' && needs.detection.outputs.detection_conclusion == 'success'
       permissions:
         pull-requests: write
       inputs:
