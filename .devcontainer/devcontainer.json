@@ -2,9 +2,8 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
 	"name": "Tailspin Toys (Astro + Drizzle + Node SQLite)",
-	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:5-26-bookworm",
 	"features": {
-		"ghcr.io/schlich/devcontainer-features/playwright:0": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	"customizations": {
@@ -18,7 +17,7 @@
 		}
 	},
 	// Install Node dependencies, Playwright's Chromium browser, and set up the local SQLite database.
-	"postCreateCommand": "npm ci --registry=https://registry.npmjs.org/ && npx --registry=https://registry.npmjs.org/ playwright install --with-deps chromium && npm run db:setup",
+	"postCreateCommand": "npm ci && npx playwright install --with-deps chromium && npm run db:setup",
 	// Astro dev/preview server.
 	"forwardPorts": [4321]
 }

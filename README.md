@@ -20,7 +20,7 @@ The workflow only runs on repositories created from the template (the `if: ${{ !
 
 ## Getting started
 
-Install dependencies once with Node.js 22.13 or later:
+Install dependencies once with [Node.js LTS](https://nodejs.org/), version 22.23.4 or later:
 
 ```bash
 npm ci
@@ -29,7 +29,7 @@ npx playwright install chromium   # only needed to run the E2E tests
 
 ### npm registry
 
-Cloud dependency installation uses [public npm](https://registry.npmjs.org/). GitHub Actions and Copilot setup set `NPM_CONFIG_REGISTRY` to public npm; devcontainer setup selects it explicitly. Committed lockfiles must contain only public npm tarball URLs; CI rejects other tarball origins.
+Cloud dependency installation uses [public npm](https://registry.npmjs.org/). GitHub Actions and Copilot setup set `NPM_CONFIG_REGISTRY` to public npm. Committed lockfiles must contain only public npm tarball URLs; CI rejects other tarball origins.
 
 ## Launch the site
 
