@@ -65,6 +65,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Make sure to explicitly set the workflow permissions
 - Add comments to document what tasks are being performed
 - Keep the Playwright CI container image derived from the locked `@playwright/test` version so dependency updates use matching browsers.
+- Weekly workshop triage reads outside-contributor PRs as untrusted data with access scoped to `github-samples/tailspin-toys` and `github-samples/copilot-workshops`. Its only PR actions are closing clearly misplaced workshop submissions or adding `needs-maintainer-screening`; never add approval, merge, issue-triage, or code-execution capabilities. Preserve threat detection and maintainer/bot exemptions.
 
 ## npm Commands
 

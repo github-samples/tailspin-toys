@@ -18,6 +18,10 @@ This repository is a GitHub template. When you create a new repository from it, 
 
 The workflow only runs on repositories created from the template (the `if: ${{ !github.event.repository.is_template }}` guard skips the template itself), and after creating the issues it removes itself and the `.github/bootstrap-issues/` folder in a cleanup commit so it never runs again.
 
+## Weekly workshop PR triage
+
+The [weekly cloud workflow](.github/workflows/weekly-workshop-triage.md) runs every Monday at 08:00 UTC and supports manual dispatch. It reads outside-contributor PRs as untrusted data, with read access scoped to this repository and the [workshop curriculum](https://github.com/github-samples/copilot-workshops). It can only close clearly misplaced workshop PRs with an explanation or add `needs-maintainer-screening` for human review. Maintainer and bot PRs are exempt; issues are not triaged. Threat detection remains enabled. The triager never approves or merges PRs.
+
 ## Getting started
 
 Install dependencies once with [Node.js LTS](https://nodejs.org/), version 22.23.4 or later:
