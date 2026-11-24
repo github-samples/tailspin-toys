@@ -17,6 +17,7 @@ concurrency:
 env:
   # Keep CI runs quiet and reproducible.
   ASTRO_TELEMETRY_DISABLED: "1"
+  NPM_CONFIG_REGISTRY: "https://registry.npmjs.org/"
 
 jobs:
   # Lint the frontend code with ESLint
@@ -89,6 +90,19 @@ jobs:
           node-version: "lts/*"
           cache: "npm"
           cache-dependency-path: "./package-lock.json"
+
+      # Require public npm tarball origins in shared dependency metadata.
+      - name: Check public npm lockfile origins
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const { packages } = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+          for (const [name, { resolved }] of Object.entries(packages)) {
+            if (resolved && new URL(resolved).origin !== 'https://registry.npmjs.org') {
+              throw new Error(`Non-public npm origin for ${name}: ${resolved}`);
+            }
+          }
+          NODE
 
       - name: Install JavaScript dependencies
         run: npm ci

@@ -18,14 +18,22 @@ This repository is a GitHub template. When you create a new repository from it, 
 
 The workflow only runs on repositories created from the template (the `if: ${{ !github.event.repository.is_template }}` guard skips the template itself), and after creating the issues it removes itself and the `.github/bootstrap-issues/` folder in a cleanup commit so it never runs again.
 
+## Weekly workshop PR triage
+
+The [weekly cloud workflow](.github/workflows/weekly-workshop-triage.md) runs every Monday at 08:00 UTC and supports manual dispatch. It reads outside-contributor PRs as untrusted data, with read access scoped to this repository and the [workshop curriculum](https://github.com/github-samples/copilot-workshops). It can only close clearly misplaced workshop PRs with an explanation or add `needs-maintainer-screening` for human review. Maintainer and bot PRs are exempt; issues are not triaged. Threat detection remains enabled. The triager never approves or merges PRs.
+
 ## Getting started
 
-Install dependencies once with Node.js 22.13 or later:
+Install dependencies once with [Node.js LTS](https://nodejs.org/), version 22.23.4 or later:
 
 ```bash
 npm ci
 npx playwright install chromium   # only needed to run the E2E tests
 ```
+
+### npm registry
+
+Cloud dependency installation uses [public npm](https://registry.npmjs.org/). GitHub Actions and Copilot setup set `NPM_CONFIG_REGISTRY` to public npm. Committed lockfiles must contain only public npm tarball URLs; CI rejects other tarball origins.
 
 ## Launch the site
 
@@ -45,6 +53,8 @@ npm run preview
 ## Database
 
 The SQLite database is built from `db/games.csv` — there is no live data to migrate.
+
+The legacy `@esbuild-kit/core-utils` dependency used by `drizzle-kit` is scoped to patched `esbuild` 0.25.12 through [`package.json`](package.json). Other esbuild consumers keep their own dependency ranges.
 
 ```bash
 npm run db:generate   # generate a migration after editing db/schema.ts

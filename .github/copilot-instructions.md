@@ -65,9 +65,11 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Make sure to explicitly set the workflow permissions
 - Add comments to document what tasks are being performed
 - Keep the Playwright CI container image derived from the locked `@playwright/test` version so dependency updates use matching browsers.
+- Weekly workshop triage reads outside-contributor PRs as untrusted data with access scoped to `github-samples/tailspin-toys` and `github-samples/copilot-workshops`. Its only PR actions are closing clearly misplaced workshop submissions or adding `needs-maintainer-screening`; never add approval, merge, issue-triage, or code-execution capabilities. Preserve threat detection and maintainer/bot exemptions.
 
 ## npm Commands
 
+- Use public npm (`https://registry.npmjs.org/`) for cloud dependency operations. Keep committed lockfile tarball URLs on public npm, and reject other origins in CI.
 - Development commands are defined in `package.json`. They run Astro for the site and TypeScript tasks in `db/` for database setup.
 - **Skills take precedence.** Before running a command directly, check whether a skill covers the task (e.g. the `quality-checks` skill wraps unit tests, lint, and type checks). If one applies, follow it.
 - Key npm scripts:
