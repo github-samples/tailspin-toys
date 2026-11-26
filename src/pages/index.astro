@@ -1,33 +1,409 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import GameCard from '../components/GameCard.astro';
-import PageHero from '../components/PageHero.astro';
-import EmptyState from '../components/EmptyState.astro';
-import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
-
-export const prerender = true;
-
-const games = await getAllGames(getDatabase());
 ---
 
-<Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
-  <div class="py-8">
-    <PageHero
-      title="Welcome to Tailspin Toys"
-      subtitle="Find your next game! And maybe even back one! Explore our collection!"
-    />
+<Layout title="Intero — thoughtful spaces, made together">
+  <div class="space-y-10 py-8">
+    <section class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end" aria-labelledby="welcome-heading">
+      <div>
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-emerald-300">A calmer way to shape a room</p>
+        <h1 id="welcome-heading" class="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          Make room for a better idea.
+        </h1>
+        <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+          Bring a floor plan, confirm what is really there, then explore an illustrative room concept and get optional, provider-backed design suggestions.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm leading-6 text-slate-300">
+        <p class="font-semibold text-slate-100">A transparent design demo</p>
+        <p class="mt-2">Your plan stays in this browser tab. The interactive room is a clearly labeled concept view, not AI-generated geometry, a measured CAD model, or a photorealistic lighting render.</p>
+      </div>
+    </section>
 
-    <div>
-      <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
-
-      {games.length === 0 ? (
-        <EmptyState text="No games available at the moment." />
-      ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
+    <section id="workspace" class="grid scroll-mt-8 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]" aria-label="Intero design workspace">
+      <form id="room-form" class="space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg sm:p-7" data-testid="room-form">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Step 1 · Your room</p>
+          <h2 class="mt-2 text-2xl font-semibold text-slate-100">Start with the plan</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Add an optional reference image or PDF. Intero does not upload, analyze, or retain it; confirm the scale and measurements below yourself.</p>
         </div>
-      )}
-    </div>
+
+        <div>
+          <label for="floor-plan" class="mb-2 block text-sm font-medium text-slate-200">Floor plan reference <span class="font-normal text-slate-400">(optional)</span></label>
+          <input
+            id="floor-plan"
+            name="floorPlan"
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp,.pdf,image/png,image/jpeg,image/webp,application/pdf"
+            class="block w-full rounded-lg border border-slate-700 bg-slate-950 text-sm text-slate-300 file:mr-4 file:border-0 file:bg-slate-800 file:px-4 file:py-3 file:font-medium file:text-slate-100 hover:file:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            data-testid="floor-plan-input"
+            aria-describedby="plan-privacy plan-file-status"
+          />
+          <p id="plan-privacy" class="mt-2 text-xs leading-5 text-slate-400">PNG, JPG, WEBP, or PDF · maximum 12 MB · preview remains temporary in this tab.</p>
+          <p id="plan-file-status" class="mt-2 min-h-5 text-sm text-slate-300" role="status" aria-live="polite" data-testid="plan-file-status"></p>
+          <div id="plan-preview" class="mt-3 hidden overflow-hidden rounded-xl border border-slate-700 bg-slate-950 p-2" data-testid="plan-preview">
+            <img id="plan-preview-image" class="hidden max-h-56 w-full object-contain" alt="Temporary local preview of the selected floor plan" />
+          </div>
+        </div>
+
+        <fieldset class="space-y-4">
+          <legend class="text-sm font-semibold text-slate-200">Step 2 · Confirm measurements</legend>
+          <p class="text-xs leading-5 text-slate-400">Intero does not interpret plan scale. Record the reference you used, then enter measurements in metres; the uploaded plan is not analyzed.</p>
+          <div>
+            <label for="scale-reference" class="mb-1.5 block text-sm text-slate-300">Scale or measurement source</label>
+            <input id="scale-reference" name="scaleReference" type="text" maxlength="60" required placeholder="e.g. 1:50 or measured directly" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="scale-reference" />
+          </div>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label for="room-width" class="mb-1.5 block text-sm text-slate-300">Width (m)</label>
+              <input id="room-width" name="widthM" type="number" min="2" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="room-width" />
+            </div>
+            <div>
+              <label for="room-length" class="mb-1.5 block text-sm text-slate-300">Length (m)</label>
+              <input id="room-length" name="lengthM" type="number" min="2" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="room-length" />
+            </div>
+            <div>
+              <label for="room-height" class="mb-1.5 block text-sm text-slate-300">Wall height (m)</label>
+              <input id="room-height" name="heightM" type="number" min="2.1" max="5" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="room-height" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="space-y-4">
+          <legend class="text-sm font-semibold text-slate-200">Step 3 · Mark openings</legend>
+          <p class="text-xs leading-5 text-slate-400">Offsets are measured from the left corner of the chosen wall while standing inside the room. Door and window positions are illustrative markers.</p>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="door-wall" class="mb-1.5 block text-sm text-slate-300">Door wall</label>
+              <select id="door-wall" name="doorWall" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="door-wall">
+                <option value="north">North</option>
+                <option value="east">East</option>
+                <option value="south" selected>South</option>
+                <option value="west">West</option>
+              </select>
+            </div>
+            <div>
+              <label for="door-offset" class="mb-1.5 block text-sm text-slate-300">Door centre offset (m)</label>
+              <input id="door-offset" name="doorOffsetM" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="door-offset" />
+            </div>
+            <div>
+              <label for="window-wall" class="mb-1.5 block text-sm text-slate-300">Window wall <span class="text-slate-400">(optional)</span></label>
+              <select id="window-wall" name="windowWall" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="window-wall">
+                <option value="none" selected>No window</option>
+                <option value="north">North</option>
+                <option value="east">East</option>
+                <option value="south">South</option>
+                <option value="west">West</option>
+              </select>
+            </div>
+            <div>
+              <label for="window-offset" class="mb-1.5 block text-sm text-slate-300">Window centre offset (m)</label>
+              <input id="window-offset" name="windowOffsetM" type="number" min="0" max="15" step="0.01" disabled class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="window-offset" />
+            </div>
+          </div>
+        </fieldset>
+
+        <label class="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">
+          <input id="confirm-geometry" name="confirmGeometry" type="checkbox" required class="mt-1 h-4 w-4 accent-emerald-400 focus:ring-2 focus:ring-emerald-400" data-testid="confirm-geometry" />
+          <span>I confirm these room dimensions and opening positions against the scale or measurement source above. I understand the demo layout is generic and illustrative.</span>
+        </label>
+
+        <p id="room-form-status" class="min-h-5 text-sm text-amber-200" role="status" aria-live="polite" data-testid="room-form-status"></p>
+        <button type="submit" class="w-full rounded-xl bg-emerald-300 px-5 py-3 font-semibold text-slate-950 transition-colors hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-slate-900" data-testid="confirm-room-button">
+          Confirm room and show demo layout
+        </button>
+      </form>
+
+      <div class="space-y-6">
+        <section id="room-scene" class="hidden overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg" aria-labelledby="scene-heading" data-testid="room-scene">
+          <div class="flex flex-wrap items-start justify-between gap-3 p-5 sm:p-7">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Illustrative demo · not a CAD model</p>
+              <h2 id="scene-heading" class="mt-2 text-2xl font-semibold text-slate-100">A room concept to explore</h2>
+              <p id="room-summary" class="mt-2 text-sm text-slate-400" data-testid="room-summary"></p>
+            </div>
+            <span class="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">Not a photoreal render</span>
+          </div>
+
+          <div id="scene-stage" class="scene-stage" data-lighting="daylight" role="group" aria-label="Interactive 360-degree orbit view of the illustrative room. Drag to rotate or use the rotation buttons." data-testid="scene-stage">
+            <div id="scene-room" class="scene-room" role="img" aria-label="Illustrative room with a sofa, rug, and side table">
+              <div class="scene-wall scene-wall-back"></div>
+              <div class="scene-wall scene-wall-left"></div>
+              <div class="scene-wall scene-wall-right"></div>
+              <div class="scene-floor"></div>
+              <div class="scene-window" aria-hidden="true"></div>
+              <div class="scene-door" aria-hidden="true"></div>
+              <div class="scene-rug" aria-hidden="true"></div>
+              <div class="scene-sofa" aria-hidden="true"><span></span></div>
+              <div class="scene-table" aria-hidden="true"><span></span></div>
+              <div class="scene-plant" aria-hidden="true"><span></span></div>
+            </div>
+          </div>
+
+          <div class="space-y-4 p-5 sm:p-7">
+            <p class="text-center text-xs text-slate-400">Drag the scene to orbit around the generic concept. Openings and furnishings are not placed from your measurements; this CSS 3D preview is not an architectural model or simulated light.</p>
+            <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Lighting appearance presets">
+              <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="daylight" aria-pressed="true" data-testid="lighting-daylight">Soft daylight</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="warm" aria-pressed="false" data-testid="lighting-warm">Warm evening</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="task" aria-pressed="false" data-testid="lighting-task">Focused light</button>
+            </div>
+            <div class="flex justify-center gap-2">
+              <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="rotate-left">Rotate left</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="reset-view">Reset view</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="rotate-right">Rotate right</button>
+            </div>
+            <p id="scene-status" class="sr-only" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg sm:p-7" aria-labelledby="assistant-heading">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Optional · text suggestions</p>
+              <h2 id="assistant-heading" class="mt-2 text-2xl font-semibold text-slate-100">Ask a design question</h2>
+            </div>
+            <label class="min-w-52 flex-1 sm:max-w-64">
+              <span class="mb-1.5 block text-sm text-slate-300">Provider</span>
+              <select id="ai-provider" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-60" data-testid="ai-provider" disabled>
+                <option value="">Checking server configuration…</option>
+                <option value="google-ai-studio">Google AI Studio</option>
+                <option value="groq">Groq</option>
+              </select>
+            </label>
+          </div>
+          <p id="provider-status" class="mt-3 text-sm text-slate-400" role="status" aria-live="polite" data-testid="provider-status">Checking which server-side providers are configured.</p>
+          <form id="assistant-form" class="mt-4 space-y-3">
+            <label for="design-question" class="block text-sm text-slate-300">What would you like ideas for?</label>
+            <textarea id="design-question" rows="3" maxlength="1000" required placeholder="For example: suggest a calm palette for a reading corner." class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-60" data-testid="design-question" disabled></textarea>
+            <button id="ask-assistant" type="submit" class="rounded-xl border border-emerald-300/50 px-4 py-2.5 text-sm font-semibold text-emerald-200 transition-colors hover:bg-emerald-300/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-50" data-testid="ask-assistant" disabled>
+              Get text suggestions
+            </button>
+          </form>
+          <p id="assistant-response" class="mt-4 min-h-6 whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-200" role="status" aria-live="polite" data-testid="assistant-response">Provider suggestions are text only. They do not generate or validate geometry, lighting simulations, or rendered images.</p>
+          <p class="mt-3 text-xs leading-5 text-slate-300">The server sends your question and confirmed room summary to the provider you select. Never enter private or identifying details.</p>
+        </section>
+      </div>
+    </section>
   </div>
 </Layout>
+
+<script>
+  import { validateRoomGeometry, type RoomGeometry } from '../lib/room-design';
+
+  const roomForm = document.querySelector<HTMLFormElement>('#room-form');
+  const roomFormStatus = document.querySelector<HTMLElement>('#room-form-status');
+  const roomScene = document.querySelector<HTMLElement>('#room-scene');
+  const sceneStage = document.querySelector<HTMLElement>('#scene-stage');
+  const roomSummary = document.querySelector<HTMLElement>('#room-summary');
+  const sceneStatus = document.querySelector<HTMLElement>('#scene-status');
+  const planInput = document.querySelector<HTMLInputElement>('#floor-plan');
+  const planFileStatus = document.querySelector<HTMLElement>('#plan-file-status');
+  const planPreview = document.querySelector<HTMLElement>('#plan-preview');
+  const planPreviewImage = document.querySelector<HTMLImageElement>('#plan-preview-image');
+  const windowWallInput = document.querySelector<HTMLSelectElement>('#window-wall');
+  const windowOffsetInput = document.querySelector<HTMLInputElement>('#window-offset');
+  const providerSelect = document.querySelector<HTMLSelectElement>('#ai-provider');
+  const providerStatus = document.querySelector<HTMLElement>('#provider-status');
+  const assistantForm = document.querySelector<HTMLFormElement>('#assistant-form');
+  const designQuestion = document.querySelector<HTMLTextAreaElement>('#design-question');
+  const assistantButton = document.querySelector<HTMLButtonElement>('#ask-assistant');
+  const assistantResponse = document.querySelector<HTMLElement>('#assistant-response');
+
+  let planPreviewUrl: string | undefined;
+  let rotation = -32;
+  let configuredProviders = { googleAiStudio: false, groq: false };
+
+  function setPlanFileStatus(message: string, isError = false): void {
+    if (!planFileStatus) return;
+    planFileStatus.textContent = message;
+    planFileStatus.classList.toggle('text-rose-300', isError);
+    planFileStatus.classList.toggle('text-slate-300', !isError);
+  }
+
+  planInput?.addEventListener('change', () => {
+    const file = planInput.files?.[0];
+    if (planPreviewUrl) URL.revokeObjectURL(planPreviewUrl);
+    planPreviewUrl = undefined;
+    planPreview?.classList.add('hidden');
+    planPreviewImage?.classList.add('hidden');
+    if (planPreviewImage) planPreviewImage.removeAttribute('src');
+
+    if (!file) {
+      setPlanFileStatus('');
+      return;
+    }
+
+    const acceptedTypes = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+    if (!acceptedTypes.includes(file.type) || file.size > 12 * 1024 * 1024) {
+      planInput.value = '';
+      setPlanFileStatus('Choose a PNG, JPG, WEBP, or PDF file that is 12 MB or smaller.', true);
+      return;
+    }
+
+    if (file.type.startsWith('image/')) {
+      planPreviewUrl = URL.createObjectURL(file);
+      if (planPreviewImage) {
+        planPreviewImage.src = planPreviewUrl;
+        planPreviewImage.classList.remove('hidden');
+      }
+      planPreview?.classList.remove('hidden');
+    }
+
+    setPlanFileStatus(`${file.name} selected. It stays in this tab and is not uploaded.`);
+  });
+
+  windowWallInput?.addEventListener('change', () => {
+    if (!windowOffsetInput || !windowWallInput) return;
+    const hasWindow = windowWallInput.value !== 'none';
+    windowOffsetInput.disabled = !hasWindow;
+    windowOffsetInput.required = hasWindow;
+  });
+
+  roomForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!roomFormStatus || !roomScene || !sceneStage || !roomSummary) return;
+
+    const values = new FormData(roomForm);
+    const scaleReference = String(values.get('scaleReference')).trim();
+    if (!scaleReference) {
+      roomFormStatus.textContent = 'Enter a scale reference or state that the measurements were taken directly.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
+    const geometry: RoomGeometry = {
+      widthM: Number(values.get('widthM')),
+      lengthM: Number(values.get('lengthM')),
+      heightM: Number(values.get('heightM')),
+      doorWall: String(values.get('doorWall')),
+      doorOffsetM: Number(values.get('doorOffsetM')),
+      windowWall: String(values.get('windowWall')),
+      windowOffsetM: values.get('windowOffsetM') ? Number(values.get('windowOffsetM')) : null,
+    };
+    const validationMessage = validateRoomGeometry(geometry);
+    if (validationMessage) {
+      roomFormStatus.textContent = validationMessage;
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
+    const windowSummary = geometry.windowWall === 'none'
+      ? 'no window marked'
+      : `window ${geometry.windowWall} wall at ${geometry.windowOffsetM?.toFixed(2)} m`;
+    roomFormStatus.textContent = 'Measurements and opening positions confirmed. The room concept below is generic and illustrative.';
+    roomSummary.textContent = `${geometry.widthM.toFixed(2)} m × ${geometry.lengthM.toFixed(2)} m × ${geometry.heightM.toFixed(2)} m · scale source: ${scaleReference} · door ${geometry.doorWall} wall at ${geometry.doorOffsetM.toFixed(2)} m · ${windowSummary}`;
+    roomScene.classList.remove('hidden');
+    sceneStage.style.setProperty('--room-ratio', String(Math.max(0.7, Math.min(1.35, geometry.widthM / geometry.lengthM))));
+    sceneStage.dataset.lighting = 'daylight';
+    sceneStage.style.setProperty('--scene-rotation', `${rotation}deg`);
+    roomFormStatus.classList.remove('text-rose-300');
+    roomFormStatus.classList.add('text-emerald-200');
+    if (sceneStatus) {
+      sceneStatus.textContent = 'Illustrative room concept shown. Confirmed openings are listed but not placed in the generic scene.';
+    }
+  });
+
+  function updateRotation(nextRotation: number): void {
+    rotation = nextRotation;
+    sceneStage?.style.setProperty('--scene-rotation', `${rotation}deg`);
+    if (sceneStatus) sceneStatus.textContent = `View rotated to ${Math.round(rotation)} degrees.`;
+  }
+
+  document.querySelector('[data-testid="rotate-left"]')?.addEventListener('click', () => updateRotation(rotation - 25));
+  document.querySelector('[data-testid="rotate-right"]')?.addEventListener('click', () => updateRotation(rotation + 25));
+  document.querySelector('[data-testid="reset-view"]')?.addEventListener('click', () => updateRotation(-32));
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lighting-preset]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const preset = button.dataset.lightingPreset;
+      if (!preset || !sceneStage) return;
+      sceneStage.dataset.lighting = preset;
+      document.querySelectorAll('[data-lighting-preset]').forEach((candidate) => {
+        candidate.setAttribute('aria-pressed', String(candidate === button));
+      });
+      if (sceneStatus) sceneStatus.textContent = `${button.textContent?.trim() ?? 'Lighting'} appearance selected. This is a visual preset, not a lighting simulation.`;
+    });
+  });
+
+  sceneStage?.addEventListener('pointerdown', (event: PointerEvent) => {
+    sceneStage.setPointerCapture(event.pointerId);
+    sceneStage.dataset.dragX = String(event.clientX);
+  });
+  sceneStage?.addEventListener('pointermove', (event: PointerEvent) => {
+    if (!sceneStage.hasPointerCapture(event.pointerId)) return;
+    const previousX = Number(sceneStage.dataset.dragX);
+    if (!Number.isFinite(previousX)) return;
+    updateRotation(rotation + (event.clientX - previousX) * 0.6);
+    sceneStage.dataset.dragX = String(event.clientX);
+  });
+  sceneStage?.addEventListener('pointerup', (event: PointerEvent) => {
+    if (sceneStage.hasPointerCapture(event.pointerId)) sceneStage.releasePointerCapture(event.pointerId);
+    delete sceneStage.dataset.dragX;
+  });
+  sceneStage?.addEventListener('pointercancel', () => {
+    delete sceneStage.dataset.dragX;
+  });
+
+  async function loadProviderStatus(): Promise<void> {
+    if (!providerSelect || !providerStatus || !designQuestion || !assistantButton) return;
+    try {
+      const response = await fetch('/api/providers', { headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error('Provider status unavailable');
+      configuredProviders = await response.json() as typeof configuredProviders;
+    } catch {
+      providerStatus.textContent = 'Provider status is unavailable. The room intake and demo layout still work.';
+      providerSelect.disabled = true;
+      return;
+    }
+
+    const googleOption = providerSelect.querySelector<HTMLOptionElement>('option[value="google-ai-studio"]');
+    const groqOption = providerSelect.querySelector<HTMLOptionElement>('option[value="groq"]');
+    if (googleOption) googleOption.disabled = !configuredProviders.googleAiStudio;
+    if (groqOption) groqOption.disabled = !configuredProviders.groq;
+    const available = configuredProviders.googleAiStudio || configuredProviders.groq;
+    providerSelect.disabled = !available;
+    designQuestion.disabled = !available;
+    assistantButton.disabled = !available;
+
+    if (configuredProviders.googleAiStudio) providerSelect.value = 'google-ai-studio';
+    else if (configuredProviders.groq) providerSelect.value = 'groq';
+    providerStatus.textContent = available
+      ? 'Configured providers are available. API keys stay on the server.'
+      : 'No provider is configured. Set GOOGLE_AI_STUDIO_API_KEY or GROQ_API_KEY on the Node server to enable text suggestions.';
+  }
+
+  assistantForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!providerSelect || !designQuestion || !assistantButton || !assistantResponse) return;
+    assistantButton.disabled = true;
+    assistantResponse.textContent = 'Getting text suggestions…';
+    try {
+      const response = await fetch('/api/design-advice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          provider: providerSelect.value,
+          prompt: designQuestion.value,
+          roomSummary: roomSummary?.textContent ?? '',
+        }),
+      });
+      const result = await response.json() as { advice?: string; error?: string };
+      if (!response.ok) throw new Error(result.error ?? 'The suggestion request could not be completed.');
+      assistantResponse.textContent = `${result.advice ?? ''}\n\nText suggestion only — no geometry or render was generated.`;
+    } catch (error) {
+      assistantResponse.textContent = error instanceof Error ? error.message : 'The suggestion request could not be completed.';
+    } finally {
+      assistantButton.disabled = !configuredProviders.googleAiStudio && !configuredProviders.groq;
+    }
+  });
+
+  window.addEventListener('pagehide', () => {
+    if (planPreviewUrl) URL.revokeObjectURL(planPreviewUrl);
+  });
+
+  void loadProviderStatus();
+</script>

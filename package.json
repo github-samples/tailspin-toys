@@ -1,22 +1,21 @@
 {
-  "name": "tailspin-toys",
+  "name": "intero",
   "type": "module",
   "version": "0.0.1",
   "engines": {
     "node": ">=22.13"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "npm run build && npm run start",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "node --env-file-if-exists=.env server.mjs",
+    "start": "node --env-file-if-exists=.env server.mjs",
     "astro": "astro",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx db/migrate.ts",
     "db:seed": "tsx db/seed.ts",
     "db:setup": "npm run db:migrate && npm run db:seed",
     "db:export": "tsx db/export-catalog.ts",
-    "predev": "npm run db:setup",
-    "prebuild": "npm run db:setup",
     "predb:export": "npm run db:setup",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
@@ -53,5 +52,9 @@
     "tsx": "^4.23.15",
     "typescript-eslint": "^8.73.0",
     "vitest": "^5.1.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "esbuild@0.25.12": true
   }
 }

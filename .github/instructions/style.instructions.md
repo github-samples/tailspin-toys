@@ -45,6 +45,7 @@ ALL UI components MUST use dark theme colors:
 - Prefer utility classes over custom CSS when possible
 - Use semantic grouping: layout, spacing, colors, typography
 - Keep utility combinations readable and maintainable
+- Keep custom CSS limited to effects that utilities cannot express cleanly, such as the isolated 3D room scene and visual presets in `src/styles/global.css`
 
 ## Modern UI Patterns
 

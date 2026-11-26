@@ -6,7 +6,7 @@ interface Props {
   title?: string;
 }
 
-const { title = "Tailspin Toys" } = Astro.props;
+const { title = "Intero — thoughtful spaces, made together" } = Astro.props;
 ---
 
 <!doctype html>
@@ -31,9 +31,9 @@ const { title = "Tailspin Toys" } = Astro.props;
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
         </noscript>
     </head>
-    <body class="min-h-screen bg-slate-900 text-white transition-colors duration-300 m-0 w-full h-full font-sans">
+    <body class="m-0 min-h-screen w-full bg-slate-950 font-sans text-slate-100">
         <Header />
-        <main class="container mx-auto py-6 h-full max-w-7xl">
+        <main class="mx-auto min-h-[calc(100vh-4rem)] max-w-7xl py-6">
             <div class="px-4 sm:px-6 lg:px-8">
                 <slot />
             </div>

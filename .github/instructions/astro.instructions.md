@@ -7,7 +7,7 @@ applyTo: '**/*.astro'
 
 ## Astro Component Patterns
 
-Astro handles everything in the UI: pages, layouts, components, routing, and content. The site is **fully prerendered** (`output: 'static'`) — there is no client-side UI framework and no separate API server. Pages read data **directly in frontmatter** at build time via the Drizzle/Node SQLite data-access helpers in `src/lib/`.
+Astro handles the UI: pages, layouts, components, routing, and content. The UI is **fully prerendered** (`output: 'static'`) and has no client-side UI framework. The Node.js `server.mjs` host serves the generated files and provides optional same-origin provider endpoints; Astro pages do not read from the legacy game catalog.
 
 ### Component Structure
 
@@ -15,20 +15,18 @@ Astro handles everything in the UI: pages, layouts, components, routing, and con
 ---
 // Frontmatter: runs at build time (static output)
 import Layout from '../layouts/Layout.astro';
-import GameCard from '../components/GameCard.astro';
-import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
 
 interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
-const games = await getAllGames(getDatabase());
 ---
 
 <Layout title={title}>
-  {games.map((game) => <GameCard {game} />)}
+  <main>
+    <h1>{title}</h1>
+  </main>
 </Layout>
 ```
 
@@ -66,41 +64,39 @@ const { title } = Astro.props;
 
 - Create pages in `src/pages/`
 - File-based routing: `src/pages/about.astro` → `/about`
-- Dynamic routes: `src/pages/game/[id].astro`
+- Dynamic routes use bracketed path segments, for example `src/pages/rooms/[id].astro`
 - Provide a branded `src/pages/404.astro` — with static output, any URL with no generated page is a real 404.
 
 ### Dynamic Routes (static output)
 
-With `output: 'static'`, every dynamic route must enumerate its pages with `getStaticPaths()` and set `prerender = true`. Query data in frontmatter using the data-access helpers:
+With `output: 'static'`, every dynamic route must enumerate its pages with `getStaticPaths()` and set `prerender = true`. Keep generated paths deterministic and do not query the legacy game catalog for Intero pages.
 
 ```astro
 ---
 import type { GetStaticPaths } from 'astro';
 import Layout from '../../layouts/Layout.astro';
-import { getDatabase } from '../../lib/db';
-import { getAllGameIds, getGameById } from '../../lib/games';
-
 export const prerender = true;
 
 export const getStaticPaths = (async () => {
-  const ids = await getAllGameIds(getDatabase());
-  return ids.map((id) => ({ params: { id: String(id) } }));
+  return ['example'].map((id) => ({ params: { id } }));
 }) satisfies GetStaticPaths;
 
 const { id } = Astro.params;
-const game = await getGameById(getDatabase(), Number(id));
 ---
 
-<Layout title="Game Details - Tailspin Toys">
-  <!-- Game details -->
+<Layout title={`Room ${id}`}>
+  <main>
+    <h1>Room {id}</h1>
+  </main>
 </Layout>
 ```
 
-## Data Access
+## Runtime and Data
 
-- Build-time data comes from a local SQLite database via **Drizzle ORM + Node SQLite** (see [`drizzle.instructions.md`](drizzle.instructions.md)).
-- Import `getDatabase()` from `src/lib/db.ts` and the typed helpers from `src/lib/games.ts`.
-- The database must be migrated and seeded before `astro build`; the `prebuild` npm script (`db:setup`) handles this.
+- Astro builds the UI into `dist/`; `server.mjs` serves it and handles `/api/providers` and `/api/design-advice`.
+- The optional design-advice endpoint accepts text requests only. Provider keys are read by the Node host from environment variables and must never be embedded in Astro frontmatter or browser scripts.
+- The Drizzle/SQLite game catalog under `db/` is legacy starter data. It is not queried by Intero pages, and its migration/seed commands are not required for `astro build`.
+- Add authentication and rate limiting before exposing provider-backed requests publicly.
 
 ## Client Interactivity (rare)
 
@@ -116,7 +112,7 @@ There is no Svelte/React layer. When a page genuinely needs client behaviour, ad
 
 ## Best Practices
 
-- Keep data fetching in frontmatter (build time); avoid client-side fetching
+- Keep page content static where possible; use same-origin APIs from scoped scripts only for necessary runtime operations, such as text suggestions
 - Minimize client-side JavaScript — the default is zero JS shipped
 - Import and use global CSS styles from layouts
 - Always include a `data-testid` on interactive elements (see `ui.instructions.md`)

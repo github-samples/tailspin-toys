@@ -1,6 +1,6 @@
-# Tailspin Toys Crowd Funding Development Guidelines
+# Intero Interior Design Workspace Guidelines
 
-This is a crowdfunding platform for games with a developer theme. The application is a single **Astro 7** site (fully prerendered/static output) styled with **Tailwind CSS v4**. Data is stored in a local SQLite database accessed at build time through **Drizzle ORM + Node.js's built-in SQLite driver**; pages query the database directly in frontmatter — there is no separate backend API or client-side UI framework. Please follow these guidelines when contributing:
+Intero is an interior-design workspace built with **Astro 7** and **Tailwind CSS v4**. Astro prerenders the UI into `dist/`; the Node.js `server.mjs` host serves those files and provides same-origin endpoints for optional, text-only design suggestions. The UI has no client-side framework. The original SQLite/Drizzle game catalog remains as a legacy starter scaffold and is not part of Intero's build or runtime. Please follow these guidelines when contributing:
 
 ## Agent notes
 
@@ -37,7 +37,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 - Use TypeScript with explicit types for function parameters and return values, especially in the data layer (`db/`, `src/lib/`)
 - Frontend code (TypeScript, Astro) must pass ESLint checks (`npm run lint`)
 
-### Data Layer Patterns (Drizzle + Node SQLite)
+### Legacy Catalog Patterns (Drizzle + Node SQLite)
 
 - Define tables in `db/schema.ts`; manage schema changes with drizzle-kit migrations - see `drizzle.instructions.md`
 - Keep data-access helpers in `src/lib/` with an **injectable `db`** argument so they're testable
@@ -47,14 +47,17 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 ### Astro Patterns
 
 - **Astro Pages/Components**: routing, layouts, content, and components are all `.astro` - see `astro.instructions.md`
-- Query data directly in page frontmatter via the `src/lib/` helpers (build-time, static output)
+- Keep pages prerenderable; the `server.mjs` host serves Astro's static output
+- Keep provider credentials in server environment variables; never expose or log keys in page code
+- The only supported text providers are Google AI Studio and Groq, configured with `GOOGLE_AI_STUDIO_API_KEY` and `GROQ_API_KEY`
+- Provider suggestions are text only and must not be described as generated geometry, CAD, lighting simulation, or rendered imagery
 - Dynamic routes use `getStaticPaths()` + `export const prerender = true`
 - Provide a branded `404.astro` (unknown routes are real 404s under static output)
 - Only add a scoped Astro `<script>` when genuine client interactivity is required
 
 ### Styling
 
-- Use Tailwind CSS utility classes exclusively - see `style.instructions.md`
+- Use Tailwind CSS utility classes by default - see `style.instructions.md`; keep required 3D scene effects isolated in `src/styles/global.css`
 - Dark theme colors: slate palette (`bg-slate-800`, `text-slate-100`, etc.)
 - Rounded corners and modern UI patterns
 - Follow modern UI/UX principles with clean, accessible interfaces
@@ -70,20 +73,20 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 ## npm Commands
 
 - Use public npm (`https://registry.npmjs.org/`) for cloud dependency operations. Keep committed lockfile tarball URLs on public npm, and reject other origins in CI.
-- Development commands are defined in `package.json`. They run Astro for the site and TypeScript tasks in `db/` for database setup.
+- Development commands are defined in `package.json`. Astro builds the static UI; `server.mjs` serves it and handles optional provider requests. The legacy catalog tasks in `db/` are separate.
 - **Skills take precedence.** Before running a command directly, check whether a skill covers the task (e.g. the `quality-checks` skill wraps unit tests, lint, and type checks). If one applies, follow it.
 - Key npm scripts:
-  - `npm run dev` — start the Astro dev server (`predev` migrates + seeds the local SQLite database)
-  - `npm run build` — build the static site (`prebuild` migrates + seeds the local SQLite database)
-  - `npm run preview` — serve the built `dist/` output
+  - `npm run dev` — build the static site and start the Node host (no Astro hot reload)
+  - `npm run build` — build the static UI into `dist/`; no database setup is required
+  - `npm start` / `npm run preview` — serve `dist/` and the Node API routes
   - `npm run lint` — ESLint
   - `npm run test:unit` — Vitest unit tests
-  - `npm run test:e2e` — Playwright E2E tests (builds + previews first)
+  - `npm run test:e2e` — Playwright E2E tests (builds and starts the Node host first)
+  - `npm run test:e2e:install` — install the locked Playwright Chromium browser
   - `npm run typecheck` — type-check the pure TypeScript with `tsgo` (TypeScript 7 native compiler, via `@typescript/native-preview`) using `tsconfig.tsgo.json`
   - `npm run typecheck:astro` — type-check `.astro` files with `astro check` (classic TypeScript package)
   - `npm run typecheck:all` — run both type-check scripts (used by the CI `type-check` job)
-  - `npm run db:generate` / `db:migrate` / `db:seed` / `db:setup` — Drizzle schema/migration/seed tasks
-  - `npm run db:export` — migrate and seed via `predb:export`, then write the catalog grounding file to `db/catalog.json`
+  - `npm run db:generate` / `db:migrate` / `db:seed` / `db:setup` / `db:export` — legacy game-catalog maintenance tasks, not part of Intero's app workflow
 
 > [!NOTE]
 > TypeScript 7 (`tsgo`) is adopted **side-by-side** for type checking only; it does not affect linting. ESLint + `typescript-eslint` and `astro check` still resolve the classic `typescript` package (kept at v6) because the native compiler's API isn't ready for them yet. Do **not** bump the classic `typescript` package to 7 (a Dependabot `ignore` holds it) until `typescript-eslint` + `@astrojs/check` support the native API. `tsgo` is `--noEmit` only; the site is still built by `astro build`.
@@ -92,13 +95,15 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 The application lives at the repository root:
 
-- `db/`: Drizzle schema, migrations, transforms, seed, and `games.csv`
-- `src/lib/`: Node SQLite client (`db.ts`) and data-access helpers (`games.ts`)
+- `server.mjs`: Node host for static files and same-origin provider endpoints
+- `.env.example`: blank template for optional server-side provider configuration
+- `db/`: legacy Drizzle catalog schema, migrations, transforms, seed, and `games.csv`
+- `src/lib/`: room-geometry validation and server-side provider helpers, plus legacy catalog helpers
 - `src/components/`: reusable `.astro` components
 - `src/layouts/`: Astro layout templates
-- `src/pages/`: Astro page routes (`index.astro` listing, `game/[id].astro`, `404.astro`, `about.astro`)
+- `src/pages/`: `index.astro` design workspace, `404.astro`, and `about.astro`
 - `src/styles/`: CSS and Tailwind configuration
-- `src/types/`: TypeScript interfaces (Game, Publisher, Category)
-- `e2e-tests/`: Playwright E2E tests (home, games, accessibility)
+- `src/types/`: shared TypeScript interfaces, including legacy catalog types
+- `e2e-tests/`: Playwright E2E and accessibility tests for the workspace
 - `drizzle.config.ts`, `vitest.config.ts`, `astro.config.mjs`, `playwright.config.ts`: tooling config
 - `README.md`: Project documentation
