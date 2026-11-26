@@ -27,9 +27,9 @@
 
 .scene-room {
     position: relative;
-    width: min(76vw, 27rem);
-    height: 15rem;
-    transform: rotateX(-15deg) rotateY(var(--scene-rotation, -32deg)) scale(var(--room-ratio, 1));
+    width: var(--room-width, 27rem);
+    height: var(--room-height, 15rem);
+    transform: rotateX(-15deg) rotateY(var(--scene-rotation, -32deg)) scale(var(--room-responsive-scale, 1));
     transform-style: preserve-3d;
     transition: transform 180ms ease-out;
 }
@@ -49,73 +49,85 @@
 .scene-wall-back {
     inset: 0;
     background: linear-gradient(145deg, #334155, #1e293b 70%);
-    transform: translateZ(-8rem);
+    transform: translateZ(var(--room-depth-negative-half, -8rem));
 }
 
 .scene-wall-left,
 .scene-wall-right {
     top: 0;
-    width: 16rem;
-    height: 15rem;
+    width: var(--room-depth, 16rem);
+    height: var(--room-height, 15rem);
     background: linear-gradient(180deg, #475569, #1e293b);
+    backface-visibility: visible;
 }
 
 .scene-wall-left {
-    left: 0;
-    transform: rotateY(-90deg) translateZ(8rem);
-    transform-origin: left center;
+    left: var(--room-depth-negative-half, -8rem);
+    transform: rotateY(90deg);
+    transform-origin: center;
 }
 
 .scene-wall-right {
-    right: 0;
-    transform: rotateY(90deg) translateZ(8rem);
-    transform-origin: right center;
+    left: calc(var(--room-width, 27rem) - var(--room-depth-half, 8rem));
+    transform: rotateY(-90deg);
+    transform-origin: center;
+}
+
+.scene-wall-front {
+    inset: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translateZ(var(--room-depth-half, 8rem));
+    backface-visibility: visible;
 }
 
 .scene-floor {
-    bottom: -8rem;
+    top: var(--room-height, 15rem);
     left: 0;
-    width: 100%;
-    height: 16rem;
+    width: var(--room-width, 27rem);
+    height: var(--room-depth, 16rem);
     background:
         repeating-linear-gradient(90deg, transparent 0 3.8rem, rgb(15 23 42 / 20%) 3.8rem 3.95rem),
         linear-gradient(135deg, #a18868, #5b5146);
-    transform: rotateX(90deg);
+    transform: translateZ(var(--room-depth-negative-half, -8rem)) rotateX(90deg);
     transform-origin: top center;
 }
 
 .scene-window {
     position: absolute;
     top: 2rem;
-    left: 35%;
-    z-index: 1;
-    width: 6rem;
-    height: 4.2rem;
+    left: 0;
+    z-index: 4;
+    width: var(--opening-width, 6rem);
+    height: var(--opening-height, 4.2rem);
     border: 0.35rem solid #cbd5e1;
     background: linear-gradient(135deg, var(--scene-light), #7dd3fc);
     box-shadow: 0 0 2.5rem var(--scene-glow);
-    transform: translateZ(-7.8rem);
+    transform-origin: left top;
+    transform: translateX(-50%) translateZ(var(--opening-z, -7.8rem));
 }
 
 .scene-door {
     position: absolute;
-    right: 2rem;
+    left: 0;
     bottom: 0;
-    z-index: 1;
-    width: 3.3rem;
-    height: 7rem;
+    z-index: 4;
+    width: var(--opening-width, 3.3rem);
+    height: var(--opening-height, 7rem);
     border: 0.2rem solid #d6b98c;
     border-bottom: 0;
     background: linear-gradient(90deg, #654a35, #8b684a);
-    transform: translateZ(-7.8rem);
+    transform-origin: left bottom;
+    transform: translateX(-50%) translateZ(var(--opening-z, -7.8rem));
 }
 
 .scene-rug {
     position: absolute;
     bottom: -2.7rem;
-    left: 5rem;
+    left: 22%;
     z-index: 2;
-    width: 13rem;
+    width: 56%;
     height: 6rem;
     border-radius: 45%;
     background: #64748b;
@@ -126,9 +138,9 @@
 .scene-sofa {
     position: absolute;
     bottom: 2.6rem;
-    left: 6rem;
+    left: 4%;
     z-index: 3;
-    width: 12rem;
+    width: 36%;
     height: 4.2rem;
     border-radius: 0.9rem 0.9rem 0.4rem 0.4rem;
     background: linear-gradient(155deg, #5f766a, #34483e);
@@ -139,8 +151,8 @@
 .scene-sofa::before {
     position: absolute;
     top: -1.7rem;
-    left: 0.7rem;
-    width: 10.6rem;
+    left: 5%;
+    width: 90%;
     height: 2rem;
     border-radius: 0.8rem 0.8rem 0.25rem 0.25rem;
     background: #718879;
@@ -170,7 +182,7 @@
 
 .scene-table {
     position: absolute;
-    right: 3rem;
+    right: 10%;
     bottom: 3rem;
     z-index: 3;
     width: 4rem;
@@ -193,8 +205,8 @@
 
 .scene-plant {
     position: absolute;
-    top: 8rem;
-    left: 2rem;
+    top: 56%;
+    left: 8%;
     z-index: 3;
     width: 1.8rem;
     height: 1.5rem;
@@ -218,5 +230,11 @@
     .scene-room,
     .scene-stage {
         transition: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .scene-room {
+        --room-responsive-scale: 0.78;
     }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateRoomGeometry, type RoomGeometry } from './room-design';
+import { getOpeningPlanPoint, validateRoomGeometry, type RoomGeometry, type RoomWall } from './room-design';
 
 const validRoom: RoomGeometry = {
     widthM: 4.8,
@@ -36,5 +36,22 @@ describe('validateRoomGeometry', () => {
             windowWall: 'north',
             windowOffsetM: 1.8,
         })).toContain('farther from the door');
+    });
+});
+
+describe('getOpeningPlanPoint', () => {
+    it.each([
+        ['north', 2, { x: 0.5, y: 0 }],
+        ['east', 1.5, { x: 1, y: 0.5 }],
+        ['south', 2, { x: 0.5, y: 1 }],
+        ['west', 1.5, { x: 0, y: 0.5 }],
+    ] as const)('maps a %s wall offset into the top-down plan', (wall: RoomWall, offsetM: number, point) => {
+        expect(getOpeningPlanPoint(wall, offsetM, 4, 3)).toEqual(point);
+    });
+
+    it('returns null for invalid walls or offsets outside the selected wall', () => {
+        expect(getOpeningPlanPoint('none', 1, 4, 3)).toBeNull();
+        expect(getOpeningPlanPoint('east', 3.1, 4, 3)).toBeNull();
+        expect(getOpeningPlanPoint('north', Number.NaN, 4, 3)).toBeNull();
     });
 });

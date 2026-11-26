@@ -11,7 +11,7 @@ import Layout from '../layouts/Layout.astro';
           Make room for a better idea.
         </h1>
         <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-          Bring a floor plan, confirm what is really there, then explore an illustrative room concept and get optional, provider-backed design suggestions.
+          Build a measured 2D floor plan, confirm what is really there, then convert it to an illustrative 3D room preview and get optional, provider-backed design suggestions.
         </p>
       </div>
       <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm leading-6 text-slate-300">
@@ -24,8 +24,8 @@ import Layout from '../layouts/Layout.astro';
       <form id="room-form" class="space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg sm:p-7" data-testid="room-form">
         <div>
           <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Step 1 · Your room</p>
-          <h2 class="mt-2 text-2xl font-semibold text-slate-100">Start with the plan</h2>
-          <p class="mt-2 text-sm leading-6 text-slate-400">Add an optional reference image or PDF. Intero does not upload, analyze, or retain it; confirm the scale and measurements below yourself.</p>
+          <h2 class="mt-2 text-2xl font-semibold text-slate-100">Build your 2D layout</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Use the measured dimensions and opening controls below to create your plan. An optional image or PDF is only a temporary visual reference; Intero does not inspect or upload it.</p>
         </div>
 
         <div>
@@ -39,7 +39,7 @@ import Layout from '../layouts/Layout.astro';
             data-testid="floor-plan-input"
             aria-describedby="plan-privacy plan-file-status"
           />
-          <p id="plan-privacy" class="mt-2 text-xs leading-5 text-slate-400">PNG, JPG, WEBP, or PDF · maximum 12 MB · preview remains temporary in this tab.</p>
+          <p id="plan-privacy" class="mt-2 text-xs leading-5 text-slate-400">PNG, JPG, WEBP, or PDF · maximum 12 MB · image previews stay temporary in this tab; files are never uploaded.</p>
           <p id="plan-file-status" class="mt-2 min-h-5 text-sm text-slate-300" role="status" aria-live="polite" data-testid="plan-file-status"></p>
           <div id="plan-preview" class="mt-3 hidden overflow-hidden rounded-xl border border-slate-700 bg-slate-950 p-2" data-testid="plan-preview">
             <img id="plan-preview-image" class="hidden max-h-56 w-full object-contain" alt="Temporary local preview of the selected floor plan" />
@@ -71,7 +71,7 @@ import Layout from '../layouts/Layout.astro';
 
         <fieldset class="space-y-4">
           <legend class="text-sm font-semibold text-slate-200">Step 3 · Mark openings</legend>
-          <p class="text-xs leading-5 text-slate-400">Offsets are measured from the left corner of the chosen wall while standing inside the room. Door and window positions are illustrative markers.</p>
+          <p class="text-xs leading-5 text-slate-400">Offsets are measured from the left corner of the chosen wall while standing inside the room. The 2D plan updates as you edit these measurements.</p>
           <div class="grid gap-4 sm:grid-cols-2">
             <div>
               <label for="door-wall" class="mb-1.5 block text-sm text-slate-300">Door wall</label>
@@ -103,14 +103,37 @@ import Layout from '../layouts/Layout.astro';
           </div>
         </fieldset>
 
+        <section class="space-y-3 rounded-xl border border-slate-800 bg-slate-950 p-4" aria-labelledby="plan-editor-heading">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-emerald-300">Step 4 · Review your plan</p>
+            <h3 id="plan-editor-heading" class="mt-1 text-lg font-semibold text-slate-100">2D layout editor</h3>
+            <p class="mt-1 text-xs leading-5 text-slate-400">This measured top-down layout is the source for the 3D room preview. North is at the top; opening markers use your wall and offset values.</p>
+          </div>
+          <svg id="layout-plan-preview" class="w-full rounded-lg bg-slate-900" viewBox="0 0 400 300" role="img" aria-labelledby="plan-preview-title plan-preview-description" data-testid="layout-2d-preview">
+            <title id="plan-preview-title">2D floor plan preview</title>
+            <desc id="plan-preview-description">Enter room width and length to display a measured top-down plan with door and optional window markers.</desc>
+            <text id="plan-empty-state" x="200" y="150" text-anchor="middle" class="fill-slate-400 text-sm">Enter room width and length to draw the plan.</text>
+            <g id="plan-drawing" class="hidden">
+              <rect id="plan-outline" rx="3" class="fill-slate-800 stroke-slate-300" stroke-width="3"></rect>
+              <line id="plan-door-marker" class="stroke-amber-300" stroke-width="7" stroke-linecap="round"></line>
+              <line id="plan-window-marker" class="hidden stroke-sky-300" stroke-width="5" stroke-linecap="round"></line>
+              <text id="plan-width-label" text-anchor="middle" class="fill-slate-200 text-xs"></text>
+              <text id="plan-length-label" text-anchor="middle" class="fill-slate-200 text-xs"></text>
+              <text id="plan-north-label" text-anchor="middle" class="fill-emerald-300 text-xs font-semibold">N</text>
+            </g>
+          </svg>
+          <p id="plan-editor-status" class="min-h-5 text-xs text-slate-300" role="status" aria-live="polite" data-testid="plan-editor-status">Enter room width and length to draw the 2D plan preview.</p>
+          <p class="text-xs text-slate-400"><span class="text-amber-300">Amber</span> door · <span class="text-sky-300">Blue</span> window</p>
+        </section>
+
         <label class="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">
           <input id="confirm-geometry" name="confirmGeometry" type="checkbox" required class="mt-1 h-4 w-4 accent-emerald-400 focus:ring-2 focus:ring-emerald-400" data-testid="confirm-geometry" />
-          <span>I confirm these room dimensions and opening positions against the scale or measurement source above. I understand the demo layout is generic and illustrative.</span>
+          <span>I confirm these room dimensions and opening positions against the scale or measurement source above. I understand the 3D preview uses this plan for its room shell; furnishings and lighting remain illustrative.</span>
         </label>
 
         <p id="room-form-status" class="min-h-5 text-sm text-amber-200" role="status" aria-live="polite" data-testid="room-form-status"></p>
         <button type="submit" class="w-full rounded-xl bg-emerald-300 px-5 py-3 font-semibold text-slate-950 transition-colors hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-slate-900" data-testid="confirm-room-button">
-          Confirm room and show demo layout
+          Convert 2D layout to 3D preview
         </button>
       </form>
 
@@ -118,18 +141,19 @@ import Layout from '../layouts/Layout.astro';
         <section id="room-scene" class="hidden overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg" aria-labelledby="scene-heading" data-testid="room-scene">
           <div class="flex flex-wrap items-start justify-between gap-3 p-5 sm:p-7">
             <div>
-              <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Illustrative demo · not a CAD model</p>
-              <h2 id="scene-heading" class="mt-2 text-2xl font-semibold text-slate-100">A room concept to explore</h2>
+              <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Illustrative conversion · not CAD</p>
+              <h2 id="scene-heading" class="mt-2 text-2xl font-semibold text-slate-100">3D preview from your 2D layout</h2>
               <p id="room-summary" class="mt-2 text-sm text-slate-400" data-testid="room-summary"></p>
             </div>
-            <span class="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">Not a photoreal render</span>
+            <span class="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">Not a 360° photo</span>
           </div>
 
-          <div id="scene-stage" class="scene-stage" data-lighting="daylight" role="group" aria-label="Interactive 360-degree orbit view of the illustrative room. Drag to rotate or use the rotation buttons." data-testid="scene-stage">
+          <div id="scene-stage" class="scene-stage" data-lighting="daylight" role="group" aria-label="Interactive orbit view of the illustrative 3D room preview. Drag to rotate or use the rotation buttons." data-testid="scene-stage">
             <div id="scene-room" class="scene-room" role="img" aria-label="Illustrative room with a sofa, rug, and side table">
               <div class="scene-wall scene-wall-back"></div>
               <div class="scene-wall scene-wall-left"></div>
               <div class="scene-wall scene-wall-right"></div>
+              <div class="scene-wall scene-wall-front"></div>
               <div class="scene-floor"></div>
               <div class="scene-window" aria-hidden="true"></div>
               <div class="scene-door" aria-hidden="true"></div>
@@ -141,7 +165,7 @@ import Layout from '../layouts/Layout.astro';
           </div>
 
           <div class="space-y-4 p-5 sm:p-7">
-            <p class="text-center text-xs text-slate-400">Drag the scene to orbit around the generic concept. Openings and furnishings are not placed from your measurements; this CSS 3D preview is not an architectural model or simulated light.</p>
+            <p class="text-center text-xs text-slate-400">Room proportions and door/window markers follow the confirmed 2D plan. Furniture and lighting are illustrative; this CSS scene is not an architectural model, photoreal render, 360° photo, or lighting simulation.</p>
             <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Lighting appearance presets">
               <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="daylight" aria-pressed="true" data-testid="lighting-daylight">Soft daylight</button>
               <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="warm" aria-pressed="false" data-testid="lighting-warm">Warm evening</button>
@@ -188,20 +212,42 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { validateRoomGeometry, type RoomGeometry } from '../lib/room-design';
+  import { getOpeningPlanPoint, validateRoomGeometry, type RoomGeometry } from '../lib/room-design';
 
   const roomForm = document.querySelector<HTMLFormElement>('#room-form');
   const roomFormStatus = document.querySelector<HTMLElement>('#room-form-status');
   const roomScene = document.querySelector<HTMLElement>('#room-scene');
   const sceneStage = document.querySelector<HTMLElement>('#scene-stage');
+  const sceneRoom = document.querySelector<HTMLElement>('#scene-room');
+  const sceneDoor = document.querySelector<HTMLElement>('.scene-door');
+  const sceneWindow = document.querySelector<HTMLElement>('.scene-window');
+  const sceneWalls: Record<string, HTMLElement | null> = {
+    north: document.querySelector<HTMLElement>('.scene-wall-back'),
+    east: document.querySelector<HTMLElement>('.scene-wall-right'),
+    south: document.querySelector<HTMLElement>('.scene-wall-front'),
+    west: document.querySelector<HTMLElement>('.scene-wall-left'),
+  };
   const roomSummary = document.querySelector<HTMLElement>('#room-summary');
   const sceneStatus = document.querySelector<HTMLElement>('#scene-status');
   const planInput = document.querySelector<HTMLInputElement>('#floor-plan');
   const planFileStatus = document.querySelector<HTMLElement>('#plan-file-status');
   const planPreview = document.querySelector<HTMLElement>('#plan-preview');
   const planPreviewImage = document.querySelector<HTMLImageElement>('#plan-preview-image');
+  const widthInput = document.querySelector<HTMLInputElement>('#room-width');
+  const lengthInput = document.querySelector<HTMLInputElement>('#room-length');
+  const doorWallInput = document.querySelector<HTMLSelectElement>('#door-wall');
+  const doorOffsetInput = document.querySelector<HTMLInputElement>('#door-offset');
   const windowWallInput = document.querySelector<HTMLSelectElement>('#window-wall');
   const windowOffsetInput = document.querySelector<HTMLInputElement>('#window-offset');
+  const planDrawing = document.querySelector<SVGGElement>('#plan-drawing');
+  const planEmptyState = document.querySelector<SVGTextElement>('#plan-empty-state');
+  const planOutline = document.querySelector<SVGRectElement>('#plan-outline');
+  const planDoorMarker = document.querySelector<SVGLineElement>('#plan-door-marker');
+  const planWindowMarker = document.querySelector<SVGLineElement>('#plan-window-marker');
+  const planWidthLabel = document.querySelector<SVGTextElement>('#plan-width-label');
+  const planLengthLabel = document.querySelector<SVGTextElement>('#plan-length-label');
+  const planNorthLabel = document.querySelector<SVGTextElement>('#plan-north-label');
+  const planEditorStatus = document.querySelector<HTMLElement>('#plan-editor-status');
   const providerSelect = document.querySelector<HTMLSelectElement>('#ai-provider');
   const providerStatus = document.querySelector<HTMLElement>('#provider-status');
   const assistantForm = document.querySelector<HTMLFormElement>('#assistant-form');
@@ -212,6 +258,178 @@ import Layout from '../layouts/Layout.astro';
   let planPreviewUrl: string | undefined;
   let rotation = -32;
   let configuredProviders = { googleAiStudio: false, groq: false };
+
+  function drawOpeningMarker(
+    marker: SVGLineElement | null,
+    wall: string,
+    offsetM: number,
+    openingWidthM: number,
+    widthM: number,
+    lengthM: number,
+    x: number,
+    y: number,
+    planWidth: number,
+    planLength: number,
+  ): boolean {
+    if (!marker) return false;
+    const point = getOpeningPlanPoint(wall, offsetM, widthM, lengthM);
+    if (!point) {
+      marker.classList.add('hidden');
+      return false;
+    }
+
+    marker.classList.remove('hidden');
+    const centerX = x + point.x * planWidth;
+    const centerY = y + point.y * planLength;
+    const horizontalWall = wall === 'north' || wall === 'south';
+    const wallPixels = horizontalWall ? planWidth : planLength;
+    const halfOpening = Math.min(openingWidthM * Math.min(planWidth / widthM, planLength / lengthM) / 2, wallPixels / 4);
+    marker.setAttribute('x1', String(horizontalWall ? centerX - halfOpening : centerX));
+    marker.setAttribute('y1', String(horizontalWall ? centerY : centerY - halfOpening));
+    marker.setAttribute('x2', String(horizontalWall ? centerX + halfOpening : centerX));
+    marker.setAttribute('y2', String(horizontalWall ? centerY : centerY + halfOpening));
+    return true;
+  }
+
+  function renderPlanEditor(): void {
+    const widthM = Number(widthInput?.value);
+    const lengthM = Number(lengthInput?.value);
+    if (!planDrawing || !planEmptyState || !planEditorStatus) return;
+
+    if (!Number.isFinite(widthM) || widthM <= 0 || !Number.isFinite(lengthM) || lengthM <= 0) {
+      planDrawing.classList.add('hidden');
+      planEmptyState.classList.remove('hidden');
+      planEditorStatus.textContent = 'Enter room width and length to draw the 2D plan preview.';
+      return;
+    }
+
+    const planWidth = Math.min(296 / widthM, 198 / lengthM) * widthM;
+    const planLength = Math.min(296 / widthM, 198 / lengthM) * lengthM;
+    const x = (400 - planWidth) / 2;
+    const y = (300 - planLength) / 2;
+    planDrawing.classList.remove('hidden');
+    planEmptyState.classList.add('hidden');
+    planOutline?.setAttribute('x', String(x));
+    planOutline?.setAttribute('y', String(y));
+    planOutline?.setAttribute('width', String(planWidth));
+    planOutline?.setAttribute('height', String(planLength));
+    planWidthLabel?.setAttribute('x', String(x + planWidth / 2));
+    planWidthLabel?.setAttribute('y', String(y - 12));
+    if (planWidthLabel) planWidthLabel.textContent = `${widthM.toFixed(2)} m`;
+    const lengthLabelX = x + planWidth + 26;
+    const lengthLabelY = y + planLength / 2;
+    planLengthLabel?.setAttribute('transform', `rotate(90 ${lengthLabelX} ${lengthLabelY})`);
+    if (planLengthLabel) planLengthLabel.textContent = `${lengthM.toFixed(2)} m`;
+    planNorthLabel?.setAttribute('x', String(x + planWidth / 2));
+    planNorthLabel?.setAttribute('y', String(y - 28));
+
+    const doorWall = doorWallInput?.value ?? '';
+    const doorOffsetM = doorOffsetInput?.value.trim() ? Number(doorOffsetInput.value) : Number.NaN;
+    const doorVisible = drawOpeningMarker(
+      planDoorMarker,
+      doorWall,
+      doorOffsetM,
+      0.9,
+      widthM,
+      lengthM,
+      x,
+      y,
+      planWidth,
+      planLength,
+    );
+    const windowWall = windowWallInput?.value ?? 'none';
+    const windowOffsetM = windowOffsetInput?.value.trim() ? Number(windowOffsetInput.value) : Number.NaN;
+    const windowVisible = windowWall !== 'none' && drawOpeningMarker(
+      planWindowMarker,
+      windowWall,
+      windowOffsetM,
+      1.2,
+      widthM,
+      lengthM,
+      x,
+      y,
+      planWidth,
+      planLength,
+    );
+    if (windowWall === 'none') planWindowMarker?.classList.add('hidden');
+
+    const windowSummary = windowWall === 'none'
+      ? 'no window'
+      : windowVisible ? `window on ${windowWall} at ${windowOffsetM.toFixed(2)} m` : 'window offset needs adjustment';
+    planEditorStatus.textContent = `2D plan preview: ${widthM.toFixed(2)} m × ${lengthM.toFixed(2)} m; ${doorVisible ? `door on ${doorWall} at ${doorOffsetM.toFixed(2)} m` : 'door offset needs adjustment'}; ${windowSummary}.`;
+  }
+
+  [widthInput, lengthInput, doorWallInput, doorOffsetInput, windowWallInput, windowOffsetInput].forEach((input) => {
+    input?.addEventListener('input', renderPlanEditor);
+    input?.addEventListener('change', renderPlanEditor);
+  });
+
+  function positionSceneOpening(
+    element: HTMLElement | null,
+    wall: string,
+    offsetM: number,
+    geometry: RoomGeometry,
+    roomWidth: number,
+    openingWidth: number,
+  ): boolean {
+    if (!element || !sceneWalls[wall]) return false;
+    if (!getOpeningPlanPoint(wall, offsetM, geometry.widthM, geometry.lengthM)) return false;
+    const scale = roomWidth / geometry.widthM;
+    const offsetAlongWall = wall === 'south' ? geometry.widthM - offsetM : offsetM;
+    sceneWalls[wall]?.append(element);
+    element.style.left = `${offsetAlongWall * scale - openingWidth / 2}rem`;
+    element.style.transform = 'none';
+    return true;
+  }
+
+  function updateSceneGeometry(geometry: RoomGeometry): boolean {
+    if (!sceneStage || !sceneRoom || !sceneDoor || !sceneWindow) return false;
+    const scale = Math.min(22 / geometry.widthM, 14 / geometry.lengthM);
+    const roomWidth = geometry.widthM * scale;
+    const roomDepth = geometry.lengthM * scale;
+    const roomHeight = geometry.heightM / 5 * 13;
+    sceneStage.style.setProperty('--room-width', `${roomWidth}rem`);
+    sceneStage.style.setProperty('--room-depth', `${roomDepth}rem`);
+    sceneStage.style.setProperty('--room-height', `${roomHeight}rem`);
+    sceneStage.style.setProperty('--room-depth-half', `${roomDepth / 2}rem`);
+    sceneStage.style.setProperty('--room-depth-negative-half', `${roomDepth / -2}rem`);
+    sceneStage.style.setProperty('--room-width-half', `${roomWidth / 2}rem`);
+
+    const doorWidth = Math.min(3.2, Math.max(1.4, scale * 0.9));
+    sceneDoor.style.width = `${doorWidth}rem`;
+    sceneDoor.style.height = `${Math.min(roomHeight - 0.5, Math.max(3, geometry.heightM / 5 * 9))}rem`;
+    const doorPositioned = positionSceneOpening(
+      sceneDoor,
+      geometry.doorWall,
+      geometry.doorOffsetM,
+      geometry,
+      roomWidth,
+      doorWidth,
+    );
+
+    const hasWindow = geometry.windowWall !== 'none' && geometry.windowOffsetM !== null;
+    sceneWindow.classList.toggle('hidden', !hasWindow);
+    const windowWidth = Math.min(4.2, Math.max(1.6, scale * 1.2));
+    if (hasWindow) {
+      sceneWindow.style.width = `${windowWidth}rem`;
+      sceneWindow.style.height = `${Math.min(3.2, Math.max(1.8, roomHeight * 0.24))}rem`;
+      sceneWindow.style.top = `${Math.min(4, roomHeight * 0.28)}rem`;
+    }
+    const windowPositioned = !hasWindow || positionSceneOpening(
+      sceneWindow,
+      geometry.windowWall,
+      geometry.windowOffsetM ?? 0,
+      geometry,
+      roomWidth,
+      windowWidth,
+    );
+
+    sceneRoom.setAttribute(
+      'aria-label',
+      `${geometry.widthM.toFixed(2)} by ${geometry.lengthM.toFixed(2)} metre illustrative room preview with a ${geometry.doorWall} wall door${hasWindow ? ` and ${geometry.windowWall} wall window` : ''}`,
+    );
+    return doorPositioned && windowPositioned;
+  }
 
   function setPlanFileStatus(message: string, isError = false): void {
     if (!planFileStatus) return;
@@ -257,7 +475,9 @@ import Layout from '../layouts/Layout.astro';
     const hasWindow = windowWallInput.value !== 'none';
     windowOffsetInput.disabled = !hasWindow;
     windowOffsetInput.required = hasWindow;
+    renderPlanEditor();
   });
+  renderPlanEditor();
 
   roomForm?.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -291,19 +511,26 @@ import Layout from '../layouts/Layout.astro';
       return;
     }
 
+    if (!updateSceneGeometry(geometry)) {
+      roomFormStatus.textContent = 'Could not map the confirmed opening positions to the 3D preview. Check the selected walls and offsets.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
     const windowSummary = geometry.windowWall === 'none'
       ? 'no window marked'
       : `window ${geometry.windowWall} wall at ${geometry.windowOffsetM?.toFixed(2)} m`;
-    roomFormStatus.textContent = 'Measurements and opening positions confirmed. The room concept below is generic and illustrative.';
+    roomFormStatus.textContent = '2D layout converted to an illustrative 3D room preview. Room proportions and opening positions follow your confirmed measurements.';
     roomSummary.textContent = `${geometry.widthM.toFixed(2)} m × ${geometry.lengthM.toFixed(2)} m × ${geometry.heightM.toFixed(2)} m · scale source: ${scaleReference} · door ${geometry.doorWall} wall at ${geometry.doorOffsetM.toFixed(2)} m · ${windowSummary}`;
     roomScene.classList.remove('hidden');
-    sceneStage.style.setProperty('--room-ratio', String(Math.max(0.7, Math.min(1.35, geometry.widthM / geometry.lengthM))));
     sceneStage.dataset.lighting = 'daylight';
     sceneStage.style.setProperty('--scene-rotation', `${rotation}deg`);
     roomFormStatus.classList.remove('text-rose-300');
     roomFormStatus.classList.add('text-emerald-200');
     if (sceneStatus) {
-      sceneStatus.textContent = 'Illustrative room concept shown. Confirmed openings are listed but not placed in the generic scene.';
+      sceneStatus.textContent = '2D layout converted. Room shape and opening markers use your measurements; furniture and lighting remain illustrative.';
     }
   });
 

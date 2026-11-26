@@ -11,12 +11,44 @@ export interface RoomGeometry {
     windowOffsetM: number | null;
 }
 
+export interface PlanPoint {
+    x: number;
+    y: number;
+}
+
 function wallLength(geometry: RoomGeometry, wall: RoomWall): number {
     return wall === 'north' || wall === 'south' ? geometry.widthM : geometry.lengthM;
 }
 
 function isRoomWall(wall: string): wall is RoomWall {
     return ['north', 'east', 'south', 'west'].includes(wall);
+}
+
+/** Map an opening's wall offset to normalized top-down plan coordinates. */
+export function getOpeningPlanPoint(
+    wall: string,
+    offsetM: number,
+    widthM: number,
+    lengthM: number,
+): PlanPoint | null {
+    if (!isRoomWall(wall) || !Number.isFinite(offsetM)) return null;
+
+    const wallLengthM = wall === 'north' || wall === 'south' ? widthM : lengthM;
+    if (!Number.isFinite(wallLengthM) || wallLengthM <= 0 || offsetM < 0 || offsetM > wallLengthM) {
+        return null;
+    }
+
+    const position = offsetM / wallLengthM;
+    switch (wall) {
+        case 'north':
+            return { x: position, y: 0 };
+        case 'east':
+            return { x: 1, y: position };
+        case 'south':
+            return { x: 1 - position, y: 1 };
+        case 'west':
+            return { x: 0, y: 1 - position };
+    }
 }
 
 /** Return a user-facing validation message, or null when the confirmed room geometry is plausible. */

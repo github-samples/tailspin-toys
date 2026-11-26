@@ -102,6 +102,8 @@ const { id } = Astro.params;
 
 There is no Svelte/React layer. When a page genuinely needs client behaviour, add a scoped Astro `<script>` using standard DOM APIs. Prefer native interactive elements (`<button>`, `<a href>`) so keyboard and focus behaviour come for free.
 
+For Intero's room workspace, derive the live SVG floor plan and illustrative 3D room shell from the same user-confirmed dimensions and opening offsets. Treat optional uploaded plan files as local references only; do not imply image interpretation or CAD/photorealistic output.
+
 ## TypeScript
 
 - Use TypeScript for type-safe props
