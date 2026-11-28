@@ -16,6 +16,45 @@ export interface PlanPoint {
     y: number;
 }
 
+export interface FurniturePlacements {
+    sofa: PlanPoint;
+    sideTable: PlanPoint;
+    plant: PlanPoint;
+}
+
+export function getDefaultFurniturePlacements(widthM: number, lengthM: number): FurniturePlacements {
+    return {
+        sofa: { x: widthM * 0.46, y: lengthM * 0.56 },
+        sideTable: { x: widthM * 0.76, y: lengthM * 0.68 },
+        plant: { x: widthM * 0.16, y: lengthM * 0.18 },
+    };
+}
+
+export function validateFurniturePlacements(
+    placements: FurniturePlacements,
+    widthM: number,
+    lengthM: number,
+): string | null {
+    for (const [label, point, halfWidthM, halfLengthM] of [
+        ['Sofa', placements.sofa, Math.min(1, widthM * 0.4), Math.min(0.45, lengthM * 0.35)],
+        ['Side table', placements.sideTable, Math.min(0.4, widthM * 0.18), Math.min(0.325, lengthM * 0.18)],
+        ['Plant', placements.plant, Math.min(0.2, widthM * 0.12), Math.min(0.2, lengthM * 0.12)],
+    ] as const) {
+        if (
+            !Number.isFinite(point.x) ||
+            !Number.isFinite(point.y) ||
+            point.x < halfWidthM ||
+            point.x > widthM - halfWidthM ||
+            point.y < halfLengthM ||
+            point.y > lengthM - halfLengthM
+        ) {
+            return `Keep the ${label.toLowerCase()} fully inside the room boundaries.`;
+        }
+    }
+
+    return null;
+}
+
 function wallLength(geometry: RoomGeometry, wall: RoomWall): number {
     return wall === 'north' || wall === 'south' ? geometry.widthM : geometry.lengthM;
 }

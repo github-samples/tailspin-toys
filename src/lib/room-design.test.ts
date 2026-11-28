@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { getOpeningPlanPoint, validateRoomGeometry, type RoomGeometry, type RoomWall } from './room-design';
+import {
+    getDefaultFurniturePlacements,
+    getOpeningPlanPoint,
+    validateFurniturePlacements,
+    validateRoomGeometry,
+    type FurniturePlacements,
+    type RoomGeometry,
+    type RoomWall,
+} from './room-design';
 
 const validRoom: RoomGeometry = {
     widthM: 4.8,
@@ -53,5 +61,27 @@ describe('getOpeningPlanPoint', () => {
         expect(getOpeningPlanPoint('none', 1, 4, 3)).toBeNull();
         expect(getOpeningPlanPoint('east', 3.1, 4, 3)).toBeNull();
         expect(getOpeningPlanPoint('north', Number.NaN, 4, 3)).toBeNull();
+    });
+});
+
+describe('furniture placements', () => {
+    it('provides default object centres within the measured room', () => {
+        const placements = getDefaultFurniturePlacements(4.8, 3.6);
+        expect(validateFurniturePlacements(placements, 4.8, 3.6)).toBeNull();
+    });
+
+    it('rejects object centres outside the room or with non-finite coordinates', () => {
+        const placements: FurniturePlacements = {
+            sofa: { x: 4.9, y: 1.8 },
+            sideTable: { x: 2, y: 1 },
+            plant: { x: Number.NaN, y: 0.5 },
+        };
+        expect(validateFurniturePlacements(placements, 4.8, 3.6)).toContain('sofa');
+    });
+
+    it('keeps the full furniture footprint away from the room edges', () => {
+        const placements = getDefaultFurniturePlacements(4.8, 3.6);
+        placements.sofa = { x: 0.2, y: 1.8 };
+        expect(validateFurniturePlacements(placements, 4.8, 3.6)).toContain('fully inside');
     });
 });

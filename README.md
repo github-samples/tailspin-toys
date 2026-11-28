@@ -6,9 +6,12 @@ Intero is an interior-design workspace prototype. It guides a user through creat
 
 - Accepts PNG, JPG, WEBP, and PDF floor-plan references up to 12 MB. The file is previewed in the browser tab only; it is not uploaded or retained.
 - Draws a live top-down 2D plan from user-entered dimensions and door/window wall offsets. Users review and confirm the measurements before selecting **Convert 2D layout to 3D preview**.
-- Uses the same confirmed geometry for the illustrative 3D room shell and opening markers. It does not interpret a plan image or automatically convert its scale; optional files are references only.
+- Includes a placement editor for the sofa, side table, and plant, with coordinates in metres from the north-west room corner. Edits update the floor plan and converted 3D concept; placements must stay within the room.
+- Uses the same confirmed geometry and furniture positions for the illustrative 3D room shell and opening markers. It does not interpret a plan image or automatically convert its scale; optional files are references only.
 - Shows a CSS 3D concept scene with drag/keyboard orbit controls and visual appearance presets. Furniture is generic; the scene is not a measured CAD model, a photorealistic render, a 360-degree photo, or a physical lighting simulation.
+- Downloads a generated schematic of the current room concept as PNG or JPEG. The exported image is a separate illustrative rendering of the confirmed geometry and furniture positions, not a screenshot of the interactive CSS scene or a photorealistic render.
 - Can request text-only design suggestions from Google AI Studio or Groq when the corresponding server environment variable is configured. Suggestions do not create or validate geometry or renders.
+- Includes an on-page walkthrough for choosing a configured AI provider and making a useful prompt. The helper does not change the layout, and prompts/room summaries are sent to the selected provider.
 
 Intero does not persist room projects or user accounts. Do not enter private or identifying details into the optional assistant.
 
@@ -17,7 +20,7 @@ Intero does not persist room projects or user accounts. Do not enter private or 
 - **Astro 7** builds the browser UI into `dist/`.
 - **Node.js 22.13 or later** runs `server.mjs`, which serves the built files and provides same-origin `/api/providers` and `/api/design-advice` routes.
 - **Tailwind CSS v4** styles the interface; the room concept uses a small amount of custom CSS 3D.
-- **Vitest** covers geometry validation, plan coordinate mapping, and provider request handling. **Playwright** covers the live 2D editor, 2D-to-3D conversion, local-only plan selection, scene controls, and accessibility.
+- **Vitest** covers geometry validation, plan coordinate mapping, furniture placement validation, and provider request handling. **Playwright** covers the live 2D editor, placement edits, 2D-to-3D conversion, PNG/JPEG export, local-only plan selection, scene controls, and accessibility.
 
 The AI keys are read only by `server.mjs` from process environment variables. Provider status responses expose booleans only. The API does not log keys or provider error response bodies. The demo has no authentication or durable rate limiting; put authentication and rate limits in front of it before exposing provider-backed calls publicly.
 

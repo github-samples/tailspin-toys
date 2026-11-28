@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 
 test.describe('Intero workspace', () => {
@@ -9,6 +10,8 @@ test.describe('Intero workspace', () => {
     await expect(page).toHaveTitle('Intero — thoughtful spaces, made together');
     await expect(page.getByRole('heading', { name: 'Make room for a better idea.' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Build your 2D layout' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Placement editor' })).toBeVisible();
+    await expect(page.getByTestId('ai-tutorial')).toContainText('Choose a provider');
     await expect(page.getByLabel('Floor plan reference')).toBeVisible();
     await expect(page.getByRole('link', { name: 'intero' })).toBeVisible();
   });
@@ -26,12 +29,18 @@ test.describe('Intero workspace', () => {
     await expect(page.getByTestId('plan-editor-status')).toContainText('4.80 m × 3.60 m');
     await expect(page.getByTestId('plan-editor-status')).toContainText('door on north at 2.40 m');
     await expect(page.getByTestId('plan-editor-status')).toContainText('window on east at 1.80 m');
+    await expect(page.getByTestId('placement-sofa-x')).toHaveValue('2.21');
     const doorMarker = page.locator('#plan-door-marker');
     const windowMarker = page.locator('#plan-window-marker');
+    const plantMarker = page.locator('#plan-plant-marker');
+    const originalPlantX = await plantMarker.getAttribute('cx');
     await expect(doorMarker).not.toHaveClass(/hidden/);
     await expect(windowMarker).not.toHaveClass(/hidden/);
     expect(await doorMarker.getAttribute('y1')).toBe(await doorMarker.getAttribute('y2'));
     expect(await windowMarker.getAttribute('x1')).toBe(await windowMarker.getAttribute('x2'));
+    await page.getByTestId('placement-plant-x').fill('1.10');
+    await expect(plantMarker).not.toHaveAttribute('cx', originalPlantX ?? '');
+    await expect(page.getByTestId('placement-status')).toContainText('plant 1.10');
 
     await page.getByTestId('scale-reference').fill('Measured directly');
     await page.getByTestId('confirm-geometry').check();
@@ -40,8 +49,31 @@ test.describe('Intero workspace', () => {
     await expect(page.getByTestId('room-scene')).toBeVisible();
     await expect(page.getByRole('heading', { name: '3D preview from your 2D layout' })).toBeVisible();
     await expect(page.getByTestId('room-summary')).toContainText('4.80 m × 3.60 m × 2.70 m');
+    await expect(page.getByTestId('room-summary')).toContainText('plant 1.10');
     await expect(page.locator('.scene-wall-back .scene-door')).toHaveCount(1);
     await expect(page.locator('.scene-wall-right .scene-window')).toHaveCount(1);
+
+    const sofa = page.locator('.scene-sofa');
+    await expect(sofa).toHaveAttribute('style', /inset: 100% auto auto 8\.59444rem/);
+    await page.getByTestId('placement-sofa-x').fill('3.00');
+    await expect(sofa).toHaveAttribute('style', /inset: 100% auto auto 11\.6667rem/);
+    await expect(page.getByTestId('room-summary')).toContainText('sofa 3.00');
+
+    const pngDownloadPromise = page.waitForEvent('download');
+    await page.getByTestId('download-png').click();
+    const pngDownload = await pngDownloadPromise;
+    expect(pngDownload.suggestedFilename()).toBe('intero-room-concept.png');
+    const pngPath = await pngDownload.path();
+    if (!pngPath) throw new Error('PNG export did not create a downloadable file.');
+    expect((await readFile(pngPath)).subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+
+    const jpegDownloadPromise = page.waitForEvent('download');
+    await page.getByTestId('download-jpeg').click();
+    const jpegDownload = await jpegDownloadPromise;
+    expect(jpegDownload.suggestedFilename()).toBe('intero-room-concept.jpg');
+    const jpegPath = await jpegDownload.path();
+    if (!jpegPath) throw new Error('JPEG export did not create a downloadable file.');
+    expect((await readFile(jpegPath)).subarray(0, 3)).toEqual(Buffer.from([255, 216, 255]));
   });
 
   test('keeps a selected plan local and requires geometry confirmation', async ({ page }) => {

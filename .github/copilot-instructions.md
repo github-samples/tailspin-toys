@@ -52,6 +52,7 @@ Intero is an interior-design workspace built with **Astro 7** and **Tailwind CSS
 - The only supported text providers are Google AI Studio and Groq, configured with `GOOGLE_AI_STUDIO_API_KEY` and `GROQ_API_KEY`
 - Provider suggestions are text only and must not be described as generated geometry, CAD, lighting simulation, or rendered imagery
 - Keep the live 2D plan preview and 3D room shell driven by the same user-confirmed dimensions and opening offsets; optional uploaded plans remain local references and are not interpreted. Describe the CSS scene as illustrative, not CAD, a 360-degree photo, or a lighting simulation.
+- Keep furniture placement edits synchronized between the 2D plan and illustrative 3D preview. PNG/JPEG exports are schematic concept renders, not screenshots or photorealistic images; the AI usage tutorial must state that providers return text only.
 - Dynamic routes use `getStaticPaths()` + `export const prerender = true`
 - Provide a branded `404.astro` (unknown routes are real 404s under static output)
 - Only add a scoped Astro `<script>` when genuine client interactivity is required

@@ -11,16 +11,16 @@ import Layout from '../layouts/Layout.astro';
           Make room for a better idea.
         </h1>
         <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-          Build a measured 2D floor plan, confirm what is really there, then convert it to an illustrative 3D room preview and get optional, provider-backed design suggestions.
+        Build a measured 2D floor plan, arrange your furniture, then convert it to an illustrative 3D room preview and get optional, provider-backed design suggestions.
         </p>
       </div>
       <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm leading-6 text-slate-300">
         <p class="font-semibold text-slate-100">A transparent design demo</p>
-        <p class="mt-2">Your plan stays in this browser tab. The interactive room is a clearly labeled concept view, not AI-generated geometry, a measured CAD model, or a photorealistic lighting render.</p>
+        <p class="mt-2">Your plan stays in this browser tab. Edit furniture positions before or after conversion; the room view is illustrative, not CAD, a photo, or a lighting simulation.</p>
       </div>
     </section>
 
-    <section id="workspace" class="grid scroll-mt-8 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]" aria-label="Intero design workspace">
+    <section id="workspace" class="grid scroll-mt-8 gap-6 lg:grid-cols-2 lg:items-start" aria-label="Intero design workspace">
       <form id="room-form" class="space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg sm:p-7" data-testid="room-form">
         <div>
           <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Step 1 · Your room</p>
@@ -117,6 +117,12 @@ import Layout from '../layouts/Layout.astro';
               <rect id="plan-outline" rx="3" class="fill-slate-800 stroke-slate-300" stroke-width="3"></rect>
               <line id="plan-door-marker" class="stroke-amber-300" stroke-width="7" stroke-linecap="round"></line>
               <line id="plan-window-marker" class="hidden stroke-sky-300" stroke-width="5" stroke-linecap="round"></line>
+              <g id="plan-furniture" class="hidden" aria-hidden="true">
+                <rect id="plan-rug-marker" rx="5" fill="#64748b" fill-opacity="0.5" stroke="#94a3b8" stroke-dasharray="4 3"></rect>
+                <rect id="plan-sofa-marker" rx="5" fill="#718879" stroke="#cbd5e1" stroke-width="2"></rect>
+                <circle id="plan-table-marker" fill="#c9a878" stroke="#f1f5f9" stroke-width="2"></circle>
+                <circle id="plan-plant-marker" fill="#7d9a77" stroke="#f1f5f9" stroke-width="2"></circle>
+              </g>
               <text id="plan-width-label" text-anchor="middle" class="fill-slate-200 text-xs"></text>
               <text id="plan-length-label" text-anchor="middle" class="fill-slate-200 text-xs"></text>
               <text id="plan-north-label" text-anchor="middle" class="fill-emerald-300 text-xs font-semibold">N</text>
@@ -126,9 +132,42 @@ import Layout from '../layouts/Layout.astro';
           <p class="text-xs text-slate-400"><span class="text-amber-300">Amber</span> door · <span class="text-sky-300">Blue</span> window</p>
         </section>
 
+        <fieldset class="space-y-4 rounded-xl border border-slate-800 bg-slate-950 p-4" aria-describedby="placement-help">
+          <legend class="px-1 text-sm font-semibold text-slate-200">Step 5 · Arrange furniture</legend>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-100">Placement editor</h3>
+            <p id="placement-help" class="mt-1 text-xs leading-5 text-slate-400">Set each object's centre in metres from the room's top-left (north-west) corner. Changes update the 2D plan and, after conversion, the 3D preview. Objects are illustrative markers.</p>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <fieldset class="space-y-2 rounded-lg border border-slate-800 p-3">
+              <legend class="px-1 text-sm font-medium text-slate-100">Sofa centre</legend>
+              <label for="sofa-x" class="block text-xs text-slate-300">Across room · m</label>
+              <input id="sofa-x" name="sofaX" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-sofa-x" />
+              <label for="sofa-y" class="block text-xs text-slate-300">From north · m</label>
+              <input id="sofa-y" name="sofaY" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-sofa-y" />
+            </fieldset>
+            <fieldset class="space-y-2 rounded-lg border border-slate-800 p-3">
+              <legend class="px-1 text-sm font-medium text-slate-100">Side table centre</legend>
+              <label for="table-x" class="block text-xs text-slate-300">Across room · m</label>
+              <input id="table-x" name="tableX" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-table-x" />
+              <label for="table-y" class="block text-xs text-slate-300">From north · m</label>
+              <input id="table-y" name="tableY" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-table-y" />
+            </fieldset>
+            <fieldset class="space-y-2 rounded-lg border border-slate-800 p-3">
+              <legend class="px-1 text-sm font-medium text-slate-100">Plant centre</legend>
+              <label for="plant-x" class="block text-xs text-slate-300">Across room · m</label>
+              <input id="plant-x" name="plantX" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-plant-x" />
+              <label for="plant-y" class="block text-xs text-slate-300">From north · m</label>
+              <input id="plant-y" name="plantY" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-plant-y" />
+            </fieldset>
+          </div>
+          <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="reset-placements">Reset sample placements</button>
+          <p id="placement-status" class="min-h-5 text-xs text-slate-300" role="status" aria-live="polite" data-testid="placement-status">Enter room dimensions to set the sample object positions.</p>
+        </fieldset>
+
         <label class="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">
           <input id="confirm-geometry" name="confirmGeometry" type="checkbox" required class="mt-1 h-4 w-4 accent-emerald-400 focus:ring-2 focus:ring-emerald-400" data-testid="confirm-geometry" />
-          <span>I confirm these room dimensions and opening positions against the scale or measurement source above. I understand the 3D preview uses this plan for its room shell; furnishings and lighting remain illustrative.</span>
+          <span>I confirm these room dimensions and opening positions against the scale or measurement source above. I understand the 3D preview uses this plan for its room shell; furniture shapes and lighting remain illustrative.</span>
         </label>
 
         <p id="room-form-status" class="min-h-5 text-sm text-amber-200" role="status" aria-live="polite" data-testid="room-form-status"></p>
@@ -176,6 +215,15 @@ import Layout from '../layouts/Layout.astro';
               <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="reset-view">Reset view</button>
               <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="rotate-right">Rotate right</button>
             </div>
+            <div class="space-y-2 border-t border-slate-800 pt-4">
+              <p class="text-center text-sm font-medium text-slate-200">Download this illustrative 3D concept</p>
+              <p class="text-center text-xs text-slate-400">Exports a schematic image using your confirmed room geometry and current furniture positions; it is not a screenshot or photorealistic render.</p>
+              <div class="flex justify-center gap-2">
+                <button type="button" class="rounded-lg border border-emerald-300/50 px-4 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-300/10 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-export-format="png" data-testid="download-png">Download PNG</button>
+                <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-export-format="jpeg" data-testid="download-jpeg">Download JPEG</button>
+              </div>
+              <p id="export-status" class="sr-only" role="status" aria-live="polite"></p>
+            </div>
             <p id="scene-status" class="sr-only" role="status" aria-live="polite"></p>
           </div>
         </section>
@@ -196,6 +244,15 @@ import Layout from '../layouts/Layout.astro';
             </label>
           </div>
           <p id="provider-status" class="mt-3 text-sm text-slate-400" role="status" aria-live="polite" data-testid="provider-status">Checking which server-side providers are configured.</p>
+          <section class="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-4" aria-labelledby="ai-tutorial-heading" data-testid="ai-tutorial">
+            <h3 id="ai-tutorial-heading" class="text-base font-semibold text-slate-100">How to use the AI design helper</h3>
+            <ol class="mt-2 list-inside list-decimal space-y-1.5 text-sm leading-6 text-slate-300">
+              <li>Choose a provider that the server owner has configured.</li>
+              <li>Ask one specific question, such as “Suggest a calming colour palette for a small north-facing reading nook.”</li>
+              <li>Select <span class="font-medium text-slate-100">Get text suggestions</span>, then refine the answer with a follow-up question.</li>
+            </ol>
+            <p class="mt-3 text-xs leading-5 text-slate-400">The helper returns text ideas only; it does not edit your plan, place objects, interpret uploaded files, or generate renders. Your prompt and confirmed room summary go to the selected provider. Do not enter personal details or API keys here.</p>
+          </section>
           <form id="assistant-form" class="mt-4 space-y-3">
             <label for="design-question" class="block text-sm text-slate-300">What would you like ideas for?</label>
             <textarea id="design-question" rows="3" maxlength="1000" required placeholder="For example: suggest a calm palette for a reading corner." class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-60" data-testid="design-question" disabled></textarea>
@@ -212,7 +269,15 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { getOpeningPlanPoint, validateRoomGeometry, type RoomGeometry } from '../lib/room-design';
+  import {
+    getDefaultFurniturePlacements,
+    getOpeningPlanPoint,
+    validateFurniturePlacements,
+    validateRoomGeometry,
+    type FurniturePlacements,
+    type RoomGeometry,
+  } from '../lib/room-design';
+  import { drawRoomPreview } from '../lib/room-preview-export';
 
   const roomForm = document.querySelector<HTMLFormElement>('#room-form');
   const roomFormStatus = document.querySelector<HTMLElement>('#room-form-status');
@@ -248,6 +313,31 @@ import Layout from '../layouts/Layout.astro';
   const planLengthLabel = document.querySelector<SVGTextElement>('#plan-length-label');
   const planNorthLabel = document.querySelector<SVGTextElement>('#plan-north-label');
   const planEditorStatus = document.querySelector<HTMLElement>('#plan-editor-status');
+  const planFurniture = document.querySelector<SVGGElement>('#plan-furniture');
+  const planRugMarker = document.querySelector<SVGRectElement>('#plan-rug-marker');
+  const planSofaMarker = document.querySelector<SVGRectElement>('#plan-sofa-marker');
+  const planTableMarker = document.querySelector<SVGCircleElement>('#plan-table-marker');
+  const planPlantMarker = document.querySelector<SVGCircleElement>('#plan-plant-marker');
+  const placementStatus = document.querySelector<HTMLElement>('#placement-status');
+  const placementInputs = {
+    sofa: {
+      x: document.querySelector<HTMLInputElement>('#sofa-x'),
+      y: document.querySelector<HTMLInputElement>('#sofa-y'),
+    },
+    sideTable: {
+      x: document.querySelector<HTMLInputElement>('#table-x'),
+      y: document.querySelector<HTMLInputElement>('#table-y'),
+    },
+    plant: {
+      x: document.querySelector<HTMLInputElement>('#plant-x'),
+      y: document.querySelector<HTMLInputElement>('#plant-y'),
+    },
+  };
+  const sceneRug = document.querySelector<HTMLElement>('.scene-rug');
+  const sceneSofa = document.querySelector<HTMLElement>('.scene-sofa');
+  const sceneTable = document.querySelector<HTMLElement>('.scene-table');
+  const scenePlant = document.querySelector<HTMLElement>('.scene-plant');
+  const exportStatus = document.querySelector<HTMLElement>('#export-status');
   const providerSelect = document.querySelector<HTMLSelectElement>('#ai-provider');
   const providerStatus = document.querySelector<HTMLElement>('#provider-status');
   const assistantForm = document.querySelector<HTMLFormElement>('#assistant-form');
@@ -258,6 +348,7 @@ import Layout from '../layouts/Layout.astro';
   let planPreviewUrl: string | undefined;
   let rotation = -32;
   let configuredProviders = { googleAiStudio: false, groq: false };
+  let currentGeometry: RoomGeometry | undefined;
 
   function drawOpeningMarker(
     marker: SVGLineElement | null,
@@ -291,6 +382,106 @@ import Layout from '../layouts/Layout.astro';
     return true;
   }
 
+  function readFurniturePlacements(): FurniturePlacements {
+    const readPoint = (inputs: { x: HTMLInputElement | null; y: HTMLInputElement | null }) => ({
+      x: inputs.x?.value.trim() ? Number(inputs.x.value) : Number.NaN,
+      y: inputs.y?.value.trim() ? Number(inputs.y.value) : Number.NaN,
+    });
+    return {
+      sofa: readPoint(placementInputs.sofa),
+      sideTable: readPoint(placementInputs.sideTable),
+      plant: readPoint(placementInputs.plant),
+    };
+  }
+
+  function summarizeFurniturePlacements(placements: FurniturePlacements): string {
+    return `furniture centres (north-west origin): sofa ${placements.sofa.x.toFixed(2)}, ${placements.sofa.y.toFixed(2)} m; side table ${placements.sideTable.x.toFixed(2)}, ${placements.sideTable.y.toFixed(2)} m; plant ${placements.plant.x.toFixed(2)}, ${placements.plant.y.toFixed(2)} m`;
+  }
+
+  function initializeFurniturePlacementInputs(widthM: number, lengthM: number): void {
+    const defaults = getDefaultFurniturePlacements(widthM, lengthM);
+    for (const [name, point] of Object.entries(defaults) as Array<[keyof FurniturePlacements, FurniturePlacements[keyof FurniturePlacements]]>) {
+      const inputs = placementInputs[name];
+      if (inputs.x) {
+        inputs.x.max = String(widthM);
+        if (!inputs.x.value) inputs.x.value = point.x.toFixed(2);
+      }
+      if (inputs.y) {
+        inputs.y.max = String(lengthM);
+        if (!inputs.y.value) inputs.y.value = point.y.toFixed(2);
+      }
+    }
+  }
+
+  function setPlanFurnitureMarker(
+    marker: SVGRectElement | SVGCircleElement | null,
+    point: { x: number; y: number },
+    widthM: number,
+    lengthM: number,
+    x: number,
+    y: number,
+    planWidth: number,
+    planLength: number,
+    markerWidthM: number,
+    markerLengthM: number,
+  ): void {
+    if (!marker) return;
+    const markerWidth = Math.min(markerWidthM, widthM) * planWidth / widthM;
+    const markerLength = Math.min(markerLengthM, lengthM) * planLength / lengthM;
+    const centerX = x + point.x / widthM * planWidth;
+    const centerY = y + point.y / lengthM * planLength;
+    if (marker instanceof SVGRectElement) {
+      marker.setAttribute('x', String(Math.max(x, Math.min(x + planWidth - markerWidth, centerX - markerWidth / 2))));
+      marker.setAttribute('y', String(Math.max(y, Math.min(y + planLength - markerLength, centerY - markerLength / 2))));
+      marker.setAttribute('width', String(markerWidth));
+      marker.setAttribute('height', String(markerLength));
+      return;
+    }
+    marker.setAttribute('cx', String(centerX));
+    marker.setAttribute('cy', String(centerY));
+    marker.setAttribute('r', String(Math.min(markerWidth, markerLength) / 2));
+  }
+
+  function updateSceneFurniture(geometry: RoomGeometry): boolean {
+    if (!sceneStage || !sceneRug || !sceneSofa || !sceneTable || !scenePlant) return false;
+    const placements = readFurniturePlacements();
+    const validationMessage = validateFurniturePlacements(placements, geometry.widthM, geometry.lengthM);
+    if (validationMessage) {
+      if (placementStatus) placementStatus.textContent = validationMessage;
+      return false;
+    }
+
+    const roomWidth = Number.parseFloat(sceneStage.style.getPropertyValue('--room-width'));
+    const roomDepth = Number.parseFloat(sceneStage.style.getPropertyValue('--room-depth'));
+    if (!Number.isFinite(roomWidth) || !Number.isFinite(roomDepth)) return false;
+    const positionAt = (
+      element: HTMLElement,
+      point: { x: number; y: number },
+      footprintWidthM: number,
+      footprintDepthM: number,
+      floorSurface: boolean,
+    ): void => {
+      const depth = point.y / geometry.lengthM * roomDepth - roomDepth / 2;
+      element.style.left = `${point.x / geometry.widthM * roomWidth}rem`;
+      element.style.right = 'auto';
+      element.style.top = '100%';
+      element.style.bottom = 'auto';
+      element.style.width = `${Math.min(footprintWidthM, geometry.widthM) / geometry.widthM * roomWidth}rem`;
+      element.style.height = `${Math.min(footprintDepthM, geometry.lengthM) / geometry.lengthM * roomDepth}rem`;
+      element.style.transform = floorSurface
+        ? `translate(-50%, -50%) translateZ(${depth}rem) rotateX(90deg)`
+        : `translate(-50%, -100%) translateZ(${depth}rem)`;
+    };
+
+    positionAt(sceneRug, placements.sofa, 2.5, 1.5, true);
+    positionAt(sceneSofa, placements.sofa, 2.0, 0.9, false);
+    positionAt(sceneTable, placements.sideTable, 0.8, 0.65, false);
+    sceneTable.style.top = 'calc(100% - 1rem)';
+    sceneTable.style.height = '0.35rem';
+    positionAt(scenePlant, placements.plant, 0.4, 0.4, false);
+    return true;
+  }
+
   function renderPlanEditor(): void {
     const widthM = Number(widthInput?.value);
     const lengthM = Number(lengthInput?.value);
@@ -303,6 +494,7 @@ import Layout from '../layouts/Layout.astro';
       return;
     }
 
+    initializeFurniturePlacementInputs(widthM, lengthM);
     const planWidth = Math.min(296 / widthM, 198 / lengthM) * widthM;
     const planLength = Math.min(296 / widthM, 198 / lengthM) * lengthM;
     const x = (400 - planWidth) / 2;
@@ -353,16 +545,59 @@ import Layout from '../layouts/Layout.astro';
     );
     if (windowWall === 'none') planWindowMarker?.classList.add('hidden');
 
+    const placements = readFurniturePlacements();
+    const placementError = validateFurniturePlacements(placements, widthM, lengthM);
+    const showFurniture = !placementError && planFurniture !== null;
+    planFurniture?.classList.toggle('hidden', !showFurniture);
+    if (showFurniture) {
+      setPlanFurnitureMarker(planRugMarker, placements.sofa, widthM, lengthM, x, y, planWidth, planLength, 2.5, 1.5);
+      setPlanFurnitureMarker(planSofaMarker, placements.sofa, widthM, lengthM, x, y, planWidth, planLength, 1.9, 0.8);
+      setPlanFurnitureMarker(planTableMarker, placements.sideTable, widthM, lengthM, x, y, planWidth, planLength, 0.7, 0.6);
+      setPlanFurnitureMarker(planPlantMarker, placements.plant, widthM, lengthM, x, y, planWidth, planLength, 0.4, 0.4);
+    }
+    if (placementStatus) {
+      placementStatus.textContent = placementError
+        ?? `Sofa ${placements.sofa.x.toFixed(2)}, ${placements.sofa.y.toFixed(2)} m · side table ${placements.sideTable.x.toFixed(2)}, ${placements.sideTable.y.toFixed(2)} m · plant ${placements.plant.x.toFixed(2)}, ${placements.plant.y.toFixed(2)} m.`;
+    }
+    if (currentGeometry && !placementError && updateSceneFurniture(currentGeometry)) {
+      if (roomSummary) roomSummary.textContent = `${roomSummary.textContent?.split(' · furniture centres')[0] ?? ''} · ${summarizeFurniturePlacements(placements)}`;
+      if (sceneStatus) sceneStatus.textContent = 'Furniture positions updated from the placement editor in the 2D plan and illustrative 3D preview.';
+    }
+
     const windowSummary = windowWall === 'none'
       ? 'no window'
       : windowVisible ? `window on ${windowWall} at ${windowOffsetM.toFixed(2)} m` : 'window offset needs adjustment';
     planEditorStatus.textContent = `2D plan preview: ${widthM.toFixed(2)} m × ${lengthM.toFixed(2)} m; ${doorVisible ? `door on ${doorWall} at ${doorOffsetM.toFixed(2)} m` : 'door offset needs adjustment'}; ${windowSummary}.`;
   }
 
-  [widthInput, lengthInput, doorWallInput, doorOffsetInput, windowWallInput, windowOffsetInput].forEach((input) => {
+  [
+    widthInput,
+    lengthInput,
+    doorWallInput,
+    doorOffsetInput,
+    windowWallInput,
+    windowOffsetInput,
+    ...Object.values(placementInputs).flatMap((inputs) => [inputs.x, inputs.y]),
+  ].forEach((input) => {
     input?.addEventListener('input', renderPlanEditor);
     input?.addEventListener('change', renderPlanEditor);
   });
+
+  [widthInput, lengthInput, document.querySelector<HTMLInputElement>('#room-height'), doorWallInput, doorOffsetInput, windowWallInput, windowOffsetInput].forEach((input) => {
+    input?.addEventListener('input', invalidateConvertedGeometry);
+    input?.addEventListener('change', invalidateConvertedGeometry);
+  });
+
+  function invalidateConvertedGeometry(): void {
+    if (!currentGeometry) return;
+    currentGeometry = undefined;
+    roomScene?.classList.add('hidden');
+    if (roomFormStatus) {
+      roomFormStatus.textContent = 'Room measurements or openings changed. Convert the updated plan again to refresh the 3D preview.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-amber-200');
+    }
+  }
 
   function positionSceneOpening(
     element: HTMLElement | null,
@@ -479,6 +714,20 @@ import Layout from '../layouts/Layout.astro';
   });
   renderPlanEditor();
 
+  document.querySelector('[data-testid="reset-placements"]')?.addEventListener('click', () => {
+    const widthM = Number(widthInput?.value);
+    const lengthM = Number(lengthInput?.value);
+    if (!Number.isFinite(widthM) || widthM <= 0 || !Number.isFinite(lengthM) || lengthM <= 0) return;
+    const defaults = getDefaultFurniturePlacements(widthM, lengthM);
+    for (const [name, point] of Object.entries(defaults) as Array<[keyof FurniturePlacements, FurniturePlacements[keyof FurniturePlacements]]>) {
+      const inputs = placementInputs[name];
+      if (inputs.x) inputs.x.value = point.x.toFixed(2);
+      if (inputs.y) inputs.y.value = point.y.toFixed(2);
+    }
+    renderPlanEditor();
+    if (placementStatus) placementStatus.textContent = 'Sample furniture positions restored.';
+  });
+
   roomForm?.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!roomFormStatus || !roomScene || !sceneStage || !roomSummary) return;
@@ -511,8 +760,25 @@ import Layout from '../layouts/Layout.astro';
       return;
     }
 
+    const placements = readFurniturePlacements();
+    const placementError = validateFurniturePlacements(placements, geometry.widthM, geometry.lengthM);
+    if (placementError) {
+      roomFormStatus.textContent = placementError;
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
     if (!updateSceneGeometry(geometry)) {
       roomFormStatus.textContent = 'Could not map the confirmed opening positions to the 3D preview. Check the selected walls and offsets.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+    if (!updateSceneFurniture(geometry)) {
+      roomFormStatus.textContent = 'Could not apply the current furniture positions to the 3D preview. Check the placement editor values.';
       roomFormStatus.classList.remove('text-emerald-200');
       roomFormStatus.classList.add('text-rose-300');
       roomScene.classList.add('hidden');
@@ -523,7 +789,8 @@ import Layout from '../layouts/Layout.astro';
       ? 'no window marked'
       : `window ${geometry.windowWall} wall at ${geometry.windowOffsetM?.toFixed(2)} m`;
     roomFormStatus.textContent = '2D layout converted to an illustrative 3D room preview. Room proportions and opening positions follow your confirmed measurements.';
-    roomSummary.textContent = `${geometry.widthM.toFixed(2)} m × ${geometry.lengthM.toFixed(2)} m × ${geometry.heightM.toFixed(2)} m · scale source: ${scaleReference} · door ${geometry.doorWall} wall at ${geometry.doorOffsetM.toFixed(2)} m · ${windowSummary}`;
+    roomSummary.textContent = `${geometry.widthM.toFixed(2)} m × ${geometry.lengthM.toFixed(2)} m × ${geometry.heightM.toFixed(2)} m · scale source: ${scaleReference} · door ${geometry.doorWall} wall at ${geometry.doorOffsetM.toFixed(2)} m · ${windowSummary} · ${summarizeFurniturePlacements(placements)}`;
+    currentGeometry = geometry;
     roomScene.classList.remove('hidden');
     sceneStage.dataset.lighting = 'daylight';
     sceneStage.style.setProperty('--scene-rotation', `${rotation}deg`);
@@ -532,6 +799,47 @@ import Layout from '../layouts/Layout.astro';
     if (sceneStatus) {
       sceneStatus.textContent = '2D layout converted. Room shape and opening markers use your measurements; furniture and lighting remain illustrative.';
     }
+  });
+
+  async function exportScene(format: 'png' | 'jpeg'): Promise<void> {
+    if (!currentGeometry || !exportStatus) return;
+    const placements = readFurniturePlacements();
+    const validationMessage = validateFurniturePlacements(placements, currentGeometry.widthM, currentGeometry.lengthM);
+    if (validationMessage) {
+      exportStatus.textContent = validationMessage;
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 900;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      exportStatus.textContent = 'Could not create an image for download in this browser.';
+      return;
+    }
+
+    drawRoomPreview(context, currentGeometry, placements);
+    const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mimeType, 0.92));
+    if (!blob) {
+      exportStatus.textContent = 'Could not export the room preview image.';
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `intero-room-concept.${format === 'jpeg' ? 'jpg' : 'png'}`;
+    downloadLink.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportStatus.textContent = `Illustrative room concept downloaded as ${format.toUpperCase()}.`;
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-export-format]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const format = button.dataset.exportFormat;
+      if (format === 'png' || format === 'jpeg') void exportScene(format);
+    });
   });
 
   function updateRotation(nextRotation: number): void {
