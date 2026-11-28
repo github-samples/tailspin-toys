@@ -1,33 +1,944 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import GameCard from '../components/GameCard.astro';
-import PageHero from '../components/PageHero.astro';
-import EmptyState from '../components/EmptyState.astro';
-import { getDatabase } from '../lib/db';
-import { getAllGames } from '../lib/games';
-
-export const prerender = true;
-
-const games = await getAllGames(getDatabase());
 ---
 
-<Layout title="Tailspin Toys - Crowdfunding your new favorite game!">
-  <div class="py-8">
-    <PageHero
-      title="Welcome to Tailspin Toys"
-      subtitle="Find your next game! And maybe even back one! Explore our collection!"
-    />
+<Layout title="Intero — thoughtful spaces, made together">
+  <div class="space-y-10 py-8">
+    <section class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end" aria-labelledby="welcome-heading">
+      <div>
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-emerald-300">A calmer way to shape a room</p>
+        <h1 id="welcome-heading" class="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          Make room for a better idea.
+        </h1>
+        <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+        Build a measured 2D floor plan, arrange your furniture, then convert it to an illustrative 3D room preview and get optional, provider-backed design suggestions.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm leading-6 text-slate-300">
+        <p class="font-semibold text-slate-100">A transparent design demo</p>
+        <p class="mt-2">Your plan stays in this browser tab. Edit furniture positions before or after conversion; the room view is illustrative, not CAD, a photo, or a lighting simulation.</p>
+      </div>
+    </section>
 
-    <div>
-      <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
-
-      {games.length === 0 ? (
-        <EmptyState text="No games available at the moment." />
-      ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
-          {games.map((game) => <GameCard game={game} />)}
+    <section id="workspace" class="grid scroll-mt-8 gap-6 lg:grid-cols-2 lg:items-start" aria-label="Intero design workspace">
+      <form id="room-form" class="space-y-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg sm:p-7" data-testid="room-form">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Step 1 · Your room</p>
+          <h2 class="mt-2 text-2xl font-semibold text-slate-100">Build your 2D layout</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-400">Use the measured dimensions and opening controls below to create your plan. An optional image or PDF is only a temporary visual reference; Intero does not inspect or upload it.</p>
         </div>
-      )}
-    </div>
+
+        <div>
+          <label for="floor-plan" class="mb-2 block text-sm font-medium text-slate-200">Floor plan reference <span class="font-normal text-slate-400">(optional)</span></label>
+          <input
+            id="floor-plan"
+            name="floorPlan"
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp,.pdf,image/png,image/jpeg,image/webp,application/pdf"
+            class="block w-full rounded-lg border border-slate-700 bg-slate-950 text-sm text-slate-300 file:mr-4 file:border-0 file:bg-slate-800 file:px-4 file:py-3 file:font-medium file:text-slate-100 hover:file:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            data-testid="floor-plan-input"
+            aria-describedby="plan-privacy plan-file-status"
+          />
+          <p id="plan-privacy" class="mt-2 text-xs leading-5 text-slate-400">PNG, JPG, WEBP, or PDF · maximum 12 MB · image previews stay temporary in this tab; files are never uploaded.</p>
+          <p id="plan-file-status" class="mt-2 min-h-5 text-sm text-slate-300" role="status" aria-live="polite" data-testid="plan-file-status"></p>
+          <div id="plan-preview" class="mt-3 hidden overflow-hidden rounded-xl border border-slate-700 bg-slate-950 p-2" data-testid="plan-preview">
+            <img id="plan-preview-image" class="hidden max-h-56 w-full object-contain" alt="Temporary local preview of the selected floor plan" />
+          </div>
+        </div>
+
+        <fieldset class="space-y-4">
+          <legend class="text-sm font-semibold text-slate-200">Step 2 · Confirm measurements</legend>
+          <p class="text-xs leading-5 text-slate-400">Intero does not interpret plan scale. Record the reference you used, then enter measurements in metres; the uploaded plan is not analyzed.</p>
+          <div>
+            <label for="scale-reference" class="mb-1.5 block text-sm text-slate-300">Scale or measurement source</label>
+            <input id="scale-reference" name="scaleReference" type="text" maxlength="60" required placeholder="e.g. 1:50 or measured directly" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="scale-reference" />
+          </div>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label for="room-width" class="mb-1.5 block text-sm text-slate-300">Width (m)</label>
+              <input id="room-width" name="widthM" type="number" min="2" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="room-width" />
+            </div>
+            <div>
+              <label for="room-length" class="mb-1.5 block text-sm text-slate-300">Length (m)</label>
+              <input id="room-length" name="lengthM" type="number" min="2" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="room-length" />
+            </div>
+            <div>
+              <label for="room-height" class="mb-1.5 block text-sm text-slate-300">Wall height (m)</label>
+              <input id="room-height" name="heightM" type="number" min="2.1" max="5" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="room-height" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="space-y-4">
+          <legend class="text-sm font-semibold text-slate-200">Step 3 · Mark openings</legend>
+          <p class="text-xs leading-5 text-slate-400">Offsets are measured from the left corner of the chosen wall while standing inside the room. The 2D plan updates as you edit these measurements.</p>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="door-wall" class="mb-1.5 block text-sm text-slate-300">Door wall</label>
+              <select id="door-wall" name="doorWall" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="door-wall">
+                <option value="north">North</option>
+                <option value="east">East</option>
+                <option value="south" selected>South</option>
+                <option value="west">West</option>
+              </select>
+            </div>
+            <div>
+              <label for="door-offset" class="mb-1.5 block text-sm text-slate-300">Door centre offset (m)</label>
+              <input id="door-offset" name="doorOffsetM" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="door-offset" />
+            </div>
+            <div>
+              <label for="window-wall" class="mb-1.5 block text-sm text-slate-300">Window wall <span class="text-slate-400">(optional)</span></label>
+              <select id="window-wall" name="windowWall" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="window-wall">
+                <option value="none" selected>No window</option>
+                <option value="north">North</option>
+                <option value="east">East</option>
+                <option value="south">South</option>
+                <option value="west">West</option>
+              </select>
+            </div>
+            <div>
+              <label for="window-offset" class="mb-1.5 block text-sm text-slate-300">Window centre offset (m)</label>
+              <input id="window-offset" name="windowOffsetM" type="number" min="0" max="15" step="0.01" disabled class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="window-offset" />
+            </div>
+          </div>
+        </fieldset>
+
+        <section class="space-y-3 rounded-xl border border-slate-800 bg-slate-950 p-4" aria-labelledby="plan-editor-heading">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-emerald-300">Step 4 · Review your plan</p>
+            <h3 id="plan-editor-heading" class="mt-1 text-lg font-semibold text-slate-100">2D layout editor</h3>
+            <p class="mt-1 text-xs leading-5 text-slate-400">This measured top-down layout is the source for the 3D room preview. North is at the top; opening markers use your wall and offset values.</p>
+          </div>
+          <svg id="layout-plan-preview" class="w-full rounded-lg bg-slate-900" viewBox="0 0 400 300" role="img" aria-labelledby="plan-preview-title plan-preview-description" data-testid="layout-2d-preview">
+            <title id="plan-preview-title">2D floor plan preview</title>
+            <desc id="plan-preview-description">Enter room width and length to display a measured top-down plan with door and optional window markers.</desc>
+            <text id="plan-empty-state" x="200" y="150" text-anchor="middle" class="fill-slate-400 text-sm">Enter room width and length to draw the plan.</text>
+            <g id="plan-drawing" class="hidden">
+              <rect id="plan-outline" rx="3" class="fill-slate-800 stroke-slate-300" stroke-width="3"></rect>
+              <line id="plan-door-marker" class="stroke-amber-300" stroke-width="7" stroke-linecap="round"></line>
+              <line id="plan-window-marker" class="hidden stroke-sky-300" stroke-width="5" stroke-linecap="round"></line>
+              <g id="plan-furniture" class="hidden" aria-hidden="true">
+                <rect id="plan-rug-marker" rx="5" fill="#64748b" fill-opacity="0.5" stroke="#94a3b8" stroke-dasharray="4 3"></rect>
+                <rect id="plan-sofa-marker" rx="5" fill="#718879" stroke="#cbd5e1" stroke-width="2"></rect>
+                <circle id="plan-table-marker" fill="#c9a878" stroke="#f1f5f9" stroke-width="2"></circle>
+                <circle id="plan-plant-marker" fill="#7d9a77" stroke="#f1f5f9" stroke-width="2"></circle>
+              </g>
+              <text id="plan-width-label" text-anchor="middle" class="fill-slate-200 text-xs"></text>
+              <text id="plan-length-label" text-anchor="middle" class="fill-slate-200 text-xs"></text>
+              <text id="plan-north-label" text-anchor="middle" class="fill-emerald-300 text-xs font-semibold">N</text>
+            </g>
+          </svg>
+          <p id="plan-editor-status" class="min-h-5 text-xs text-slate-300" role="status" aria-live="polite" data-testid="plan-editor-status">Enter room width and length to draw the 2D plan preview.</p>
+          <p class="text-xs text-slate-400"><span class="text-amber-300">Amber</span> door · <span class="text-sky-300">Blue</span> window</p>
+        </section>
+
+        <fieldset class="space-y-4 rounded-xl border border-slate-800 bg-slate-950 p-4" aria-describedby="placement-help">
+          <legend class="px-1 text-sm font-semibold text-slate-200">Step 5 · Arrange furniture</legend>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-100">Placement editor</h3>
+            <p id="placement-help" class="mt-1 text-xs leading-5 text-slate-400">Set each object's centre in metres from the room's top-left (north-west) corner. Changes update the 2D plan and, after conversion, the 3D preview. Objects are illustrative markers.</p>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <fieldset class="space-y-2 rounded-lg border border-slate-800 p-3">
+              <legend class="px-1 text-sm font-medium text-slate-100">Sofa centre</legend>
+              <label for="sofa-x" class="block text-xs text-slate-300">Across room · m</label>
+              <input id="sofa-x" name="sofaX" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-sofa-x" />
+              <label for="sofa-y" class="block text-xs text-slate-300">From north · m</label>
+              <input id="sofa-y" name="sofaY" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-sofa-y" />
+            </fieldset>
+            <fieldset class="space-y-2 rounded-lg border border-slate-800 p-3">
+              <legend class="px-1 text-sm font-medium text-slate-100">Side table centre</legend>
+              <label for="table-x" class="block text-xs text-slate-300">Across room · m</label>
+              <input id="table-x" name="tableX" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-table-x" />
+              <label for="table-y" class="block text-xs text-slate-300">From north · m</label>
+              <input id="table-y" name="tableY" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-table-y" />
+            </fieldset>
+            <fieldset class="space-y-2 rounded-lg border border-slate-800 p-3">
+              <legend class="px-1 text-sm font-medium text-slate-100">Plant centre</legend>
+              <label for="plant-x" class="block text-xs text-slate-300">Across room · m</label>
+              <input id="plant-x" name="plantX" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-plant-x" />
+              <label for="plant-y" class="block text-xs text-slate-300">From north · m</label>
+              <input id="plant-y" name="plantY" type="number" min="0" max="15" step="0.01" required class="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="placement-plant-y" />
+            </fieldset>
+          </div>
+          <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="reset-placements">Reset sample placements</button>
+          <p id="placement-status" class="min-h-5 text-xs text-slate-300" role="status" aria-live="polite" data-testid="placement-status">Enter room dimensions to set the sample object positions.</p>
+        </fieldset>
+
+        <label class="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">
+          <input id="confirm-geometry" name="confirmGeometry" type="checkbox" required class="mt-1 h-4 w-4 accent-emerald-400 focus:ring-2 focus:ring-emerald-400" data-testid="confirm-geometry" />
+          <span>I confirm these room dimensions and opening positions against the scale or measurement source above. I understand the 3D preview uses this plan for its room shell; furniture shapes and lighting remain illustrative.</span>
+        </label>
+
+        <p id="room-form-status" class="min-h-5 text-sm text-amber-200" role="status" aria-live="polite" data-testid="room-form-status"></p>
+        <button type="submit" class="w-full rounded-xl bg-emerald-300 px-5 py-3 font-semibold text-slate-950 transition-colors hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-slate-900" data-testid="confirm-room-button">
+          Convert 2D layout to 3D preview
+        </button>
+      </form>
+
+      <div class="space-y-6">
+        <section id="room-scene" class="hidden overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-lg" aria-labelledby="scene-heading" data-testid="room-scene">
+          <div class="flex flex-wrap items-start justify-between gap-3 p-5 sm:p-7">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Illustrative conversion · not CAD</p>
+              <h2 id="scene-heading" class="mt-2 text-2xl font-semibold text-slate-100">3D preview from your 2D layout</h2>
+              <p id="room-summary" class="mt-2 text-sm text-slate-400" data-testid="room-summary"></p>
+            </div>
+            <span class="rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">Not a 360° photo</span>
+          </div>
+
+          <div id="scene-stage" class="scene-stage" data-lighting="daylight" role="group" aria-label="Interactive orbit view of the illustrative 3D room preview. Drag to rotate or use the rotation buttons." data-testid="scene-stage">
+            <div id="scene-room" class="scene-room" role="img" aria-label="Illustrative room with a sofa, rug, and side table">
+              <div class="scene-wall scene-wall-back"></div>
+              <div class="scene-wall scene-wall-left"></div>
+              <div class="scene-wall scene-wall-right"></div>
+              <div class="scene-wall scene-wall-front"></div>
+              <div class="scene-floor"></div>
+              <div class="scene-window" aria-hidden="true"></div>
+              <div class="scene-door" aria-hidden="true"></div>
+              <div class="scene-rug" aria-hidden="true"></div>
+              <div class="scene-sofa" aria-hidden="true"><span></span></div>
+              <div class="scene-table" aria-hidden="true"><span></span></div>
+              <div class="scene-plant" aria-hidden="true"><span></span></div>
+            </div>
+          </div>
+
+          <div class="space-y-4 p-5 sm:p-7">
+            <p class="text-center text-xs text-slate-400">Room proportions and door/window markers follow the confirmed 2D plan. Furniture and lighting are illustrative; this CSS scene is not an architectural model, photoreal render, 360° photo, or lighting simulation.</p>
+            <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="Lighting appearance presets">
+              <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="daylight" aria-pressed="true" data-testid="lighting-daylight">Soft daylight</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="warm" aria-pressed="false" data-testid="lighting-warm">Warm evening</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-lighting-preset="task" aria-pressed="false" data-testid="lighting-task">Focused light</button>
+            </div>
+            <div class="flex justify-center gap-2">
+              <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="rotate-left">Rotate left</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="reset-view">Reset view</button>
+              <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-testid="rotate-right">Rotate right</button>
+            </div>
+            <div class="space-y-2 border-t border-slate-800 pt-4">
+              <p class="text-center text-sm font-medium text-slate-200">Download this illustrative 3D concept</p>
+              <p class="text-center text-xs text-slate-400">Exports a schematic image using your confirmed room geometry and current furniture positions; it is not a screenshot or photorealistic render.</p>
+              <div class="flex justify-center gap-2">
+                <button type="button" class="rounded-lg border border-emerald-300/50 px-4 py-2 text-sm font-semibold text-emerald-200 hover:bg-emerald-300/10 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-export-format="png" data-testid="download-png">Download PNG</button>
+                <button type="button" class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" data-export-format="jpeg" data-testid="download-jpeg">Download JPEG</button>
+              </div>
+              <p id="export-status" class="sr-only" role="status" aria-live="polite"></p>
+            </div>
+            <p id="scene-status" class="sr-only" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-lg sm:p-7" aria-labelledby="assistant-heading">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-semibold uppercase tracking-widest text-emerald-300">Optional · text suggestions</p>
+              <h2 id="assistant-heading" class="mt-2 text-2xl font-semibold text-slate-100">Ask a design question</h2>
+            </div>
+            <label class="min-w-52 flex-1 sm:max-w-64">
+              <span class="mb-1.5 block text-sm text-slate-300">Provider</span>
+              <select id="ai-provider" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-60" data-testid="ai-provider" disabled>
+                <option value="">Checking server configuration…</option>
+                <option value="google-ai-studio">Google AI Studio</option>
+                <option value="groq">Groq</option>
+              </select>
+            </label>
+          </div>
+          <p id="provider-status" class="mt-3 text-sm text-slate-400" role="status" aria-live="polite" data-testid="provider-status">Checking which server-side providers are configured.</p>
+          <section class="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-4" aria-labelledby="ai-tutorial-heading" data-testid="ai-tutorial">
+            <h3 id="ai-tutorial-heading" class="text-base font-semibold text-slate-100">How to use the AI design helper</h3>
+            <ol class="mt-2 list-inside list-decimal space-y-1.5 text-sm leading-6 text-slate-300">
+              <li>Choose a provider that the server owner has configured.</li>
+              <li>Ask one specific question, such as “Suggest a calming colour palette for a small north-facing reading nook.”</li>
+              <li>Select <span class="font-medium text-slate-100">Get text suggestions</span>, then refine the answer with a follow-up question.</li>
+            </ol>
+            <p class="mt-3 text-xs leading-5 text-slate-400">The helper returns text ideas only; it does not edit your plan, place objects, interpret uploaded files, or generate renders. Your prompt and confirmed room summary go to the selected provider. Do not enter personal details or API keys here.</p>
+          </section>
+          <form id="assistant-form" class="mt-4 space-y-3">
+            <label for="design-question" class="block text-sm text-slate-300">What would you like ideas for?</label>
+            <textarea id="design-question" rows="3" maxlength="1000" required placeholder="For example: suggest a calm palette for a reading corner." class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:opacity-60" data-testid="design-question" disabled></textarea>
+            <button id="ask-assistant" type="submit" class="rounded-xl border border-emerald-300/50 px-4 py-2.5 text-sm font-semibold text-emerald-200 transition-colors hover:bg-emerald-300/10 focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-50" data-testid="ask-assistant" disabled>
+              Get text suggestions
+            </button>
+          </form>
+          <p id="assistant-response" class="mt-4 min-h-6 whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-200" role="status" aria-live="polite" data-testid="assistant-response">Provider suggestions are text only. They do not generate or validate geometry, lighting simulations, or rendered images.</p>
+          <p class="mt-3 text-xs leading-5 text-slate-300">The server sends your question and confirmed room summary to the provider you select. Never enter private or identifying details.</p>
+        </section>
+      </div>
+    </section>
   </div>
 </Layout>
+
+<script>
+  import {
+    getDefaultFurniturePlacements,
+    getOpeningPlanPoint,
+    validateFurniturePlacements,
+    validateRoomGeometry,
+    type FurniturePlacements,
+    type RoomGeometry,
+  } from '../lib/room-design';
+  import { drawRoomPreview } from '../lib/room-preview-export';
+
+  const roomForm = document.querySelector<HTMLFormElement>('#room-form');
+  const roomFormStatus = document.querySelector<HTMLElement>('#room-form-status');
+  const roomScene = document.querySelector<HTMLElement>('#room-scene');
+  const sceneStage = document.querySelector<HTMLElement>('#scene-stage');
+  const sceneRoom = document.querySelector<HTMLElement>('#scene-room');
+  const sceneDoor = document.querySelector<HTMLElement>('.scene-door');
+  const sceneWindow = document.querySelector<HTMLElement>('.scene-window');
+  const sceneWalls: Record<string, HTMLElement | null> = {
+    north: document.querySelector<HTMLElement>('.scene-wall-back'),
+    east: document.querySelector<HTMLElement>('.scene-wall-right'),
+    south: document.querySelector<HTMLElement>('.scene-wall-front'),
+    west: document.querySelector<HTMLElement>('.scene-wall-left'),
+  };
+  const roomSummary = document.querySelector<HTMLElement>('#room-summary');
+  const sceneStatus = document.querySelector<HTMLElement>('#scene-status');
+  const planInput = document.querySelector<HTMLInputElement>('#floor-plan');
+  const planFileStatus = document.querySelector<HTMLElement>('#plan-file-status');
+  const planPreview = document.querySelector<HTMLElement>('#plan-preview');
+  const planPreviewImage = document.querySelector<HTMLImageElement>('#plan-preview-image');
+  const widthInput = document.querySelector<HTMLInputElement>('#room-width');
+  const lengthInput = document.querySelector<HTMLInputElement>('#room-length');
+  const doorWallInput = document.querySelector<HTMLSelectElement>('#door-wall');
+  const doorOffsetInput = document.querySelector<HTMLInputElement>('#door-offset');
+  const windowWallInput = document.querySelector<HTMLSelectElement>('#window-wall');
+  const windowOffsetInput = document.querySelector<HTMLInputElement>('#window-offset');
+  const planDrawing = document.querySelector<SVGGElement>('#plan-drawing');
+  const planEmptyState = document.querySelector<SVGTextElement>('#plan-empty-state');
+  const planOutline = document.querySelector<SVGRectElement>('#plan-outline');
+  const planDoorMarker = document.querySelector<SVGLineElement>('#plan-door-marker');
+  const planWindowMarker = document.querySelector<SVGLineElement>('#plan-window-marker');
+  const planWidthLabel = document.querySelector<SVGTextElement>('#plan-width-label');
+  const planLengthLabel = document.querySelector<SVGTextElement>('#plan-length-label');
+  const planNorthLabel = document.querySelector<SVGTextElement>('#plan-north-label');
+  const planEditorStatus = document.querySelector<HTMLElement>('#plan-editor-status');
+  const planFurniture = document.querySelector<SVGGElement>('#plan-furniture');
+  const planRugMarker = document.querySelector<SVGRectElement>('#plan-rug-marker');
+  const planSofaMarker = document.querySelector<SVGRectElement>('#plan-sofa-marker');
+  const planTableMarker = document.querySelector<SVGCircleElement>('#plan-table-marker');
+  const planPlantMarker = document.querySelector<SVGCircleElement>('#plan-plant-marker');
+  const placementStatus = document.querySelector<HTMLElement>('#placement-status');
+  const placementInputs = {
+    sofa: {
+      x: document.querySelector<HTMLInputElement>('#sofa-x'),
+      y: document.querySelector<HTMLInputElement>('#sofa-y'),
+    },
+    sideTable: {
+      x: document.querySelector<HTMLInputElement>('#table-x'),
+      y: document.querySelector<HTMLInputElement>('#table-y'),
+    },
+    plant: {
+      x: document.querySelector<HTMLInputElement>('#plant-x'),
+      y: document.querySelector<HTMLInputElement>('#plant-y'),
+    },
+  };
+  const sceneRug = document.querySelector<HTMLElement>('.scene-rug');
+  const sceneSofa = document.querySelector<HTMLElement>('.scene-sofa');
+  const sceneTable = document.querySelector<HTMLElement>('.scene-table');
+  const scenePlant = document.querySelector<HTMLElement>('.scene-plant');
+  const exportStatus = document.querySelector<HTMLElement>('#export-status');
+  const providerSelect = document.querySelector<HTMLSelectElement>('#ai-provider');
+  const providerStatus = document.querySelector<HTMLElement>('#provider-status');
+  const assistantForm = document.querySelector<HTMLFormElement>('#assistant-form');
+  const designQuestion = document.querySelector<HTMLTextAreaElement>('#design-question');
+  const assistantButton = document.querySelector<HTMLButtonElement>('#ask-assistant');
+  const assistantResponse = document.querySelector<HTMLElement>('#assistant-response');
+
+  let planPreviewUrl: string | undefined;
+  let rotation = -32;
+  let configuredProviders = { googleAiStudio: false, groq: false };
+  let currentGeometry: RoomGeometry | undefined;
+
+  function drawOpeningMarker(
+    marker: SVGLineElement | null,
+    wall: string,
+    offsetM: number,
+    openingWidthM: number,
+    widthM: number,
+    lengthM: number,
+    x: number,
+    y: number,
+    planWidth: number,
+    planLength: number,
+  ): boolean {
+    if (!marker) return false;
+    const point = getOpeningPlanPoint(wall, offsetM, widthM, lengthM);
+    if (!point) {
+      marker.classList.add('hidden');
+      return false;
+    }
+
+    marker.classList.remove('hidden');
+    const centerX = x + point.x * planWidth;
+    const centerY = y + point.y * planLength;
+    const horizontalWall = wall === 'north' || wall === 'south';
+    const wallPixels = horizontalWall ? planWidth : planLength;
+    const halfOpening = Math.min(openingWidthM * Math.min(planWidth / widthM, planLength / lengthM) / 2, wallPixels / 4);
+    marker.setAttribute('x1', String(horizontalWall ? centerX - halfOpening : centerX));
+    marker.setAttribute('y1', String(horizontalWall ? centerY : centerY - halfOpening));
+    marker.setAttribute('x2', String(horizontalWall ? centerX + halfOpening : centerX));
+    marker.setAttribute('y2', String(horizontalWall ? centerY : centerY + halfOpening));
+    return true;
+  }
+
+  function readFurniturePlacements(): FurniturePlacements {
+    const readPoint = (inputs: { x: HTMLInputElement | null; y: HTMLInputElement | null }) => ({
+      x: inputs.x?.value.trim() ? Number(inputs.x.value) : Number.NaN,
+      y: inputs.y?.value.trim() ? Number(inputs.y.value) : Number.NaN,
+    });
+    return {
+      sofa: readPoint(placementInputs.sofa),
+      sideTable: readPoint(placementInputs.sideTable),
+      plant: readPoint(placementInputs.plant),
+    };
+  }
+
+  function summarizeFurniturePlacements(placements: FurniturePlacements): string {
+    return `furniture centres (north-west origin): sofa ${placements.sofa.x.toFixed(2)}, ${placements.sofa.y.toFixed(2)} m; side table ${placements.sideTable.x.toFixed(2)}, ${placements.sideTable.y.toFixed(2)} m; plant ${placements.plant.x.toFixed(2)}, ${placements.plant.y.toFixed(2)} m`;
+  }
+
+  function initializeFurniturePlacementInputs(widthM: number, lengthM: number): void {
+    const defaults = getDefaultFurniturePlacements(widthM, lengthM);
+    for (const [name, point] of Object.entries(defaults) as Array<[keyof FurniturePlacements, FurniturePlacements[keyof FurniturePlacements]]>) {
+      const inputs = placementInputs[name];
+      if (inputs.x) {
+        inputs.x.max = String(widthM);
+        if (!inputs.x.value) inputs.x.value = point.x.toFixed(2);
+      }
+      if (inputs.y) {
+        inputs.y.max = String(lengthM);
+        if (!inputs.y.value) inputs.y.value = point.y.toFixed(2);
+      }
+    }
+  }
+
+  function setPlanFurnitureMarker(
+    marker: SVGRectElement | SVGCircleElement | null,
+    point: { x: number; y: number },
+    widthM: number,
+    lengthM: number,
+    x: number,
+    y: number,
+    planWidth: number,
+    planLength: number,
+    markerWidthM: number,
+    markerLengthM: number,
+  ): void {
+    if (!marker) return;
+    const markerWidth = Math.min(markerWidthM, widthM) * planWidth / widthM;
+    const markerLength = Math.min(markerLengthM, lengthM) * planLength / lengthM;
+    const centerX = x + point.x / widthM * planWidth;
+    const centerY = y + point.y / lengthM * planLength;
+    if (marker instanceof SVGRectElement) {
+      marker.setAttribute('x', String(Math.max(x, Math.min(x + planWidth - markerWidth, centerX - markerWidth / 2))));
+      marker.setAttribute('y', String(Math.max(y, Math.min(y + planLength - markerLength, centerY - markerLength / 2))));
+      marker.setAttribute('width', String(markerWidth));
+      marker.setAttribute('height', String(markerLength));
+      return;
+    }
+    marker.setAttribute('cx', String(centerX));
+    marker.setAttribute('cy', String(centerY));
+    marker.setAttribute('r', String(Math.min(markerWidth, markerLength) / 2));
+  }
+
+  function updateSceneFurniture(geometry: RoomGeometry): boolean {
+    if (!sceneStage || !sceneRug || !sceneSofa || !sceneTable || !scenePlant) return false;
+    const placements = readFurniturePlacements();
+    const validationMessage = validateFurniturePlacements(placements, geometry.widthM, geometry.lengthM);
+    if (validationMessage) {
+      if (placementStatus) placementStatus.textContent = validationMessage;
+      return false;
+    }
+
+    const roomWidth = Number.parseFloat(sceneStage.style.getPropertyValue('--room-width'));
+    const roomDepth = Number.parseFloat(sceneStage.style.getPropertyValue('--room-depth'));
+    if (!Number.isFinite(roomWidth) || !Number.isFinite(roomDepth)) return false;
+    const positionAt = (
+      element: HTMLElement,
+      point: { x: number; y: number },
+      footprintWidthM: number,
+      footprintDepthM: number,
+      floorSurface: boolean,
+    ): void => {
+      const depth = point.y / geometry.lengthM * roomDepth - roomDepth / 2;
+      element.style.left = `${point.x / geometry.widthM * roomWidth}rem`;
+      element.style.right = 'auto';
+      element.style.top = '100%';
+      element.style.bottom = 'auto';
+      element.style.width = `${Math.min(footprintWidthM, geometry.widthM) / geometry.widthM * roomWidth}rem`;
+      element.style.height = `${Math.min(footprintDepthM, geometry.lengthM) / geometry.lengthM * roomDepth}rem`;
+      element.style.transform = floorSurface
+        ? `translate(-50%, -50%) translateZ(${depth}rem) rotateX(90deg)`
+        : `translate(-50%, -100%) translateZ(${depth}rem)`;
+    };
+
+    positionAt(sceneRug, placements.sofa, 2.5, 1.5, true);
+    positionAt(sceneSofa, placements.sofa, 2.0, 0.9, false);
+    positionAt(sceneTable, placements.sideTable, 0.8, 0.65, false);
+    sceneTable.style.top = 'calc(100% - 1rem)';
+    sceneTable.style.height = '0.35rem';
+    positionAt(scenePlant, placements.plant, 0.4, 0.4, false);
+    return true;
+  }
+
+  function renderPlanEditor(): void {
+    const widthM = Number(widthInput?.value);
+    const lengthM = Number(lengthInput?.value);
+    if (!planDrawing || !planEmptyState || !planEditorStatus) return;
+
+    if (!Number.isFinite(widthM) || widthM <= 0 || !Number.isFinite(lengthM) || lengthM <= 0) {
+      planDrawing.classList.add('hidden');
+      planEmptyState.classList.remove('hidden');
+      planEditorStatus.textContent = 'Enter room width and length to draw the 2D plan preview.';
+      return;
+    }
+
+    initializeFurniturePlacementInputs(widthM, lengthM);
+    const planWidth = Math.min(296 / widthM, 198 / lengthM) * widthM;
+    const planLength = Math.min(296 / widthM, 198 / lengthM) * lengthM;
+    const x = (400 - planWidth) / 2;
+    const y = (300 - planLength) / 2;
+    planDrawing.classList.remove('hidden');
+    planEmptyState.classList.add('hidden');
+    planOutline?.setAttribute('x', String(x));
+    planOutline?.setAttribute('y', String(y));
+    planOutline?.setAttribute('width', String(planWidth));
+    planOutline?.setAttribute('height', String(planLength));
+    planWidthLabel?.setAttribute('x', String(x + planWidth / 2));
+    planWidthLabel?.setAttribute('y', String(y - 12));
+    if (planWidthLabel) planWidthLabel.textContent = `${widthM.toFixed(2)} m`;
+    const lengthLabelX = x + planWidth + 26;
+    const lengthLabelY = y + planLength / 2;
+    planLengthLabel?.setAttribute('transform', `rotate(90 ${lengthLabelX} ${lengthLabelY})`);
+    if (planLengthLabel) planLengthLabel.textContent = `${lengthM.toFixed(2)} m`;
+    planNorthLabel?.setAttribute('x', String(x + planWidth / 2));
+    planNorthLabel?.setAttribute('y', String(y - 28));
+
+    const doorWall = doorWallInput?.value ?? '';
+    const doorOffsetM = doorOffsetInput?.value.trim() ? Number(doorOffsetInput.value) : Number.NaN;
+    const doorVisible = drawOpeningMarker(
+      planDoorMarker,
+      doorWall,
+      doorOffsetM,
+      0.9,
+      widthM,
+      lengthM,
+      x,
+      y,
+      planWidth,
+      planLength,
+    );
+    const windowWall = windowWallInput?.value ?? 'none';
+    const windowOffsetM = windowOffsetInput?.value.trim() ? Number(windowOffsetInput.value) : Number.NaN;
+    const windowVisible = windowWall !== 'none' && drawOpeningMarker(
+      planWindowMarker,
+      windowWall,
+      windowOffsetM,
+      1.2,
+      widthM,
+      lengthM,
+      x,
+      y,
+      planWidth,
+      planLength,
+    );
+    if (windowWall === 'none') planWindowMarker?.classList.add('hidden');
+
+    const placements = readFurniturePlacements();
+    const placementError = validateFurniturePlacements(placements, widthM, lengthM);
+    const showFurniture = !placementError && planFurniture !== null;
+    planFurniture?.classList.toggle('hidden', !showFurniture);
+    if (showFurniture) {
+      setPlanFurnitureMarker(planRugMarker, placements.sofa, widthM, lengthM, x, y, planWidth, planLength, 2.5, 1.5);
+      setPlanFurnitureMarker(planSofaMarker, placements.sofa, widthM, lengthM, x, y, planWidth, planLength, 1.9, 0.8);
+      setPlanFurnitureMarker(planTableMarker, placements.sideTable, widthM, lengthM, x, y, planWidth, planLength, 0.7, 0.6);
+      setPlanFurnitureMarker(planPlantMarker, placements.plant, widthM, lengthM, x, y, planWidth, planLength, 0.4, 0.4);
+    }
+    if (placementStatus) {
+      placementStatus.textContent = placementError
+        ?? `Sofa ${placements.sofa.x.toFixed(2)}, ${placements.sofa.y.toFixed(2)} m · side table ${placements.sideTable.x.toFixed(2)}, ${placements.sideTable.y.toFixed(2)} m · plant ${placements.plant.x.toFixed(2)}, ${placements.plant.y.toFixed(2)} m.`;
+    }
+    if (currentGeometry && !placementError && updateSceneFurniture(currentGeometry)) {
+      if (roomSummary) roomSummary.textContent = `${roomSummary.textContent?.split(' · furniture centres')[0] ?? ''} · ${summarizeFurniturePlacements(placements)}`;
+      if (sceneStatus) sceneStatus.textContent = 'Furniture positions updated from the placement editor in the 2D plan and illustrative 3D preview.';
+    }
+
+    const windowSummary = windowWall === 'none'
+      ? 'no window'
+      : windowVisible ? `window on ${windowWall} at ${windowOffsetM.toFixed(2)} m` : 'window offset needs adjustment';
+    planEditorStatus.textContent = `2D plan preview: ${widthM.toFixed(2)} m × ${lengthM.toFixed(2)} m; ${doorVisible ? `door on ${doorWall} at ${doorOffsetM.toFixed(2)} m` : 'door offset needs adjustment'}; ${windowSummary}.`;
+  }
+
+  [
+    widthInput,
+    lengthInput,
+    doorWallInput,
+    doorOffsetInput,
+    windowWallInput,
+    windowOffsetInput,
+    ...Object.values(placementInputs).flatMap((inputs) => [inputs.x, inputs.y]),
+  ].forEach((input) => {
+    input?.addEventListener('input', renderPlanEditor);
+    input?.addEventListener('change', renderPlanEditor);
+  });
+
+  [widthInput, lengthInput, document.querySelector<HTMLInputElement>('#room-height'), doorWallInput, doorOffsetInput, windowWallInput, windowOffsetInput].forEach((input) => {
+    input?.addEventListener('input', invalidateConvertedGeometry);
+    input?.addEventListener('change', invalidateConvertedGeometry);
+  });
+
+  function invalidateConvertedGeometry(): void {
+    if (!currentGeometry) return;
+    currentGeometry = undefined;
+    roomScene?.classList.add('hidden');
+    if (roomFormStatus) {
+      roomFormStatus.textContent = 'Room measurements or openings changed. Convert the updated plan again to refresh the 3D preview.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-amber-200');
+    }
+  }
+
+  function positionSceneOpening(
+    element: HTMLElement | null,
+    wall: string,
+    offsetM: number,
+    geometry: RoomGeometry,
+    roomWidth: number,
+    openingWidth: number,
+  ): boolean {
+    if (!element || !sceneWalls[wall]) return false;
+    if (!getOpeningPlanPoint(wall, offsetM, geometry.widthM, geometry.lengthM)) return false;
+    const scale = roomWidth / geometry.widthM;
+    const offsetAlongWall = wall === 'south' ? geometry.widthM - offsetM : offsetM;
+    sceneWalls[wall]?.append(element);
+    element.style.left = `${offsetAlongWall * scale - openingWidth / 2}rem`;
+    element.style.transform = 'none';
+    return true;
+  }
+
+  function updateSceneGeometry(geometry: RoomGeometry): boolean {
+    if (!sceneStage || !sceneRoom || !sceneDoor || !sceneWindow) return false;
+    const scale = Math.min(22 / geometry.widthM, 14 / geometry.lengthM);
+    const roomWidth = geometry.widthM * scale;
+    const roomDepth = geometry.lengthM * scale;
+    const roomHeight = geometry.heightM / 5 * 13;
+    sceneStage.style.setProperty('--room-width', `${roomWidth}rem`);
+    sceneStage.style.setProperty('--room-depth', `${roomDepth}rem`);
+    sceneStage.style.setProperty('--room-height', `${roomHeight}rem`);
+    sceneStage.style.setProperty('--room-depth-half', `${roomDepth / 2}rem`);
+    sceneStage.style.setProperty('--room-depth-negative-half', `${roomDepth / -2}rem`);
+    sceneStage.style.setProperty('--room-width-half', `${roomWidth / 2}rem`);
+
+    const doorWidth = Math.min(3.2, Math.max(1.4, scale * 0.9));
+    sceneDoor.style.width = `${doorWidth}rem`;
+    sceneDoor.style.height = `${Math.min(roomHeight - 0.5, Math.max(3, geometry.heightM / 5 * 9))}rem`;
+    const doorPositioned = positionSceneOpening(
+      sceneDoor,
+      geometry.doorWall,
+      geometry.doorOffsetM,
+      geometry,
+      roomWidth,
+      doorWidth,
+    );
+
+    const hasWindow = geometry.windowWall !== 'none' && geometry.windowOffsetM !== null;
+    sceneWindow.classList.toggle('hidden', !hasWindow);
+    const windowWidth = Math.min(4.2, Math.max(1.6, scale * 1.2));
+    if (hasWindow) {
+      sceneWindow.style.width = `${windowWidth}rem`;
+      sceneWindow.style.height = `${Math.min(3.2, Math.max(1.8, roomHeight * 0.24))}rem`;
+      sceneWindow.style.top = `${Math.min(4, roomHeight * 0.28)}rem`;
+    }
+    const windowPositioned = !hasWindow || positionSceneOpening(
+      sceneWindow,
+      geometry.windowWall,
+      geometry.windowOffsetM ?? 0,
+      geometry,
+      roomWidth,
+      windowWidth,
+    );
+
+    sceneRoom.setAttribute(
+      'aria-label',
+      `${geometry.widthM.toFixed(2)} by ${geometry.lengthM.toFixed(2)} metre illustrative room preview with a ${geometry.doorWall} wall door${hasWindow ? ` and ${geometry.windowWall} wall window` : ''}`,
+    );
+    return doorPositioned && windowPositioned;
+  }
+
+  function setPlanFileStatus(message: string, isError = false): void {
+    if (!planFileStatus) return;
+    planFileStatus.textContent = message;
+    planFileStatus.classList.toggle('text-rose-300', isError);
+    planFileStatus.classList.toggle('text-slate-300', !isError);
+  }
+
+  planInput?.addEventListener('change', () => {
+    const file = planInput.files?.[0];
+    if (planPreviewUrl) URL.revokeObjectURL(planPreviewUrl);
+    planPreviewUrl = undefined;
+    planPreview?.classList.add('hidden');
+    planPreviewImage?.classList.add('hidden');
+    if (planPreviewImage) planPreviewImage.removeAttribute('src');
+
+    if (!file) {
+      setPlanFileStatus('');
+      return;
+    }
+
+    const acceptedTypes = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
+    if (!acceptedTypes.includes(file.type) || file.size > 12 * 1024 * 1024) {
+      planInput.value = '';
+      setPlanFileStatus('Choose a PNG, JPG, WEBP, or PDF file that is 12 MB or smaller.', true);
+      return;
+    }
+
+    if (file.type.startsWith('image/')) {
+      planPreviewUrl = URL.createObjectURL(file);
+      if (planPreviewImage) {
+        planPreviewImage.src = planPreviewUrl;
+        planPreviewImage.classList.remove('hidden');
+      }
+      planPreview?.classList.remove('hidden');
+    }
+
+    setPlanFileStatus(`${file.name} selected. It stays in this tab and is not uploaded.`);
+  });
+
+  windowWallInput?.addEventListener('change', () => {
+    if (!windowOffsetInput || !windowWallInput) return;
+    const hasWindow = windowWallInput.value !== 'none';
+    windowOffsetInput.disabled = !hasWindow;
+    windowOffsetInput.required = hasWindow;
+    renderPlanEditor();
+  });
+  renderPlanEditor();
+
+  document.querySelector('[data-testid="reset-placements"]')?.addEventListener('click', () => {
+    const widthM = Number(widthInput?.value);
+    const lengthM = Number(lengthInput?.value);
+    if (!Number.isFinite(widthM) || widthM <= 0 || !Number.isFinite(lengthM) || lengthM <= 0) return;
+    const defaults = getDefaultFurniturePlacements(widthM, lengthM);
+    for (const [name, point] of Object.entries(defaults) as Array<[keyof FurniturePlacements, FurniturePlacements[keyof FurniturePlacements]]>) {
+      const inputs = placementInputs[name];
+      if (inputs.x) inputs.x.value = point.x.toFixed(2);
+      if (inputs.y) inputs.y.value = point.y.toFixed(2);
+    }
+    renderPlanEditor();
+    if (placementStatus) placementStatus.textContent = 'Sample furniture positions restored.';
+  });
+
+  roomForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!roomFormStatus || !roomScene || !sceneStage || !roomSummary) return;
+
+    const values = new FormData(roomForm);
+    const scaleReference = String(values.get('scaleReference')).trim();
+    if (!scaleReference) {
+      roomFormStatus.textContent = 'Enter a scale reference or state that the measurements were taken directly.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
+    const geometry: RoomGeometry = {
+      widthM: Number(values.get('widthM')),
+      lengthM: Number(values.get('lengthM')),
+      heightM: Number(values.get('heightM')),
+      doorWall: String(values.get('doorWall')),
+      doorOffsetM: Number(values.get('doorOffsetM')),
+      windowWall: String(values.get('windowWall')),
+      windowOffsetM: values.get('windowOffsetM') ? Number(values.get('windowOffsetM')) : null,
+    };
+    const validationMessage = validateRoomGeometry(geometry);
+    if (validationMessage) {
+      roomFormStatus.textContent = validationMessage;
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
+    const placements = readFurniturePlacements();
+    const placementError = validateFurniturePlacements(placements, geometry.widthM, geometry.lengthM);
+    if (placementError) {
+      roomFormStatus.textContent = placementError;
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
+    if (!updateSceneGeometry(geometry)) {
+      roomFormStatus.textContent = 'Could not map the confirmed opening positions to the 3D preview. Check the selected walls and offsets.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+    if (!updateSceneFurniture(geometry)) {
+      roomFormStatus.textContent = 'Could not apply the current furniture positions to the 3D preview. Check the placement editor values.';
+      roomFormStatus.classList.remove('text-emerald-200');
+      roomFormStatus.classList.add('text-rose-300');
+      roomScene.classList.add('hidden');
+      return;
+    }
+
+    const windowSummary = geometry.windowWall === 'none'
+      ? 'no window marked'
+      : `window ${geometry.windowWall} wall at ${geometry.windowOffsetM?.toFixed(2)} m`;
+    roomFormStatus.textContent = '2D layout converted to an illustrative 3D room preview. Room proportions and opening positions follow your confirmed measurements.';
+    roomSummary.textContent = `${geometry.widthM.toFixed(2)} m × ${geometry.lengthM.toFixed(2)} m × ${geometry.heightM.toFixed(2)} m · scale source: ${scaleReference} · door ${geometry.doorWall} wall at ${geometry.doorOffsetM.toFixed(2)} m · ${windowSummary} · ${summarizeFurniturePlacements(placements)}`;
+    currentGeometry = geometry;
+    roomScene.classList.remove('hidden');
+    sceneStage.dataset.lighting = 'daylight';
+    sceneStage.style.setProperty('--scene-rotation', `${rotation}deg`);
+    roomFormStatus.classList.remove('text-rose-300');
+    roomFormStatus.classList.add('text-emerald-200');
+    if (sceneStatus) {
+      sceneStatus.textContent = '2D layout converted. Room shape and opening markers use your measurements; furniture and lighting remain illustrative.';
+    }
+  });
+
+  async function exportScene(format: 'png' | 'jpeg'): Promise<void> {
+    if (!currentGeometry || !exportStatus) return;
+    const placements = readFurniturePlacements();
+    const validationMessage = validateFurniturePlacements(placements, currentGeometry.widthM, currentGeometry.lengthM);
+    if (validationMessage) {
+      exportStatus.textContent = validationMessage;
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 900;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      exportStatus.textContent = 'Could not create an image for download in this browser.';
+      return;
+    }
+
+    drawRoomPreview(context, currentGeometry, placements);
+    const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mimeType, 0.92));
+    if (!blob) {
+      exportStatus.textContent = 'Could not export the room preview image.';
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `intero-room-concept.${format === 'jpeg' ? 'jpg' : 'png'}`;
+    downloadLink.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportStatus.textContent = `Illustrative room concept downloaded as ${format.toUpperCase()}.`;
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-export-format]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const format = button.dataset.exportFormat;
+      if (format === 'png' || format === 'jpeg') void exportScene(format);
+    });
+  });
+
+  function updateRotation(nextRotation: number): void {
+    rotation = nextRotation;
+    sceneStage?.style.setProperty('--scene-rotation', `${rotation}deg`);
+    if (sceneStatus) sceneStatus.textContent = `View rotated to ${Math.round(rotation)} degrees.`;
+  }
+
+  document.querySelector('[data-testid="rotate-left"]')?.addEventListener('click', () => updateRotation(rotation - 25));
+  document.querySelector('[data-testid="rotate-right"]')?.addEventListener('click', () => updateRotation(rotation + 25));
+  document.querySelector('[data-testid="reset-view"]')?.addEventListener('click', () => updateRotation(-32));
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lighting-preset]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const preset = button.dataset.lightingPreset;
+      if (!preset || !sceneStage) return;
+      sceneStage.dataset.lighting = preset;
+      document.querySelectorAll('[data-lighting-preset]').forEach((candidate) => {
+        candidate.setAttribute('aria-pressed', String(candidate === button));
+      });
+      if (sceneStatus) sceneStatus.textContent = `${button.textContent?.trim() ?? 'Lighting'} appearance selected. This is a visual preset, not a lighting simulation.`;
+    });
+  });
+
+  sceneStage?.addEventListener('pointerdown', (event: PointerEvent) => {
+    sceneStage.setPointerCapture(event.pointerId);
+    sceneStage.dataset.dragX = String(event.clientX);
+  });
+  sceneStage?.addEventListener('pointermove', (event: PointerEvent) => {
+    if (!sceneStage.hasPointerCapture(event.pointerId)) return;
+    const previousX = Number(sceneStage.dataset.dragX);
+    if (!Number.isFinite(previousX)) return;
+    updateRotation(rotation + (event.clientX - previousX) * 0.6);
+    sceneStage.dataset.dragX = String(event.clientX);
+  });
+  sceneStage?.addEventListener('pointerup', (event: PointerEvent) => {
+    if (sceneStage.hasPointerCapture(event.pointerId)) sceneStage.releasePointerCapture(event.pointerId);
+    delete sceneStage.dataset.dragX;
+  });
+  sceneStage?.addEventListener('pointercancel', () => {
+    delete sceneStage.dataset.dragX;
+  });
+
+  async function loadProviderStatus(): Promise<void> {
+    if (!providerSelect || !providerStatus || !designQuestion || !assistantButton) return;
+    try {
+      const response = await fetch('/api/providers', { headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error('Provider status unavailable');
+      configuredProviders = await response.json() as typeof configuredProviders;
+    } catch {
+      providerStatus.textContent = 'Provider status is unavailable. The room intake and demo layout still work.';
+      providerSelect.disabled = true;
+      return;
+    }
+
+    const googleOption = providerSelect.querySelector<HTMLOptionElement>('option[value="google-ai-studio"]');
+    const groqOption = providerSelect.querySelector<HTMLOptionElement>('option[value="groq"]');
+    if (googleOption) googleOption.disabled = !configuredProviders.googleAiStudio;
+    if (groqOption) groqOption.disabled = !configuredProviders.groq;
+    const available = configuredProviders.googleAiStudio || configuredProviders.groq;
+    providerSelect.disabled = !available;
+    designQuestion.disabled = !available;
+    assistantButton.disabled = !available;
+
+    if (configuredProviders.googleAiStudio) providerSelect.value = 'google-ai-studio';
+    else if (configuredProviders.groq) providerSelect.value = 'groq';
+    providerStatus.textContent = available
+      ? 'Configured providers are available. API keys stay on the server.'
+      : 'No provider is configured. Set GOOGLE_AI_STUDIO_API_KEY or GROQ_API_KEY on the Node server to enable text suggestions.';
+  }
+
+  assistantForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!providerSelect || !designQuestion || !assistantButton || !assistantResponse) return;
+    assistantButton.disabled = true;
+    assistantResponse.textContent = 'Getting text suggestions…';
+    try {
+      const response = await fetch('/api/design-advice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          provider: providerSelect.value,
+          prompt: designQuestion.value,
+          roomSummary: roomSummary?.textContent ?? '',
+        }),
+      });
+      const result = await response.json() as { advice?: string; error?: string };
+      if (!response.ok) throw new Error(result.error ?? 'The suggestion request could not be completed.');
+      assistantResponse.textContent = `${result.advice ?? ''}\n\nText suggestion only — no geometry or render was generated.`;
+    } catch (error) {
+      assistantResponse.textContent = error instanceof Error ? error.message : 'The suggestion request could not be completed.';
+    } finally {
+      assistantButton.disabled = !configuredProviders.googleAiStudio && !configuredProviders.groq;
+    }
+  });
+
+  window.addEventListener('pagehide', () => {
+    if (planPreviewUrl) URL.revokeObjectURL(planPreviewUrl);
+  });
+
+  void loadProviderStatus();
+</script>

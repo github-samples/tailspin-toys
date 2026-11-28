@@ -18,7 +18,8 @@ db/catalog.json
 
 # environment variables
 .env
-.env.production
+.env.*
+!.env.example
 
 # logs
 npm-debug.log*

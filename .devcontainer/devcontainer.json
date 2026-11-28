@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-	"name": "Tailspin Toys (Astro + Drizzle + Node SQLite)",
+	"name": "Intero (Astro + Node)",
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:5-26-bookworm",
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {}
@@ -16,8 +16,8 @@
 			]
 		}
 	},
-	// Install Node dependencies, Playwright's Chromium browser, and set up the local SQLite database.
-	"postCreateCommand": "npm ci && npx playwright install --with-deps chromium && npm run db:setup",
-	// Astro dev/preview server.
+	// Install Node dependencies and Playwright's Chromium browser.
+	"postCreateCommand": "npm ci && npx playwright install --with-deps chromium",
+	// Intero Node runtime.
 	"forwardPorts": [4321]
 }

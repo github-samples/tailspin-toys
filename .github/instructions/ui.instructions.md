@@ -4,7 +4,7 @@ description: 'Central UI strategy and component development philosophy'
 
 # UI Component Strategy
 
-This file defines the central UI development strategy for Tailspin Toys. Technology-specific guidance is in separate instruction files.
+This file defines the central UI development strategy for Intero. Technology-specific guidance is in separate instruction files.
 
 ## Component Architecture
 

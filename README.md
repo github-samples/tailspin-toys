@@ -1,118 +1,79 @@
-# Tailspin Toys
+# Intero
 
-Tailspin Toys is a crowdfunding platform for games with a developer theme. The project is a website for a fictional game crowd-funding company, built as a single [Astro](https://astro.build/) site (fully prerendered/static output) styled with [Tailwind CSS](https://tailwindcss.com/). Its data lives in a local SQLite database accessed through [Drizzle ORM](https://orm.drizzle.team/) and Node.js's built-in SQLite driver; pages query the database directly in frontmatter at build time, so there is no separate backend service.
+Intero is an interior-design workspace prototype. It guides a user through creating a measured 2D floor plan, confirming room dimensions and opening positions, and converting that plan into a clearly labeled illustrative 3D room preview. Optional provider-backed design help returns text suggestions only.
 
-## Architecture
+## What this prototype does
 
-- **Astro 7** — pages, layouts, components, and routing. `output: 'static'`, so the whole site is prerendered to HTML at build time.
-- **Drizzle ORM + Node SQLite** — the data layer. The schema lives in `db/schema.ts`; data is seeded from `db/games.csv`. Migrations are managed with `drizzle-kit`.
-- **Tailwind CSS v4** — styling via utility classes (dark theme).
-- **Vitest** — unit tests for the data layer and pure transforms.
-- **Playwright** — end-to-end tests run against the built static site.
+- Accepts PNG, JPG, WEBP, and PDF floor-plan references up to 12 MB. The file is previewed in the browser tab only; it is not uploaded or retained.
+- Draws a live top-down 2D plan from user-entered dimensions and door/window wall offsets. Users review and confirm the measurements before selecting **Convert 2D layout to 3D preview**.
+- Includes a placement editor for the sofa, side table, and plant, with coordinates in metres from the north-west room corner. Edits update the floor plan and converted 3D concept; placements must stay within the room.
+- Uses the same confirmed geometry and furniture positions for the illustrative 3D room shell and opening markers. It does not interpret a plan image or automatically convert its scale; optional files are references only.
+- Shows a CSS 3D concept scene with drag/keyboard orbit controls and visual appearance presets. Furniture is generic; the scene is not a measured CAD model, a photorealistic render, a 360-degree photo, or a physical lighting simulation.
+- Downloads a generated schematic of the current room concept as PNG or JPEG. The exported image is a separate illustrative rendering of the confirmed geometry and furniture positions, not a screenshot of the interactive CSS scene or a photorealistic render.
+- Can request text-only design suggestions from Google AI Studio or Groq when the corresponding server environment variable is configured. Suggestions do not create or validate geometry or renders.
+- Includes an on-page walkthrough for choosing a configured AI provider and making a useful prompt. The helper does not change the layout, and prompts/room summaries are sent to the selected provider.
 
-Development commands are defined in `package.json`: npm runs Astro for the dev server, static build, and preview. The `predev` and `prebuild` npm hooks run the TypeScript database migration and seed tasks in `db/`, writing to the gitignored `tailspin.db` file.
+Intero does not persist room projects or user accounts. Do not enter private or identifying details into the optional assistant.
 
-## Using this template
+## Runtime and architecture
 
-This repository is a GitHub template. When you create a new repository from it, a one-time **Bootstrap template issues** workflow (`.github/workflows/bootstrap-issues.yml`) runs automatically on the first push to `main` and opens a set of starter issues describing suggested first features. Each issue is defined by a Markdown file in `.github/bootstrap-issues/` — the first heading becomes the issue title and the remaining content becomes the body — so you can edit, add, or remove files there to control which issues are created.
+- **Astro 7** builds the browser UI into `dist/`.
+- **Node.js 22.13 or later** runs `server.mjs`, which serves the built files and provides same-origin `/api/providers` and `/api/design-advice` routes.
+- **Tailwind CSS v4** styles the interface; the room concept uses a small amount of custom CSS 3D.
+- **Vitest** covers geometry validation, plan coordinate mapping, furniture placement validation, and provider request handling. **Playwright** covers the live 2D editor, placement edits, 2D-to-3D conversion, PNG/JPEG export, local-only plan selection, scene controls, and accessibility.
 
-The workflow only runs on repositories created from the template (the `if: ${{ !github.event.repository.is_template }}` guard skips the template itself), and after creating the issues it removes itself and the `.github/bootstrap-issues/` folder in a cleanup commit so it never runs again.
+The AI keys are read only by `server.mjs` from process environment variables. Provider status responses expose booleans only. The API does not log keys or provider error response bodies. The demo has no authentication or durable rate limiting; put authentication and rate limits in front of it before exposing provider-backed calls publicly.
 
-## Weekly workshop PR triage
+## Local setup
 
-The [weekly cloud workflow](.github/workflows/weekly-workshop-triage.md) runs every Monday at 08:00 UTC and supports manual dispatch. It reads outside-contributor PRs as untrusted data, with read access scoped to this repository and the [workshop curriculum](https://github.com/github-samples/copilot-workshops). It can only close clearly misplaced workshop PRs with an explanation or add `needs-maintainer-screening` for human review. Maintainer and bot PRs are exempt; issues are not triaged. Threat detection remains enabled. The triager never approves or merges PRs.
-
-## Getting started
-
-Install dependencies once with [Node.js LTS](https://nodejs.org/), version 22.23.4 or later:
+Use Node.js 22.13 or later and public npm:
 
 ```bash
 npm ci
-npx playwright install chromium   # only needed to run the E2E tests
+Copy-Item .env.example .env
 ```
 
-### npm registry
-
-Cloud dependency installation uses [public npm](https://registry.npmjs.org/). GitHub Actions and Copilot setup set `NPM_CONFIG_REGISTRY` to public npm. Committed lockfiles must contain only public npm tarball URLs; CI rejects other tarball origins.
-
-## Launch the site
+Add a key to `.env` only for a provider you want to enable. Keep `.env` private; it is ignored by Git. Never paste key values into source files, issue comments, or logs. With no keys set, the design workspace works and provider-backed suggestions remain disabled.
 
 ```bash
 npm run dev
 ```
 
-`predev` migrates and seeds the local database first. Then navigate to the [website](http://localhost:4321) to see the site!
+This builds the Astro site and starts the Node host on `http://localhost:4321`. The dev command serves the built app rather than running Astro hot reload; restart it after source changes.
 
-To preview a production build instead:
+To run a production-style build and host:
 
 ```bash
-npm run build      # prebuild migrates + seeds, then builds the static site
-npm run preview
+npm run build
+npm start
 ```
 
-## Database
+For hosted deployment, build with `npm ci` and `npm run build`, then run `npm start` in a Node 22.13+ environment. Configure provider keys in the host's secret/environment settings; a `.env` file is not required. The server listens on `PORT` (default `4321`) and `HOST` (default `0.0.0.0`). Do not deploy only the `dist/` folder to a static host: the provider routes require the Node process.
 
-The SQLite database is built from `db/games.csv` — there is no live data to migrate.
+### Optional provider configuration
 
-The legacy `@esbuild-kit/core-utils` dependency used by `drizzle-kit` is scoped to patched `esbuild` 0.25.12 through [`package.json`](package.json). Other esbuild consumers keep their own dependency ranges.
+Set either or both keys on the server:
 
-```bash
-npm run db:generate   # generate a migration after editing db/schema.ts
-npm run db:migrate    # apply migrations
-npm run db:seed       # seed from games.csv (idempotent)
-npm run db:setup      # migrate + seed (run automatically by predev/prebuild)
-npm run db:export     # write the seeded catalog to db/catalog.json
-```
+- `GOOGLE_AI_STUDIO_API_KEY`
+- `GROQ_API_KEY`
 
-> [!NOTE]
-> Seeding is idempotent — it skips games that already exist (matched by title) rather than reconciling changed rows. CI always starts from a clean database, so it reflects `games.csv` exactly. Locally, if you edit or remove rows in `games.csv`, delete `tailspin.db` and re-run `npm run db:setup` to fully regenerate.
+Optional model overrides are `GOOGLE_AI_STUDIO_MODEL` and `GROQ_MODEL`. Defaults are supplied by the app. No provider key is needed to build, test, or use the non-AI design workspace.
 
-## Running tests
+## Tests and checks
 
 ```bash
-npm run test:unit   # Vitest unit tests (transforms + data-access helpers)
-npm run test:e2e    # Playwright E2E tests (builds + previews the static site first)
-```
-
-CI runs the E2E suite in the official Playwright container, with its image tag derived from the exact `@playwright/test` version in `package-lock.json` so the preinstalled browsers match the test runner.
-
-## Linting
-
-The frontend uses ESLint to enforce code quality across TypeScript and Astro files. Run it with:
-
-```bash
+npm run test:unit
 npm run lint
+npm run typecheck:all
+npm run test:e2e
 ```
 
-ESLint is also run automatically in CI on pull requests to `main`.
+The existing catalog seed/database utilities remain under `db/` for the starter repository, but are not part of Intero's runtime workflow.
 
-## Type checking
+## Repository workflows
 
-The project runs on **TypeScript 7** (the native Go compiler, `tsgo`) for type checking, adopted side-by-side via the [`@typescript/native-preview`](https://www.npmjs.com/package/@typescript/native-preview) package. The classic `typescript` package is intentionally kept at v6 so ESLint + `typescript-eslint` and `astro check` keep working unchanged — TypeScript 7's programmatic API isn't ready for those tools yet.
+This repository retains its workshop pull-request triage workflow. It reads outside-contributor pull requests as untrusted data and is restricted to closing clearly misplaced workshop submissions or applying `needs-maintainer-screening`; it does not approve or merge pull requests.
 
-```bash
-npm run typecheck        # tsgo (TS 7) type-checks the pure TypeScript (db/, src/lib/, src/types/, configs, tests)
-npm run typecheck:astro  # astro sync + astro check type-check .astro files (on the classic TypeScript package)
-npm run typecheck:all    # both of the above
-```
+## License
 
-`tsgo` runs against [`tsconfig.tsgo.json`](tsconfig.tsgo.json), a scoped config that excludes `.astro` files (which the native compiler doesn't understand). Type checking runs automatically in CI on pull requests to `main`.
-
-> [!NOTE]
-> The native compiler is used only for type checking (`--noEmit`); the site is still built by `astro build` (Vite/esbuild). The classic `typescript` package stays on v6 until `typescript-eslint` and `@astrojs/check` support the native API (~TS 7.1); a Dependabot `ignore` in `.github/dependabot.yml` holds the classic `typescript@7` bump until then.
-
-## License 
-
-This project is licensed under the terms of the MIT open source license. Please refer to the [LICENSE](./LICENSE) for the full terms.
-
-## Maintainers 
-
-You can find the list of maintainers in [CODEOWNERS](./.github/CODEOWNERS).
-
-## Support
-
-This project is provided as-is, and may be updated over time. If you have questions, please open an issue.
-
-## Disclaimer
-
-This app is not intended for use in a production environment, nor is it built as an example of what a production app should look like.
+This project is licensed under the MIT license. See [LICENSE](./LICENSE).

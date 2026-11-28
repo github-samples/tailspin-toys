@@ -7,7 +7,7 @@ allowed-tools:
 
 # Quality Checks
 
-This skill runs unit tests, lint, and type checks for a single Astro application (Astro 7 + Drizzle ORM/Node SQLite). Run the npm commands defined in `package.json` from the repository root.
+This skill runs unit tests, lint, and type checks for Intero (Astro 7 static UI, Node.js host, optional provider endpoints). Run the npm commands defined in `package.json` from the repository root.
 
 ## Quick Reference
 
@@ -30,7 +30,7 @@ npm run test:unit
 ```
 
 - Runs Vitest (`vitest run`) over `db/**/*.test.ts` and `src/**/*.test.ts`.
-- Covers the pure seed/transform functions and the Drizzle data-access helpers against an in-memory Node SQLite database.
+- Covers the legacy catalog helpers/transforms and Intero's pure geometry/provider helpers.
 
 ### Lint
 
@@ -68,18 +68,18 @@ npm ci
 
 ---
 
-### Database / Build-Time Data
+### Legacy Catalog Data
 
-**Symptom**: Empty pages, `no such table`, or a build that produces no game pages.
+Intero's UI does not query the legacy game catalog. `npm run build`, `npm run dev`, and `npm run test:e2e` do not require a catalog database.
 
-The SQLite database must be migrated and seeded **before** `astro build`. The `prebuild` and `predev` npm hooks run the TypeScript migration and seed tasks in `db/` automatically when you use `npm run build` or `npm run dev`. To set up the database on its own:
+When explicitly changing or exercising the legacy catalog, set it up manually:
 
 ```bash
 npm run db:setup     # db:migrate + db:seed
 ```
 
 - The database lives at `tailspin.db` (gitignored) and is regenerated from `db/games.csv`.
-- To force a clean rebuild: `rm -f tailspin.db && rm -rf dist && npm run build`.
+- A clean Intero build needs only `npm run build`.
 
 ---
 
@@ -115,7 +115,7 @@ npx vitest run src/lib/games.test.ts
 **Symptom**: Unit tests, lint, or type checks pass locally but fail in CI (or vice versa).
 
 - **Node version mismatch**: CI uses the current Node LTS release.
-- **Database state**: CI always builds from a clean seed. Locally, delete `tailspin.db` and rebuild if you suspect stale data.
+- **Database state**: the legacy catalog is outside the Intero build; run `npm run db:setup` only when testing its maintenance tasks.
 
 ---
 

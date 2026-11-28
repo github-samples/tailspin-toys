@@ -5,7 +5,7 @@ applyTo: 'db/**/*.ts,src/lib/*.ts'
 
 # Drizzle ORM + Node SQLite Instructions
 
-The app's data lives in a local SQLite database accessed through **Drizzle ORM** over Node.js's built-in `node:sqlite` driver. It is consumed at **build time** from Astro page frontmatter — there is no runtime API server. Schema changes are managed with **drizzle-kit** migrations.
+The original game catalog remains in `db/` as a legacy starter scaffold. It uses local SQLite through **Drizzle ORM** and Node.js's built-in `node:sqlite` driver, but Intero's current pages and runtime do not query it. Schema changes to that legacy catalog are managed with **drizzle-kit** migrations.
 
 ## Layout
 
@@ -16,7 +16,7 @@ The app's data lives in a local SQLite database accessed through **Drizzle ORM**
 - `db/migrations/` — generated SQL migrations (do not hand-edit).
 - `db/test-helpers.ts` — `createTestDatabase()` returns a migrated in-memory Node SQLite db for tests.
 - `src/lib/db.ts` — `createDatabase(url)` / `getDatabase()` build the Drizzle client from `DATABASE_URL` (defaults to the local `tailspin.db` file).
-- `src/lib/games.ts` — typed, **injectable-db** data-access helpers used by pages and tests.
+- `src/lib/games.ts` — typed, **injectable-db** data-access helpers retained for legacy catalog tests and maintenance.
 
 ## Schema Conventions
 
@@ -33,8 +33,7 @@ The app's data lives in a local SQLite database accessed through **Drizzle ORM**
 3. Apply + seed locally: `npm run db:setup` (`db:migrate` + `db:seed`).
 4. Commit both the schema change **and** the generated migration in `db/migrations/`.
 
-> [!IMPORTANT]
-> The database must be migrated and seeded **before** `astro build`. The `prebuild`/`predev` npm scripts run `db:setup` automatically; CI relies on this ordering.
+The catalog's migration and seed commands are manual maintenance tasks. Intero's `astro build`, `npm run dev`, and Node host do not require a local catalog database.
 
 ## Data-Access Helpers (injectable db)
 
